@@ -1,7 +1,12 @@
 // app/layout.tsx
 import Link from "next/link";
 import "./globals.css"; // Import global styles
-import { ClerkProvider } from "@clerk/nextjs";
+import {
+  ClerkProvider,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+} from "@clerk/nextjs";
 
 export const metadata = {
   title: "Personal Finance Manager",
@@ -85,8 +90,19 @@ export default function RootLayout({
                 <h1 className=" pl-2 ">SpendLess | Personal Finance Manager</h1>
               </div>
 
-              <Link href="/dashboard">Dashboard</Link>
               <Link href="/">Home</Link>
+              <Link href="/dashboard">Dashboard</Link>
+
+              <span className=" absolute right-0 sign-in-container">
+                <SignedOut>
+                  <span className=" m-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <SignInButton mode="modal" />
+                  </span>
+                  <span className=" m-2 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                    <SignUpButton mode="modal" />
+                  </span>
+                </SignedOut>
+              </span>
             </nav>
           </header>
           <main>{children}</main>
