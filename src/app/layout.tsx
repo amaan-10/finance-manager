@@ -8,6 +8,23 @@ import {
   SignUpButton,
 } from "@clerk/nextjs";
 
+import { IBM_Plex_Mono, Courier_Prime, Roboto_Mono } from "next/font/google";
+
+const ibm = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+});
+
+const courier = Courier_Prime({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
+
+const roboto = Roboto_Mono({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+});
+
 export const metadata = {
   title: "Personal Finance Manager",
   description: "Manage your expenses and investments efficiently.",
@@ -21,10 +38,10 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body>
+        <body className={`${roboto.className}`}>
           <header>
             <nav>
-              <div className=" flex items-center">
+              <div className=" flex items-center font-extrabold">
                 {/* <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width={50}
