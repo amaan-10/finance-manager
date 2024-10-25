@@ -43,7 +43,7 @@ export default function RootLayout({
         <body className={`${roboto.className}`}>
           <header>
             <nav>
-              <div className=" p-5 flex items-center font-extrabold">
+              <div className=" p-5 pt-10 flex items-center font-extrabold">
                 {/* <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width={50}
@@ -136,8 +136,8 @@ export default function RootLayout({
               </div>
             </nav>
           </header>
-          <main>{children}</main>
-          <footer className=" text-gray-600">
+          <main className="px-10">{children}</main>
+          <footer className=" px-10 text-gray-600">
             © 2024 SpendLess | Personal Finance Manager
           </footer>
         </body>
