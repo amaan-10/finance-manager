@@ -137,7 +137,7 @@ export default function RootLayout({
             </nav>
           </header>
           <main className="px-10">{children}</main>
-          <footer className=" px-10 text-gray-600">
+          <footer className=" px-10 py-7 text-gray-600">
             © 2024 SpendLess | Personal Finance Manager
           </footer>
         </body>

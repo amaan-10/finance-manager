@@ -9,7 +9,7 @@ export default async function Home() {
   return (
     <div>
       <section>
-        <span className=" text-xl font-bold mt-4 flex gap-2">
+        <span className=" text-xl font-bold mt-4 mb-2 flex gap-2">
           Good Morning{suffix}!
           <Image height={24} width={28} src={WavingHand} alt="Waving Hand" />
         </span>
