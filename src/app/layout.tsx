@@ -106,7 +106,7 @@ export default function RootLayout({
                     <path d="M16 30h-6a3 3 0 0 1-3-3v-2h2v2a1 1 0 0 0 1 1h6zM19 14a3 3 0 1 1 3-3 3 3 0 0 1-3 3zm0-4a1 1 0 1 0 1 1 1 1 0 0 0-1-1z" />
                   </g>
                 </svg>
-                <h1 className=" pl-2 text-lg">
+                <h1 className=" pl-3 text-xl">
                   SpendLess | Personal Finance Manager
                 </h1>
               </div>
@@ -116,21 +116,21 @@ export default function RootLayout({
                   <Link href="/dashboard">Dashboard</Link>
                 </SignedIn>
                 <SignedOut>
-                  <Link className=" text-gray-400" href={""}>
+                  <Link className=" text-gray-400" href="/dashboard">
                     Dashboard
                   </Link>
                 </SignedOut>
-                <span className=" mr-5 absolute right-0 sign-in-container">
+                <span className="  mr-5 absolute right-0 sign-in-container">
                   <SignedOut>
                     <span className=" m-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                      <SignInButton mode="modal" />
+                      <SignInButton />
                     </span>
                     <span className=" m-2 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                      <SignUpButton mode="modal" />
+                      <SignUpButton />
                     </span>
                   </SignedOut>
                   <SignedIn>
-                    <UserButton />
+                    <UserButton showName />
                   </SignedIn>
                 </span>
               </div>
