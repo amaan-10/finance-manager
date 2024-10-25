@@ -3,9 +3,11 @@ import Link from "next/link";
 import "./globals.css"; // Import global styles
 import {
   ClerkProvider,
+  SignedIn,
   SignedOut,
   SignInButton,
   SignUpButton,
+  UserButton,
 } from "@clerk/nextjs";
 
 import { IBM_Plex_Mono, Courier_Prime, Roboto_Mono } from "next/font/google";
@@ -41,7 +43,7 @@ export default function RootLayout({
         <body className={`${roboto.className}`}>
           <header>
             <nav>
-              <div className=" flex items-center font-extrabold">
+              <div className=" p-5 flex items-center font-extrabold">
                 {/* <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width={50}
@@ -104,26 +106,40 @@ export default function RootLayout({
                     <path d="M16 30h-6a3 3 0 0 1-3-3v-2h2v2a1 1 0 0 0 1 1h6zM19 14a3 3 0 1 1 3-3 3 3 0 0 1-3 3zm0-4a1 1 0 1 0 1 1 1 1 0 0 0-1-1z" />
                   </g>
                 </svg>
-                <h1 className=" pl-2 ">SpendLess | Personal Finance Manager</h1>
+                <h1 className=" pl-2 text-lg">
+                  SpendLess | Personal Finance Manager
+                </h1>
               </div>
-
-              <Link href="/">Home</Link>
-              <Link href="/dashboard">Dashboard</Link>
-
-              <span className=" absolute right-0 sign-in-container">
+              <div className="ml-5">
+                <Link href="/">Home</Link>
+                <SignedIn>
+                  <Link href="/dashboard">Dashboard</Link>
+                </SignedIn>
                 <SignedOut>
-                  <span className=" m-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    <SignInButton mode="modal" />
-                  </span>
-                  <span className=" m-2 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                    <SignUpButton mode="modal" />
-                  </span>
+                  <Link className=" text-gray-400" href={""}>
+                    Dashboard
+                  </Link>
                 </SignedOut>
-              </span>
+                <span className=" mr-5 absolute right-0 sign-in-container">
+                  <SignedOut>
+                    <span className=" m-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                      <SignInButton mode="modal" />
+                    </span>
+                    <span className=" m-2 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                      <SignUpButton mode="modal" />
+                    </span>
+                  </SignedOut>
+                  <SignedIn>
+                    <UserButton />
+                  </SignedIn>
+                </span>
+              </div>
             </nav>
           </header>
           <main>{children}</main>
-          <footer>© 2024 SpendLess | Personal Finance Manager</footer>
+          <footer className=" text-gray-600">
+            © 2024 SpendLess | Personal Finance Manager
+          </footer>
         </body>
       </html>
     </ClerkProvider>
