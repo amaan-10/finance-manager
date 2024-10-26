@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
 
 // app/api/expenses/route.ts
 export async function GET(req: NextRequest) {
+  await connectToDatabase(); // Ensure MongoDB is connected
   const { userId } = getAuth(req); // Get the authenticated user ID
   const client = await clientPromise;
   const expenses = await client
