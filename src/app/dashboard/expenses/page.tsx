@@ -16,7 +16,7 @@ export default function ExpensesPage() {
 
   useEffect(() => {
     const fetchExpenses = async () => {
-      const response = await fetch("api/expenses");
+      const response = await fetch("/api/expenses");
       const data = await response.json();
       setExpenses(data);
     };
