@@ -10,11 +10,12 @@ export async function POST(req: NextRequest) {
     await connectToDatabase(); // Ensure MongoDB is connected
 
     const { userId } = getAuth(req); // Get the authenticated user ID
-    //console.log(userId);
+    console.log(userId);
     const client = await clientPromise;
     const body = await req.json();
 
     const expense = new ExpenseModel({ ...body, userId }); // Include userId in the expense
+    console.log(expense);
     await expense.save();
 
     return NextResponse.json(expense);
