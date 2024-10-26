@@ -1,24 +1,43 @@
 // app/dashboard/expenses/page.tsx
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+interface Expense {
+  category: string;
+  amount: number;
+  date: Date;
+  notes?: string;
+}
 
 export default function ExpensesPage() {
-  const [expenses, setExpenses] = useState([
-    { id: 1, category: "Food", amount: 50, date: "2024-10-22" },
-  ]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
 
-  const handleAddExpense = () => {
-    setExpenses([
-      ...expenses,
-      {
-        id: expenses.length + 1,
-        category,
-        amount: Number(amount),
-        date: new Date().toISOString(),
-      },
-    ]);
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      const response = await fetch("/api/expenses");
+      const data = await response.json();
+      setExpenses(data);
+    };
+
+    fetchExpenses();
+  }, []);
+
+  const handleAddExpense = async () => {
+    const newExpense = {
+      category,
+      amount: parseFloat(amount),
+      date: new Date(),
+    };
+    await fetch("/api/expenses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newExpense),
+    });
+
+    // Refresh the expense list
+    setExpenses([...expenses, newExpense]);
     setCategory("");
     setAmount("");
   };
@@ -28,10 +47,10 @@ export default function ExpensesPage() {
       <h2>Expenses</h2>
       <h2 className=" bg-yellow-300">Work in Progress...</h2>
       <ul className="mt-2">
-        {expenses.map((expense) => (
-          <li key={expense.id}>
+        {expenses.map((expense, index) => (
+          <li key={index}>
             {expense.category} - <span className=" font-serif">₹</span>
-            {expense.amount} on {expense.date}
+            {expense.amount} on {new Date(expense.date).toLocaleDateString()}
           </li>
         ))}
       </ul>
