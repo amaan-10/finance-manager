@@ -45,24 +45,22 @@ export default function DashboardPage() {
           ) : error ? (
             <p>Error: {error}</p> // Error state
           ) : !expenses || expenses.length === 0 ? (
-            <p>No expenses found for this user.</p> // No data found
+            <p>- No expenses found.</p> // No data found
           ) : (
             // Render expense list if data exists
             <>
               {expenses.map((expense, index) => (
                 <li key={index}>
-                  {expense._id.month}, {expense._id.year} -{" "}
-                  <span className=" font-serif">₹</span>
-                  {expense.totalAmount}
+                  {`${expense._id.month}, ${expense._id.year} - Total: $${expense.totalAmount}`}
                 </li>
               ))}
             </>
           )}
         </div>
-        <div>
+        <div className=" pt-3">
           Remaining Budget: <span className=" font-serif">₹</span>200
         </div>
-        <div>
+        <div className=" pt-3">
           Total Investments: <span className=" font-serif">₹</span>--
         </div>
       </div>
