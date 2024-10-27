@@ -4,7 +4,7 @@ import WavingHand from "../assets/Waving Hand.png";
 
 export default async function Home() {
   const user = await currentUser();
-  const username = user?.username;
+  const username = user?.firstName;
   const suffix = username ? `, ${username}` : "";
   return (
     <div>
