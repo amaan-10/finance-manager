@@ -11,14 +11,22 @@ interface Expense {
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
 
   useEffect(() => {
     const fetchExpenses = async () => {
-      const response = await fetch("/api/expenses");
-      const data = await response.json();
-      setExpenses(data);
+      try {
+        const response = await fetch("/api/expenses");
+        const data = await response.json();
+        setExpenses(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchExpenses();
@@ -46,14 +54,22 @@ export default function ExpensesPage() {
     <section className="mt-5">
       <h2>Expenses</h2>
       <h2 className=" bg-yellow-300">Work in Progress...</h2>
-      <ul className="mt-2">
-        {expenses.map((expense, index) => (
-          <li key={index}>
-            {expense.category} - <span className=" font-serif">₹</span>
-            {expense.amount} on {new Date(expense.date).toLocaleDateString()}
-          </li>
-        ))}
-      </ul>
+      {loading ? (
+        <p>Loading expenses...</p> // Loading state
+      ) : error ? (
+        <p>Error: {error}</p> // Error state
+      ) : !expenses || expenses.length === 0 ? (
+        <p>- No expenses till now.</p> // No data found
+      ) : (
+        <ul className="mt-2">
+          {expenses.map((expense, index) => (
+            <li key={index}>
+              {expense.category} - <span className=" font-serif">₹</span>
+              {expense.amount} on {new Date(expense.date).toLocaleDateString()}
+            </li>
+          ))}
+        </ul>
+      )}
       <div className="mt-2 flex gap-3">
         <input
           type="text"
