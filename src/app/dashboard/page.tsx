@@ -10,11 +10,11 @@ interface Expense {
   };
 }
 
-interface Budget {
+type Budget = {
   budget: number;
   spent: number;
   remaining: number;
-}
+};
 
 // app/dashboard/page.tsx
 export default function DashboardPage() {
@@ -48,7 +48,7 @@ export default function DashboardPage() {
         const res = await fetch(`/api/budgets/monthly`);
         const data = await res.json();
         console.log("Monthly Budget:", data);
-        setBudget(data);
+        setBudget(data.remaining);
         console.log(data);
       } catch (err: any) {
         setBudgetError(err.message);
@@ -99,7 +99,7 @@ export default function DashboardPage() {
               // Render expense list if data exists
               <>
                 <span className=" font-serif">₹</span>
-                {`${budgets.remaining}`}
+                {budgets}
               </>
             )}
           </div>
