@@ -87,6 +87,16 @@ export default function ExpensesPage() {
         />
         <button onClick={handleAddExpense}>Add Expense</button>
       </div>
+      <div className="mt-2 flex gap-3">
+        <input
+          type="number"
+          placeholder="Budget"
+          className=" pl-1"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+        <button onClick={handleAddExpense}>Add Budget</button>
+      </div>
     </section>
   );
 }
