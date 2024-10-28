@@ -10,6 +10,12 @@ interface Expense {
   };
 }
 
+interface Budget {
+  budget: number;
+  spent: number;
+  remaining: number;
+}
+
 // app/dashboard/page.tsx
 export default function DashboardPage() {
   const [expenses, setExpenses] = useState<Expense[] | null>(null);
@@ -32,6 +38,27 @@ export default function DashboardPage() {
     fetchMonthlyExpenses();
   }, []);
 
+  const [budgets, setBudget] = useState<Budget[] | null>(null);
+  const [budgetLoading, setBudgetLoading] = useState(true);
+  const [budgetError, setBudgetError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchMonthlyBudget = async () => {
+      try {
+        const res = await fetch(`/api/budgets/monthly`);
+        const data = await res.json();
+        console.log("Monthly Budget:", data);
+        setBudget(data);
+        console.log(data);
+      } catch (err: any) {
+        setBudgetError(err.message);
+      } finally {
+        setBudgetLoading(false);
+      }
+    };
+    fetchMonthlyBudget();
+  }, []);
+
   return (
     <section className=" mt-5">
       <h2>Dashboard Overview</h2>
@@ -51,14 +78,31 @@ export default function DashboardPage() {
             <>
               {expenses.map((expense, index) => (
                 <li key={index}>
-                  {`${expense._id.month}, ${expense._id.year} - Total: $${expense.totalAmount}`}
+                  {`${expense._id.month}, ${expense._id.year} - Total: `}
+                  <span className=" font-serif">₹</span>
+                  {`${expense.totalAmount}`}
                 </li>
               ))}
             </>
           )}
         </div>
         <div className=" pt-3">
-          Remaining Budget: <span className=" font-serif">₹</span>200
+          <div>
+            Remaining Budget:{" "}
+            {budgetLoading ? (
+              <p>Loading budgets...</p> // Loading state
+            ) : budgetError ? (
+              <p>Error: {budgetError}</p> // Error state
+            ) : !budgets || budgets.length === 0 ? (
+              <p>- No budgets found.</p> // No data found
+            ) : (
+              // Render expense list if data exists
+              <>
+                <span className=" font-serif">₹</span>
+                {`${budgets.remaining}`}
+              </>
+            )}
+          </div>
         </div>
         <div className=" pt-3">
           Total Investments: <span className=" font-serif">₹</span>--
