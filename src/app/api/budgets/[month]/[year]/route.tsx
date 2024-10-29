@@ -6,14 +6,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { month: number; year: number } }
+  { params }: { params: { month: string; year: string } }
 ) {
   try {
     await connectToDatabase(); // Ensure MongoDB is connected
 
-    const { month, year } = await params;
+    const { month, year } = params;
     await clientPromise;
     const client = await clientPromise;
+    const db = client.db();
 
     const { userId } = getAuth(req); // Get the authenticated user ID
     //const { amount, month, year } = await req.json();
