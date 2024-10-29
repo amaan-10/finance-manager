@@ -94,8 +94,12 @@ export default function BudgetsPage() {
       console.log(month, year);
 
       if (userConfirmed) {
-        const res = await fetch(`/api/budgets/${month}/${year}`, {
+        const res = await fetch("/api/budgets", {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ month, year }),
         });
 
         const data = await res.json();
