@@ -38,7 +38,7 @@ export default function ExpensesPage() {
       amount: parseFloat(amount),
       date: new Date(),
     };
-    await fetch("/api/expenses", {
+    await fetch("/api/expenses/${month}", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newExpense),
@@ -59,7 +59,7 @@ export default function ExpensesPage() {
       ) : error ? (
         <p>Error: {error}</p> // Error state
       ) : !expenses || expenses.length === 0 ? (
-        <p>- No expenses till now.</p> // No data found
+        <p>- No expenses till now.</p>
       ) : (
         <ul className="mt-2">
           {expenses.map((expense, index) => (
@@ -70,6 +70,7 @@ export default function ExpensesPage() {
           ))}
         </ul>
       )}
+      <p className="pt-3">Please add your expenses here.</p>
       <div className="mt-2 flex gap-3">
         <input
           type="text"
