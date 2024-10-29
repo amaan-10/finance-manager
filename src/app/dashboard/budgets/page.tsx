@@ -49,25 +49,41 @@ export default function BudgetsPage() {
     }
 
     const [year, month] = monthYear.split("-").map(Number);
-    console.log(year, month);
+    //console.log(year, month);
 
     const newBudget = {
       amount: parseFloat(amount),
       month, // You can also use a Date
       year,
     };
-    await fetch("/api/budgets", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newBudget),
-    });
 
-    //Refresh the budgets list
-    setBudgets([...budgets, newBudget]);
+    try {
+      const res = await fetch("/api/budgets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newBudget),
+      });
 
-    setMonth("");
-    setAmount("");
-    console.log(monthYear);
+      //Refresh the budgets list
+      setBudgets([...budgets, newBudget]);
+
+      setMonth("");
+      setAmount("");
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(data.message);
+        window.location.reload();
+      } else {
+        alert(data.message); // Show error message if budget already exists
+        window.location.reload();
+      }
+    } catch (err: any) {
+      alert(err.message);
+      console.log(err);
+    }
+    //console.log(monthYear);
   };
 
   return (
@@ -79,16 +95,24 @@ export default function BudgetsPage() {
       ) : error ? (
         <p>Error: {error}</p> // Error state
       ) : !budgets || budgets.length === 0 ? (
-        <p>- No budgets till now.</p> // No data found
+        <>
+          <p>- No budgets till now.</p>
+          <p className="pt-3">Please set your budget here.</p>
+        </>
       ) : (
-        <ul className="mt-2">
-          {budgets.map((budget, index) => (
-            <li key={index}>
-              <span className=" font-serif">₹</span>
-              {budget.amount} on {budget.month}, {budget.year}
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="mt-2">
+            {budgets.map((budget, index) => (
+              <li key={index}>
+                Budget - <span className=" font-serif">₹</span>
+                {budget.amount} for {budget.month}, {budget.year}
+              </li>
+            ))}
+          </ul>
+          <p className="pt-3">
+            Please re-enter the values to update the Budget.
+          </p>
+        </>
       )}
       <div className="mt-2 flex gap-3">
         <input
