@@ -4,15 +4,14 @@ import { connectToDatabase } from "@/lib/mongoose";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-interface Params {
-  params: { month: string; year: string };
-}
-
-export async function DELETE(req: NextRequest, context: Params) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { month: string; year: string } }
+) {
   try {
     await connectToDatabase(); // Ensure MongoDB is connected
 
-    const { month, year } = await context.params;
+    const { month, year } = await params;
     await clientPromise;
     const client = await clientPromise;
 
