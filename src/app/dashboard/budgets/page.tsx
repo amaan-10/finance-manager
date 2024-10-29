@@ -86,6 +86,36 @@ export default function BudgetsPage() {
     //console.log(monthYear);
   };
 
+  const handleDeleteBudget = async (month: number, year: number) => {
+    try {
+      const userConfirmed = confirm(
+        "Are you sure you want to delete this budget?"
+      );
+      console.log(month, year);
+
+      if (userConfirmed) {
+        const res = await fetch(`/api/budgets/${month}/${year}`, {
+          method: "DELETE",
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert(data.message);
+          window.location.reload();
+        } else {
+          alert(data.message); // Show error message if budget already exists
+          window.location.reload();
+        }
+      } else {
+        alert("Action canceled!");
+      }
+    } catch (err: any) {
+      alert(err.message);
+      console.log(err);
+    }
+  };
+
   return (
     <section className="mt-5">
       <h2>Budgets</h2>
@@ -106,6 +136,12 @@ export default function BudgetsPage() {
               <li key={index}>
                 Budget - <span className=" font-serif">₹</span>
                 {budget.amount} for {budget.month}, {budget.year}
+                <button
+                  className=" hover:underline pl-16 text-red-600"
+                  onClick={() => handleDeleteBudget(budget.month, budget.year)}
+                >
+                  Delete Budget
+                </button>
               </li>
             ))}
           </ul>
