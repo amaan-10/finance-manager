@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { month: string; year: string } }
+  { params }: { params: { month: number; year: number } }
 ) {
   try {
     await connectToDatabase(); // Ensure MongoDB is connected
