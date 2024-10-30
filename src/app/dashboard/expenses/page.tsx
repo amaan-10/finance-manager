@@ -38,16 +38,61 @@ export default function ExpensesPage() {
       amount: parseFloat(amount),
       date: new Date(),
     };
-    await fetch("/api/expenses/${month}", {
+    const res = await fetch("/api/expenses", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newExpense),
     });
 
+    const data = await res.json();
+
+    if (res.ok) {
+      alert(data.message);
+      window.location.reload();
+    }
+
     // Refresh the expense list
     setExpenses([...expenses, newExpense]);
     setCategory("");
     setAmount("");
+  };
+
+  const handleDeleteExpenses = async (
+    category: string,
+    amount: number,
+    date: Date
+  ) => {
+    try {
+      const userConfirmed = confirm(
+        "Are you sure you want to delete this expense?"
+      );
+      // console.log(category, amount, date);
+
+      if (userConfirmed) {
+        const res = await fetch("/api/expenses", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ category, amount, date }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert(data.message);
+          window.location.reload();
+        } else {
+          alert(data.message); // Show error message if budget already exists
+          window.location.reload();
+        }
+      } else {
+        alert("Action canceled!");
+      }
+    } catch (err: any) {
+      alert(err.message);
+      console.log(err);
+    }
   };
 
   return (
@@ -63,10 +108,25 @@ export default function ExpensesPage() {
       ) : (
         <ul className="mt-2">
           {expenses.map((expense, index) => (
-            <li key={index}>
-              {expense.category} - <span className=" font-serif">₹</span>
-              {expense.amount} on {new Date(expense.date).toLocaleDateString()}
-            </li>
+            <span className="grid grid-cols-3" key={index}>
+              <span className=" ">
+                {expense.category} - <span className=" font-serif">₹</span>
+                {expense.amount} on{" "}
+                {new Date(expense.date).toLocaleDateString()}
+              </span>
+              <button
+                className=" text-left hover:underline text-red-600"
+                onClick={() =>
+                  handleDeleteExpenses(
+                    expense.category,
+                    expense.amount,
+                    expense.date
+                  )
+                }
+              >
+                Delete Expense
+              </button>
+            </span>
           ))}
         </ul>
       )}
