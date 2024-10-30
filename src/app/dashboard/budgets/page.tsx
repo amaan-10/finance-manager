@@ -91,7 +91,7 @@ export default function BudgetsPage() {
       const userConfirmed = confirm(
         "Are you sure you want to delete this budget?"
       );
-      console.log(month, year);
+      //console.log(month, year);
 
       if (userConfirmed) {
         const res = await fetch("/api/budgets", {
