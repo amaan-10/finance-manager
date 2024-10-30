@@ -27,7 +27,7 @@ export default function DashboardPage() {
       try {
         const res = await fetch(`/api/expenses/monthly`);
         const data = await res.json();
-        console.log("Monthly Expenses:", data);
+        //console.log("Monthly Expenses:", data);
         setExpenses(data);
       } catch (err: any) {
         setError(err.message);
@@ -47,9 +47,9 @@ export default function DashboardPage() {
       try {
         const res = await fetch(`/api/budgets/monthly`);
         const data = await res.json();
-        console.log("Monthly Budget:", data);
+        //console.log("Monthly Budget:", data);
         setBudget(data.remaining);
-        console.log(data);
+        //console.log(data);
       } catch (err: any) {
         setBudgetError(err.message);
       } finally {
