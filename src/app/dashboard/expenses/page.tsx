@@ -108,7 +108,7 @@ export default function ExpensesPage() {
       ) : (
         <ul className="mt-2">
           {expenses.map((expense, index) => (
-            <span className="grid grid-cols-3" key={index}>
+            <span className="grid md:grid-cols-2 lg:grid-cols-3" key={index}>
               <span className=" ">
                 {expense.category} - <span className=" font-serif">₹</span>
                 {expense.amount} on{" "}
