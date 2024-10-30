@@ -164,7 +164,7 @@ export default function BudgetsPage() {
         />
         <input
           type="month"
-          placeholder="MM-YYYY"
+          placeholder={monthYear}
           className=" pl-1"
           value={monthYear}
           onChange={(e) => setMonth(e.target.value)}
