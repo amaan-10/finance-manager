@@ -61,7 +61,7 @@ const InvestmentsPage: React.FC = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(id),
       });
-      console.log(id);
+      //console.log(id);
       const data = await response.json();
       if (response.ok) {
         setInvestments((prev) => prev.filter((inv) => inv._id !== id));
@@ -87,7 +87,7 @@ const InvestmentsPage: React.FC = () => {
         if (!response.ok) throw new Error("Error fetching stock data");
 
         const data = await response.json();
-        console.log(data);
+        //console.log(data);
 
         setStocks(data);
       } catch (err) {
@@ -105,8 +105,9 @@ const InvestmentsPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    //console.log(type, name);
     const newInvestment = { type, amount, date, name };
-    console.log(newInvestment);
+    //console.log(newInvestment);
 
     try {
       const response = await fetch("/api/investments", {
@@ -157,18 +158,18 @@ const InvestmentsPage: React.FC = () => {
           <input
             type="text"
             placeholder="Investment Type"
-            value={type}
+            value={type.toLowerCase()}
             className=" pl-1"
-            onChange={(e) => setType(e.target.value)}
+            onChange={(e) => setType(e.target.value.toLowerCase())}
             required
           />
-          {type.toLocaleLowerCase() === "stock" ? (
+          {type === "stock" ? (
             <input
               type="text"
               placeholder="Stock Symbol Name"
-              value={name}
+              value={name.toUpperCase()}
               className="pl-1"
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value.toUpperCase())}
               required
             />
           ) : (
