@@ -17,6 +17,7 @@ interface StockData {
   amount: number;
   inv_date: string;
   status: string;
+  id: string;
   c: number; // Current price
   d: number;
   dp: number;
@@ -164,9 +165,9 @@ const InvestmentsPage: React.FC = () => {
           {type.toLocaleLowerCase() === "stock" ? (
             <input
               type="text"
-              placeholder="Stock Name"
+              placeholder="Stock Symbol Name"
               value={name}
-              className=" pl-1"
+              className="pl-1"
               onChange={(e) => setName(e.target.value)}
               required
             />
@@ -195,7 +196,7 @@ const InvestmentsPage: React.FC = () => {
         {stockData.length != 0 ? (
           <>
             <h2 className="pt-5 font-extrabold text-xl">
-              Stock Portfolio(Only US stock exchange)
+              Stock Portfolio (Only US - [NYSE, NASDAQ] stock exchange)
             </h2>
             <ul>
               {stockData.map((stock, index) => (
@@ -231,8 +232,16 @@ const InvestmentsPage: React.FC = () => {
                       >
                         Track Here
                       </Link>
+                      <br />
                     </>
                   )}
+
+                  <button
+                    className=" text-left font-medium hover:underline text-red-600"
+                    onClick={() => deleteInvestment(stock?.id)}
+                  >
+                    Delete Investment
+                  </button>
                 </li>
               ))}
             </ul>
