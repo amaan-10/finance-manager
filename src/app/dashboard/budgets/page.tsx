@@ -150,7 +150,7 @@ export default function BudgetsPage() {
             ))}
           </ul>
           <p className="pt-3">
-            Please re-enter the values to update the Budget.
+            Please re-enter the amount with same month to update the Budget.
           </p>
         </>
       )}
