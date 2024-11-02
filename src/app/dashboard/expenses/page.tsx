@@ -112,7 +112,7 @@ export default function ExpensesPage() {
               <span className=" ">
                 {expense.category} - <span className=" font-serif">₹</span>
                 {expense.amount} on{" "}
-                {new Date(expense.date).toLocaleDateString()}
+                {new Date(expense.date).toLocaleDateString("en-UK")}
               </span>
               <button
                 className=" text-left hover:underline text-red-600"
