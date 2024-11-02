@@ -16,6 +16,16 @@ type Budget = {
   remaining: number;
 };
 
+type Investment = {
+  totalAmount: number;
+  _id: string;
+};
+
+type TotalInvestment = {
+  totalAmount: number;
+  _id: null;
+};
+
 // app/dashboard/page.tsx
 export default function DashboardPage() {
   const [expenses, setExpenses] = useState<Expense[] | null>(null);
@@ -59,6 +69,31 @@ export default function DashboardPage() {
     fetchMonthlyBudget();
   }, []);
 
+  const [investments, setInvestment] = useState<Investment[] | null>(null);
+  const [totalInvestment, setTotalInvestment] = useState<
+    TotalInvestment[] | null
+  >(null);
+  const [investmentLoading, setInvestmentLoading] = useState(true);
+  const [investmentError, setInvestmentError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTotalInvestment = async () => {
+      try {
+        const res = await fetch(`/api/investments/total`);
+        const data = await res.json();
+        //console.log("Total Investment:", data);
+        setInvestment(data.byType);
+        setTotalInvestment(data.investment.totalAmount);
+        //console.log(data);
+      } catch (err: any) {
+        setInvestmentError(err.message);
+      } finally {
+        setInvestmentLoading(false);
+      }
+    };
+    fetchTotalInvestment();
+  }, []);
+
   return (
     <section className=" mt-5">
       <h2>Dashboard Overview</h2>
@@ -94,7 +129,7 @@ export default function DashboardPage() {
             ) : budgetError ? (
               <p>Error: {budgetError}</p> // Error state
             ) : !budgets || budgets.length === 0 ? (
-              <p>- No budgets found.</p> // No data found
+              <p>- No budget set for this month.</p> // No data found
             ) : (
               // Render expense list if data exists
               <>
@@ -105,7 +140,27 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className=" pt-3">
-          Total Investments: <span className=" font-serif">₹</span>--
+          Total Investments:{" "}
+          {investmentLoading ? (
+            <p>Loading Total Investments...</p> // Loading state
+          ) : investmentError ? (
+            <p>Error: {investmentError}</p> // Error state
+          ) : !investments || investments.length === 0 ? (
+            <p>- No investment found.</p> // No data found
+          ) : (
+            // Render expense list if data exists
+            <>
+              {totalInvestment}
+              <div className="pt-1"></div>
+              {investments.map((investment, index) => (
+                <li key={index}>
+                  {`${investment._id} - Total: `}
+                  <span className=" font-serif">₹</span>
+                  {`${investment.totalAmount}`}
+                </li>
+              ))}
+            </>
+          )}
         </div>
       </div>
       <nav className="mt-5">
