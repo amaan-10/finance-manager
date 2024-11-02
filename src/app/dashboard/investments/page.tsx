@@ -128,7 +128,7 @@ const InvestmentsPage: React.FC = () => {
   return (
     <section className=" mt-5">
       <h2>Investments Overview</h2>
-      <h2 className=" bg-yellow-300">Coming Soon...</h2>
+      <h2 className=" bg-yellow-300">Work in Progress...</h2>
       <ul>
         {investments.map((inv) => (
           <span className="grid md:grid-cols-2 lg:grid-cols-3" key={inv._id}>
