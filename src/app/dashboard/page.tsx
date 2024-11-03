@@ -91,10 +91,12 @@ export default function DashboardPage() {
     };
     fetchTotalInvestment();
   }, []);
+  const currentHour = new Date().getHours();
 
   return (
     <section className=" mt-5">
       <h2 className=" text-2xl font-semibold">Dashboard Overview</h2>
+      {currentHour}
       <div className="mt-2">
         <div>
           <p className="text-lg font-normal">Monthly Expenses:</p>
