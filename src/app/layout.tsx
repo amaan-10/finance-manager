@@ -43,7 +43,7 @@ export default function RootLayout({
         <body className={`${roboto.className}`}>
           <header>
             <nav>
-              <div className=" p-5 pt-10 flex items-center font-extrabold">
+              <div className=" p-10 pt-10 flex items-center font-extrabold">
                 {/* <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width={50}
