@@ -5,14 +5,14 @@ import AnalysisSVG from "../assets/analysis-animate.svg";
 import FinanceSVG from "../assets/finance-animate.svg";
 import DataSVG from "../assets/financial-data-animate.svg";
 import RevenueSVG from "../assets/revenue-animate.svg";
-
+const currentHour = new Date().getHours();
 export default async function Home() {
   const user = await currentUser();
   const username = user?.firstName;
   const suffix = username ? `, ${username}` : "";
 
   // Get the current hour
-  const currentHour = new Date().getHours();
+
   let greeting: string;
 
   // Determine greeting based on the time of day
