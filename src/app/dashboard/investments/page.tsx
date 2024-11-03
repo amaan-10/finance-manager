@@ -33,7 +33,9 @@ const InvestmentsPage: React.FC = () => {
   //const [stockData, setStockData] = useState<StockData | null>(null);
   const [stockData, setStocks] = useState<StockData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingStocks, setLoadingStocks] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [stocksError, setStocksError] = useState<string | null>(null);
   const [type, setType] = useState("");
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
@@ -46,6 +48,7 @@ const InvestmentsPage: React.FC = () => {
       setInvestments(data);
       setLoading(false);
     } catch (error) {
+      setError((error as Error).message);
       console.error("Error fetching investments:", error);
     }
   };
@@ -91,16 +94,16 @@ const InvestmentsPage: React.FC = () => {
 
         setStocks(data);
       } catch (err) {
-        setError((err as Error).message);
+        setStocksError((err as Error).message);
       } finally {
-        setLoading(false);
+        setLoadingStocks(false);
       }
     };
 
     fetchStockData();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  // if (loading) return <p>Loading...</p>;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,31 +130,38 @@ const InvestmentsPage: React.FC = () => {
 
   return (
     <section className=" mt-5">
-      <h2>Investments Overview</h2>
-      <h2 className=" bg-yellow-300">Work in Progress...</h2>
-      <ul>
-        {investments.map((inv) => (
-          <span className="grid md:grid-cols-2 lg:grid-cols-3" key={inv._id}>
-            {inv.type !== "stock" ? (
-              <>
-                <span className=" ">
-                  {inv.type}: <span className=" font-serif">₹</span>
-                  {inv.amount} on{" "}
-                  {new Date(inv.date).toLocaleDateString("en-GB")}
-                </span>
-                <button
-                  className=" text-left hover:underline text-red-600"
-                  onClick={() => deleteInvestment(inv._id)}
-                >
-                  Delete Investment
-                </button>
-              </>
-            ) : (
-              ""
-            )}
-          </span>
-        ))}
-      </ul>
+      <h2 className=" text-2xl font-semibold">Investments</h2>
+      {loading ? (
+        <p>Loading investments...</p> // Loading state
+      ) : error ? (
+        <p>Error: {error}</p> // Error state
+      ) : !investments || investments.length === 0 ? (
+        <p>- No investments till now.</p>
+      ) : (
+        <ul>
+          {investments.map((inv) => (
+            <span className="grid md:grid-cols-2 lg:grid-cols-3" key={inv._id}>
+              {inv.type !== "stock" ? (
+                <>
+                  <span className=" ">
+                    {inv.type}: <span className=" font-serif">₹</span>
+                    {inv.amount} on{" "}
+                    {new Date(inv.date).toLocaleDateString("en-GB")}
+                  </span>
+                  <button
+                    className=" text-left hover:underline text-red-600"
+                    onClick={() => deleteInvestment(inv._id)}
+                  >
+                    Delete Investment
+                  </button>
+                </>
+              ) : (
+                ""
+              )}
+            </span>
+          ))}
+        </ul>
+      )}
 
       <form onSubmit={handleSubmit}>
         <div className="mt-2 flex gap-3">
@@ -194,11 +204,17 @@ const InvestmentsPage: React.FC = () => {
         </div>
       </form>
       <div>
-        {stockData.length != 0 ? (
-          <>
-            <h2 className="pt-5 font-extrabold text-xl">
-              Stock Portfolio (Only US - [NYSE, NASDAQ] stock exchange)
-            </h2>
+        <>
+          <h2 className="pt-5 font-extrabold text-xl">
+            Stock Portfolio (Only US - [NYSE, NASDAQ] stock exchange)
+          </h2>
+          {loadingStocks ? (
+            <p>Loading stocks invested...</p> // Loading state
+          ) : stocksError ? (
+            <p>Error: {stocksError}</p> // Error state
+          ) : !stockData || stockData.length === 0 ? (
+            <p>- No stock invested till now.</p>
+          ) : (
             <ul>
               {stockData.map((stock, index) => (
                 <li className="pt-3" key={index}>
@@ -246,10 +262,8 @@ const InvestmentsPage: React.FC = () => {
                 </li>
               ))}
             </ul>
-          </>
-        ) : (
-          ""
-        )}
+          )}
+        </>
       </div>
     </section>
   );
