@@ -5,35 +5,26 @@ import AnalysisSVG from "../assets/analysis-animate.svg";
 import FinanceSVG from "../assets/finance-animate.svg";
 import DataSVG from "../assets/financial-data-animate.svg";
 import RevenueSVG from "../assets/revenue-animate.svg";
-const currentHour = new Date().getHours();
+import Greeting from "./Greeting";
+
 export default async function Home() {
   const user = await currentUser();
   const username = user?.firstName;
   const suffix = username ? `, ${username}` : "";
 
-  // Get the current hour
-
-  let greeting: string;
-
-  // Determine greeting based on the time of day
-  if (currentHour >= 5 && currentHour < 12) {
-    greeting = "Good Morning";
-  } else if (currentHour >= 12 && currentHour < 17) {
-    greeting = "Good Afternoon";
-  } else if (currentHour >= 17 && currentHour < 24) {
-    greeting = "Good Evening";
-  } else {
-    greeting = "Good Night";
-  }
-
   return (
     <div>
       <section>
-        <span className=" text-3xl font-bold mt-5 mb-2 flex gap-2">
-          {greeting}
-          {currentHour}
+        <span className=" text-3xl font-bold mt-5 mb-2 flex">
+          <Greeting />
           {suffix}!
-          <Image height={30} width={36} src={WavingHand} alt="Waving Hand" />
+          <Image
+            className="ml-2"
+            height={30}
+            width={36}
+            src={WavingHand}
+            alt="Waving Hand"
+          />
         </span>
 
         <p className="text-lg">
