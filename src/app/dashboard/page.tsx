@@ -70,9 +70,7 @@ export default function DashboardPage() {
   }, []);
 
   const [investments, setInvestment] = useState<Investment[] | null>(null);
-  const [totalInvestment, setTotalInvestment] = useState<
-    TotalInvestment[] | null
-  >(null);
+  const [totalInvestment, setTotalInvestment] = useState<string>("");
   const [investmentLoading, setInvestmentLoading] = useState(true);
   const [investmentError, setInvestmentError] = useState<string | null>(null);
 
@@ -83,7 +81,7 @@ export default function DashboardPage() {
         const data = await res.json();
         //console.log("Total Investment:", data);
         setInvestment(data.byType);
-        setTotalInvestment(data.investment.totalAmount);
+        setTotalInvestment(data.totalAmount);
         //console.log(data);
       } catch (err: any) {
         setInvestmentError(err.message);
@@ -96,12 +94,10 @@ export default function DashboardPage() {
 
   return (
     <section className=" mt-5">
-      <h2>Dashboard Overview</h2>
-
-      <h2 className=" bg-yellow-300">Work in Progress...</h2>
+      <h2 className=" text-2xl font-semibold">Dashboard Overview</h2>
       <div className="mt-2">
         <div>
-          Monthly Expenses:
+          <p className="text-lg font-normal">Monthly Expenses:</p>
           {loading ? (
             <p>Loading expenses...</p> // Loading state
           ) : error ? (
@@ -123,7 +119,7 @@ export default function DashboardPage() {
         </div>
         <div className=" pt-3">
           <div>
-            Remaining Budget:{" "}
+            <span className="text-lg">Remaining Budget: </span>
             {budgetLoading ? (
               <p>Loading budgets...</p> // Loading state
             ) : budgetError ? (
@@ -140,7 +136,7 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className=" pt-3">
-          Total Investments:{" "}
+          <span className="text-lg">Total Investments: </span>
           {investmentLoading ? (
             <p>Loading Total Investments...</p> // Loading state
           ) : investmentError ? (
@@ -150,7 +146,8 @@ export default function DashboardPage() {
           ) : (
             // Render expense list if data exists
             <>
-              {totalInvestment}
+              <span className=" font-serif">₹</span>
+              {`${totalInvestment}`}
               <div className="pt-1"></div>
               {investments.map((investment, index) => (
                 <li key={index}>
