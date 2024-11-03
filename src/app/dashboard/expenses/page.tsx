@@ -97,8 +97,7 @@ export default function ExpensesPage() {
 
   return (
     <section className="mt-5">
-      <h2>Expenses</h2>
-      <h2 className=" bg-yellow-300">Work in Progress...</h2>
+      <h2 className=" text-2xl font-semibold">Expenses</h2>
       {loading ? (
         <p>Loading expenses...</p> // Loading state
       ) : error ? (
