@@ -28,8 +28,6 @@ type TotalInvestment = {
 
 // app/dashboard/page.tsx
 export default function DashboardPage() {
-  const currentHour = new Date().getHours();
-  localStorage.setItem("hour", currentHour.toString());
   const [expenses, setExpenses] = useState<Expense[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
