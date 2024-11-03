@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     ]);
 
     return NextResponse.json({
-      investment: totalInvestment[0],
+      totalAmount: totalInvestment[0].totalAmount,
       byType: totalInvestmentByType,
     });
   } catch (error) {
