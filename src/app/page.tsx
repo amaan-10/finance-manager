@@ -31,6 +31,7 @@ export default async function Home() {
       <section>
         <span className=" text-3xl font-bold mt-5 mb-2 flex gap-2">
           {greeting}
+          {currentHour}
           {suffix}!
           <Image height={30} width={36} src={WavingHand} alt="Waving Hand" />
         </span>
