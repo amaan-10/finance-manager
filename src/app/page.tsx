@@ -10,11 +10,28 @@ export default async function Home() {
   const user = await currentUser();
   const username = user?.firstName;
   const suffix = username ? `, ${username}` : "";
+
+  // Get the current hour
+  const currentHour = new Date().getHours();
+  let greeting: string;
+
+  // Determine greeting based on the time of day
+  if (currentHour >= 5 && currentHour < 12) {
+    greeting = "Good Morning";
+  } else if (currentHour >= 12 && currentHour < 17) {
+    greeting = "Good Afternoon";
+  } else if (currentHour >= 17 && currentHour < 24) {
+    greeting = "Good Evening";
+  } else {
+    greeting = "Good Night";
+  }
+
   return (
     <div>
       <section>
         <span className=" text-3xl font-bold mt-5 mb-2 flex gap-2">
-          Good Morning{suffix}!
+          {greeting}
+          {suffix}!
           <Image height={30} width={36} src={WavingHand} alt="Waving Hand" />
         </span>
 
