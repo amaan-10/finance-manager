@@ -35,7 +35,7 @@ const Greeting: React.FC<Suffix> = ({ suffix }) => {
         <span className=" inline-flex flex-row">
           !
           <Image
-            className="ml-2 h-[34] w-[38] sm:h-[28] sm:w-[32] md:h-[34] md:w-[38] self-center justify-center"
+            className="ml-2 h-[34px] w-[38px] sm:h-[28px] sm:w-[32px] md:h-[34px] md:w-[38px] self-center justify-center"
             src={WavingHand}
             alt="Waving Hand"
           />

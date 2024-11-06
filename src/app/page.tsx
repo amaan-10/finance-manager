@@ -25,7 +25,7 @@ export default async function Home() {
               <>
                 {suffix}!
                 <Image
-                  className="ml-2 h-[34] w-[38] sm:h-[28] sm:w-[32] md:h-[34] md:w-[38] self-center justify-center"
+                  className="ml-2 h-[34px] w-[38px] sm:h-[28px] sm:w-[32px] md:h-[34px] md:w-[38px] self-center justify-center"
                   src={WavingHand}
                   alt="Waving Hand"
                 />
@@ -44,7 +44,7 @@ export default async function Home() {
             <Image
               src={AnalysisSVG}
               alt="Analysis SVG"
-              className=" lg:w-[350] lg:h-[350] md:w-[300] md:h-[300] w-[300] h-[300] self-center"
+              className=" lg:w-[350px] lg:h-[350px] md:w-[300px] md:h-[300px] w-[300px] h-[300px] self-center"
               unoptimized // This ensures the GIF is not optimized, preserving the animation.
             />
             <div className=" self-center lg:px-10">
@@ -63,7 +63,7 @@ export default async function Home() {
             <Image
               src={FinanceSVG}
               alt="Finance SVG"
-              className=" lg:w-[350] lg:h-[350] md:w-[300] md:h-[300] w-[300] h-[300] self-center lg:self-end"
+              className=" lg:w-[350px] lg:h-[350px] md:w-[300px] md:h-[300px] w-[300px] h-[300px] self-center lg:self-end"
               unoptimized // This ensures the GIF is not optimized, preserving the animation.
             />
             <div className=" self-center lg:px-10">
@@ -82,7 +82,7 @@ export default async function Home() {
             <Image
               src={DataSVG}
               alt="Financial Data SVG"
-              className=" lg:w-[350] lg:h-[350] md:w-[300] md:h-[300] w-[300] h-[300] self-center"
+              className=" lg:w-[350px] lg:h-[350px] md:w-[300px] md:h-[300px] w-[300px] h-[300px] self-center"
               unoptimized // This ensures the GIF is not optimized, preserving the animation.
             />
             <div className=" self-center lg:px-10">
@@ -100,7 +100,7 @@ export default async function Home() {
             <Image
               src={RevenueSVG}
               alt="Revenue SVG"
-              className=" lg:w-[350] lg:h-[350] md:w-[300] md:h-[300] w-[300] h-[300] self-center lg:self-end"
+              className=" lg:w-[350px] lg:h-[350px] md:w-[300px] md:h-[300px] w-[300px] h-[300px] self-center lg:self-end"
               unoptimized // This ensures the GIF is not optimized, preserving the animation.
             />
             <div className=" self-center lg:px-10">
