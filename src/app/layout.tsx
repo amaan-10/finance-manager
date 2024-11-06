@@ -41,7 +41,7 @@ export default function RootLayout({
               <div className=" md:p-10 p-10 px-5 flex items-center font-extrabold">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className=" md:w-[30] md:h-[30] sm:w-[40] sm:h-[40] xs:w-[50] xs:h-[50] w-[60] h-[60]"
+                  className=" md:w-[30px] md:h-[30px] sm:w-[40px] sm:h-[40px] xs:w-[50px] xs:h-[50px] w-[60px] h-[60px]"
                   viewBox="0 0 48 48"
                   fill="white"
                 >
