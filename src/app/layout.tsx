@@ -1,16 +1,11 @@
 // app/layout.tsx
 import Link from "next/link";
 import "./globals.css"; // Import global styles
-import {
-  ClerkProvider,
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 
 import { IBM_Plex_Mono, Courier_Prime, Roboto_Mono } from "next/font/google";
+import { ReactNode } from "react";
+import Navbar from "./Navbar";
 
 const ibm = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -43,11 +38,10 @@ export default function RootLayout({
         <body className={`${roboto.className}`}>
           <header>
             <nav>
-              <div className=" p-10 pt-10 flex items-center font-extrabold">
+              <div className=" md:p-10 p-10 px-5 flex items-center font-extrabold">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width={30}
-                  height={30}
+                  className=" md:w-[30] md:h-[30] sm:w-[40] sm:h-[40] xs:w-[50] xs:h-[50] w-[60] h-[60]"
                   viewBox="0 0 48 48"
                   fill="white"
                 >
@@ -58,38 +52,15 @@ export default function RootLayout({
                     <path d="M16 30h-6a3 3 0 0 1-3-3v-2h2v2a1 1 0 0 0 1 1h6zM19 14a3 3 0 1 1 3-3 3 3 0 0 1-3 3zm0-4a1 1 0 1 0 1 1 1 1 0 0 0-1-1z" />
                   </g>
                 </svg>
-                <h1 className=" pl-3 text-xl">
+                <h1 className=" pl-3 text-lg md:text-xl">
                   SpendLess | Personal Finance Manager
                 </h1>
               </div>
-              <div className="ml-5">
-                <Link href="/">Home</Link>
-                <SignedIn>
-                  <Link href="/dashboard">Dashboard</Link>
-                </SignedIn>
-                <SignedOut>
-                  <Link className=" text-gray-400" href="/dashboard">
-                    Dashboard
-                  </Link>
-                </SignedOut>
-                <span className="  mr-5 absolute right-0 sign-in-container">
-                  <SignedOut>
-                    <span className=" m-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                      <SignInButton />
-                    </span>
-                    <span className=" m-2 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                      <SignUpButton />
-                    </span>
-                  </SignedOut>
-                  <SignedIn>
-                    <UserButton showName />
-                  </SignedIn>
-                </span>
-              </div>
+              <Navbar />
             </nav>
           </header>
           <main className="px-10">{children}</main>
-          <footer className=" px-10 py-7 text-gray-600">
+          <footer className=" px-10 py-10 text-sm sm:text-base text-gray-500">
             © 2024 SpendLess | Personal Finance Manager
           </footer>
         </body>
