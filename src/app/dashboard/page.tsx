@@ -161,11 +161,11 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
-      <nav className="mt-5">
-        <Link className="text-black" href={"/dashboard/expenses"}>
+      <nav className="mt-5 flex flex-col sm:flex-row">
+        <Link className="underline text-black" href={"/dashboard/expenses"}>
           View Expenses
         </Link>
-        <Link className="text-black" href={"/dashboard/investments"}>
+        <Link className="underline text-black" href={"/dashboard/investments"}>
           View Investments
         </Link>
       </nav>
