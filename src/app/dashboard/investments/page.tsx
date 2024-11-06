@@ -149,7 +149,7 @@ const InvestmentsPage: React.FC = () => {
                     {new Date(inv.date).toLocaleDateString("en-GB")}
                   </span>
                   <button
-                    className=" text-left hover:underline text-red-600"
+                    className=" text-left max-w-44 hover:underline text-red-600"
                     onClick={() => deleteInvestment(inv._id)}
                   >
                     Delete Investment
@@ -164,12 +164,12 @@ const InvestmentsPage: React.FC = () => {
       )}
 
       <form onSubmit={handleSubmit}>
-        <div className="mt-2 flex gap-3">
+        <div className="mt-2 flex flex-col md:flex-row gap-3">
           <input
             type="text"
             placeholder="Investment Type"
             value={type.toLowerCase()}
-            className=" pl-1"
+            className=" pl-1 max-w-80 md:w-auto"
             onChange={(e) => setType(e.target.value.toLowerCase())}
             required
           />
@@ -178,7 +178,7 @@ const InvestmentsPage: React.FC = () => {
               type="text"
               placeholder="Stock Symbol Name"
               value={name.toUpperCase()}
-              className="pl-1"
+              className="pl-1 max-w-80 md:w-auto"
               onChange={(e) => setName(e.target.value.toUpperCase())}
               required
             />
@@ -189,24 +189,29 @@ const InvestmentsPage: React.FC = () => {
             type="number"
             placeholder="Amount"
             value={amount}
-            className=" pl-1"
+            className=" pl-1 max-w-80 md:w-auto"
             onChange={(e) => setAmount(e.target.value)}
             required
           />
           <input
             type="date"
             value={date}
-            className=" pl-1"
+            className=" pl-1 max-w-80 md:w-auto"
             onChange={(e) => setDate(e.target.value)}
             required
           />
-          <button type="submit">Add Investment</button>
+          <button className="self-start underline" type="submit">
+            Add Investment
+          </button>
         </div>
       </form>
       <div>
-        <>
-          <h2 className="pt-5 font-extrabold text-xl">
-            Stock Portfolio (Only US - [NYSE, NASDAQ] stock exchange)
+        <div className=" pt-5">
+          <h2 className=" inline font-extrabold text-xl">
+            Stock Portfolio
+            <span className=" block md:inline">
+              (Only US - [NYSE, NASDAQ] stock exchange)
+            </span>
           </h2>
           {loadingStocks ? (
             <p>Loading stocks invested...</p> // Loading state
@@ -263,7 +268,7 @@ const InvestmentsPage: React.FC = () => {
               ))}
             </ul>
           )}
-        </>
+        </div>
       </div>
     </section>
   );
