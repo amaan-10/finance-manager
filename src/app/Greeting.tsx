@@ -1,9 +1,14 @@
 // app/clientComponent.tsx
 "use client"; // This directive enables client-side features
 
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import WavingHand from "../assets/Waving Hand.png";
+interface Suffix {
+  suffix: string;
+}
 
-const Greeting: React.FC = () => {
+const Greeting: React.FC<Suffix> = ({ suffix }) => {
   const [greeting, setGreeting] = useState<string>("");
 
   useEffect(() => {
@@ -23,7 +28,19 @@ const Greeting: React.FC = () => {
 
   return (
     <div>
-      <p>{greeting}</p>
+      <span className="inline">{greeting}</span>
+      {suffix ? (
+        ","
+      ) : (
+        <span className=" inline-flex flex-row">
+          !
+          <Image
+            className="ml-2 h-[34] w-[38] sm:h-[28] sm:w-[32] md:h-[34] md:w-[38] self-center justify-center"
+            src={WavingHand}
+            alt="Waving Hand"
+          />
+        </span>
+      )}
     </div>
   );
 };
