@@ -114,7 +114,7 @@ export default function ExpensesPage() {
                 {new Date(expense.date).toLocaleDateString("en-UK")}
               </span>
               <button
-                className=" text-left hover:underline text-red-600"
+                className=" text-left max-w-36 hover:underline text-red-600"
                 onClick={() =>
                   handleDeleteExpenses(
                     expense.category,
@@ -130,22 +130,24 @@ export default function ExpensesPage() {
         </ul>
       )}
       <p className="pt-3">Please add your expenses here.</p>
-      <div className="mt-2 flex gap-3">
+      <div className="mt-2 flex flex-col md:flex-row gap-3">
         <input
           type="text"
           placeholder="Category"
-          className=" pl-1"
+          className=" pl-1 max-w-80 md:w-auto"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         />
         <input
           type="number"
           placeholder="Amount"
-          className=" pl-1"
+          className=" pl-1 max-w-80 md:w-auto"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
-        <button onClick={handleAddExpense}>Add Expense</button>
+        <button className=" self-start underline" onClick={handleAddExpense}>
+          Add Expense
+        </button>
       </div>
     </section>
   );
