@@ -136,16 +136,18 @@ export default function BudgetsPage() {
         <>
           <ul className="mt-2">
             {budgets.map((budget, index) => (
-              <li key={index}>
-                Budget - <span className=" font-serif">₹</span>
-                {budget.amount} for {budget.month}, {budget.year}
+              <span className="grid md:grid-cols-2 lg:grid-cols-3" key={index}>
+                <span className="">
+                  Budget - <span className=" font-serif">₹</span>
+                  {budget.amount} for {budget.month}, {budget.year}
+                </span>
                 <button
-                  className=" hover:underline pl-16 text-red-600"
+                  className=" hover:underline max-w-32 text-start text-red-600"
                   onClick={() => handleDeleteBudget(budget.month, budget.year)}
                 >
                   Delete Budget
                 </button>
-              </li>
+              </span>
             ))}
           </ul>
           <p className="pt-3">
@@ -153,24 +155,26 @@ export default function BudgetsPage() {
           </p>
         </>
       )}
-      <div className="mt-2 flex gap-3">
+      <div className="mt-2 flex flex-col md:flex-row gap-3">
         <input
           type="number"
           placeholder="Amount"
-          className=" pl-1"
+          className=" pl-1 max-w-80 md:w-auto"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
         <input
           type="month"
           placeholder={monthYear}
-          className=" pl-1"
+          className="  pl-1 max-w-80 md:w-auto"
           value={monthYear}
           onChange={(e) => setMonth(e.target.value)}
           min={minMonth}
         />
 
-        <button onClick={handleAddBudget}>Add Budget</button>
+        <button className="self-start underline" onClick={handleAddBudget}>
+          Add Budget
+        </button>
       </div>
     </section>
   );
