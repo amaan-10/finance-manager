@@ -166,7 +166,7 @@ export default function BudgetsPage() {
         <input
           type="month"
           placeholder={monthYear}
-          className="  pl-1 max-w-80 md:w-auto"
+          className="  pl-1 max-w-80 md:w-auto bg-white"
           value={monthYear}
           onChange={(e) => setMonth(e.target.value)}
           min={minMonth}

@@ -196,7 +196,7 @@ const InvestmentsPage: React.FC = () => {
           <input
             type="date"
             value={date}
-            className=" pl-1 max-w-80 md:w-auto"
+            className=" pl-1 max-w-80 md:w-auto bg-white"
             onChange={(e) => setDate(e.target.value)}
             required
           />
