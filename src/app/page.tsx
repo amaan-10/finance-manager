@@ -10,41 +10,48 @@ import Greeting from "./Greeting";
 export default async function Home() {
   const user = await currentUser();
   const username = user?.firstName;
-  const suffix = username ? `, ${username}` : "";
+  const suffix = username ? `${username}` : "";
 
   return (
     <div>
       <section>
-        <span className=" text-3xl font-bold mt-5 mb-2 flex">
-          <Greeting />
-          {suffix}!
-          <Image
-            className="ml-2"
-            height={30}
-            width={36}
-            src={WavingHand}
-            alt="Waving Hand"
-          />
+        <span className="text-[28px] sm:text-2xl md:text-3xl font-bold mt-5 mb-2 flex flex-col sm:flex-row">
+          <span>
+            <Greeting suffix={suffix} />
+            {/**/}
+          </span>
+          <span className=" inline-flex flex-row">
+            {suffix ? (
+              <>
+                {suffix}!
+                <Image
+                  className="ml-2 h-[34] w-[38] sm:h-[28] sm:w-[32] md:h-[34] md:w-[38] self-center justify-center"
+                  src={WavingHand}
+                  alt="Waving Hand"
+                />
+              </>
+            ) : (
+              ""
+            )}
+          </span>
         </span>
-
-        <p className="text-lg">
+        <p className=" text-base md:text-lg">
           Welcome to Personal Finance Manager <br />
           Track your expenses, create budgets, and manage your investments.
         </p>
-        <div className="flex flex-col px-7">
-          <div className="flex gap-16">
+        <div className="flex flex-col lg:px-7">
+          <div className="flex gap-11 lg:gap-16 flex-col md:flex-row">
             <Image
               src={AnalysisSVG}
               alt="Analysis SVG"
-              width={350}
-              height={350}
+              className=" lg:w-[350] lg:h-[350] md:w-[300] md:h-[300] w-[300] h-[300] self-center"
               unoptimized // This ensures the GIF is not optimized, preserving the animation.
             />
-            <div className=" self-center px-10">
-              <h1 className=" text-[28px] font-bold pb-3 ">
+            <div className=" self-center lg:px-10">
+              <h1 className=" text-center sm:text-left text-xl sm:text-2xl md:text-[28px] font-bold pb-3 ">
                 Comprehensive Analysis
               </h1>
-              <p className=" text-lg text-justify pr-10">
+              <p className=" text-sm sm:text-base lg:text-lg text-justify lg:pr-10">
                 Gain actionable insights with powerful financial analysis tools.
                 Visualize your financial health through charts and metrics,
                 helping you make data-driven decisions and track performance
@@ -52,20 +59,18 @@ export default async function Home() {
               </p>
             </div>
           </div>
-          <div className="flex flex-row-reverse gap-16">
+          <div className="flex gap-11 lg:gap-16 md:flex-row-reverse flex-col">
             <Image
               src={FinanceSVG}
               alt="Finance SVG"
-              className=" self-end"
-              width={350}
-              height={350}
+              className=" lg:w-[350] lg:h-[350] md:w-[300] md:h-[300] w-[300] h-[300] self-center lg:self-end"
               unoptimized // This ensures the GIF is not optimized, preserving the animation.
             />
-            <div className=" self-center px-10">
-              <h1 className=" text-[28px] font-bold pb-3 ">
+            <div className=" self-center lg:px-10">
+              <h1 className=" text-center sm:text-left text-xl sm:text-2xl md:text-[28px] font-bold pb-3 ">
                 Financial Data Tracking
               </h1>
-              <p className=" text-lg text-justify ">
+              <p className=" text-sm sm:text-base lg:text-lg text-justify ">
                 Stay organized by securely syncing your accounts and monitoring
                 your financial data. Our platform brings together all your bank
                 accounts, credit cards, and investments for a clear, centralized
@@ -73,39 +78,36 @@ export default async function Home() {
               </p>
             </div>
           </div>
-          <div className="flex gap-16">
+          <div className="flex gap-11 lg:gap-16 flex-col md:flex-row">
             <Image
               src={DataSVG}
               alt="Financial Data SVG"
-              width={350}
-              height={350}
+              className=" lg:w-[350] lg:h-[350] md:w-[300] md:h-[300] w-[300] h-[300] self-center"
               unoptimized // This ensures the GIF is not optimized, preserving the animation.
             />
-            <div className=" self-center px-10">
-              <h1 className=" text-[28px] font-bold pb-3 ">
+            <div className=" self-center lg:px-10">
+              <h1 className=" text-center sm:text-left text-xl sm:text-2xl md:text-[28px] font-bold pb-3 ">
                 Investment Management
               </h1>
-              <p className=" text-lg text-justify pr-10">
+              <p className=" text-sm sm:text-base lg:text-lg text-justify lg:pr-10">
                 Effortlessly monitor and manage your investment portfolio. Track
                 real-time market data, review asset performance, and make
                 informed investment choices, all in one place.
               </p>
             </div>
           </div>
-          <div className="flex flex-row-reverse gap-16">
+          <div className="flex gap-11 lg:gap-16 md:flex-row-reverse flex-col">
             <Image
               src={RevenueSVG}
               alt="Revenue SVG"
-              className=" self-end"
-              width={350}
-              height={350}
+              className=" lg:w-[350] lg:h-[350] md:w-[300] md:h-[300] w-[300] h-[300] self-center lg:self-end"
               unoptimized // This ensures the GIF is not optimized, preserving the animation.
             />
-            <div className=" self-center pr-10">
-              <h1 className=" text-[28px] font-bold pb-3 pl-5">
+            <div className=" self-center lg:px-10">
+              <h1 className=" text-center sm:text-left text-xl sm:text-2xl md:text-[28px] font-bold pb-3 ">
                 Revenue, Budget & Expense Monitoring
               </h1>
-              <p className=" text-lg text-justify pl-5">
+              <p className=" text-sm sm:text-base lg:text-lg text-justify ">
                 Keep a close eye on your income, expenses, and budgets. Set
                 financial goals, track your spending patterns, and create custom
                 budgets to stay on track and maximize savings.
