@@ -105,29 +105,85 @@ export default function ExpensesPage() {
       ) : !expenses || expenses.length === 0 ? (
         <p>- No expenses till now.</p>
       ) : (
-        <ul className="mt-2">
-          {expenses.map((expense, index) => (
-            <span className="grid md:grid-cols-2 lg:grid-cols-3" key={index}>
-              <span className=" ">
-                {expense.category} - <span className=" font-serif">₹</span>
-                {expense.amount} on{" "}
-                {new Date(expense.date).toLocaleDateString("en-UK")}
-              </span>
-              <button
-                className=" text-left max-w-36 hover:underline text-red-600"
-                onClick={() =>
-                  handleDeleteExpenses(
-                    expense.category,
-                    expense.amount,
-                    expense.date
-                  )
-                }
-              >
-                Delete Expense
-              </button>
-            </span>
-          ))}
-        </ul>
+        // <ul className="mt-2">
+        //   {expenses.map((expense, index) => (
+        //     <span className="grid md:grid-cols-2 lg:grid-cols-3" key={index}>
+        //       <span className=" ">
+        //         {expense.category} - <span className=" font-serif">₹</span>
+        //         {expense.amount} on{" "}
+        //         {new Date(expense.date).toLocaleDateString("en-UK")}
+        //       </span>
+        //       <button
+        //         className=" text-left max-w-36 hover:underline text-red-600"
+        //         onClick={() =>
+        //           handleDeleteExpenses(
+        //             expense.category,
+        //             expense.amount,
+        //             expense.date
+        //           )
+        //         }
+        //       >
+        //         Delete Expense
+        //       </button>
+        //     </span>
+        //   ))}
+        // </ul>
+        <div className=" mt-4 md:w-2/3 lg:w-3/5 relative overflow-x-auto shadow-md rounded-lg">
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
+            <thead className=" text-sm text-gray-700 uppercase bg-gray-200 ">
+              <tr>
+                <th scope="col" className="px-6 py-3">
+                  Category
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Price
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Date
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  <span className="sr-only">Delete</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {expenses.map((expense, index) => (
+                <tr
+                  key={index}
+                  className="bg-white border-b  hover:bg-gray-100 "
+                >
+                  <th
+                    scope="row"
+                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
+                  >
+                    {expense.category}
+                  </th>
+                  <td className="px-6 py-4">
+                    <span className=" font-serif">₹</span>
+                    {expense.amount}
+                  </td>
+                  <td className="px-6 py-4">
+                    {new Date(expense.date).toLocaleDateString("en-UK")}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button
+                      className=" text-left font-medium max-w-36 hover:underline text-red-600"
+                      onClick={() =>
+                        handleDeleteExpenses(
+                          expense.category,
+                          expense.amount,
+                          expense.date
+                        )
+                      }
+                    >
+                      Delete Expense
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
       <p className="pt-3">Please add your expenses here.</p>
       <div className="mt-2 flex flex-col md:flex-row gap-3">
