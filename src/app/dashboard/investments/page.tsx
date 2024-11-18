@@ -207,11 +207,9 @@ const InvestmentsPage: React.FC = () => {
       </form>
       <div>
         <div className=" pt-5">
-          <h2 className=" inline font-extrabold text-xl">
-            Stock Portfolio
-            <span className=" block md:inline">
-              (Only US - [NYSE, NASDAQ] stock exchange)
-            </span>
+          <h2 className=" font-extrabold text-xl">Stock Portfolio</h2>
+          <h2 className=" pt-2 font-extrabold text-xl">
+            Only US - [NYSE, NASDAQ] stock exchange
           </h2>
           {loadingStocks ? (
             <p>Loading stocks invested...</p> // Loading state
@@ -220,53 +218,90 @@ const InvestmentsPage: React.FC = () => {
           ) : !stockData || stockData.length === 0 ? (
             <p>- No stock invested till now.</p>
           ) : (
-            <ul>
-              {stockData.map((stock, index) => (
-                <li className="pt-3" key={index}>
-                  <h2 className=" font-extrabold text-[20px]">
-                    {stock?.name}:
-                  </h2>
-                  <p className=" font-medium">
-                    Amount hold: <span className=" font-serif">₹</span>
-                    {stock?.amount} on{" "}
-                    {new Date(stock?.inv_date).toLocaleDateString("en-GB")}
-                  </p>
-                  <p className="font-medium">Status: {stock?.status}</p>
-                  {stock?.c ||
-                  stock?.h ||
-                  stock?.l ||
-                  stock?.o ||
-                  stock?.pc != 0 ? (
-                    <>
-                      <p>Current Price: ${stock?.c}</p>
-                      <p>Highest Price: ${stock?.h}</p>
-                      <p>Lowest Price: ${stock?.l}</p>
-                      <p>Opening: ${stock?.o}</p>
-                      <p>Previous Close: ${stock?.pc}</p>
-                    </>
-                  ) : (
-                    <>
-                      <p>Not in US Stock Exchange</p>
-                      <Link
-                        className="text-blue-600 font-medium hover:underline"
-                        href={`https://www.google.com/search?q=${stock?.name}+stock`}
-                        target="_blank"
-                      >
-                        Track Here
-                      </Link>
-                      <br />
-                    </>
-                  )}
-
-                  <button
-                    className=" text-left font-medium hover:underline text-red-600"
-                    onClick={() => deleteInvestment(stock?.id)}
-                  >
-                    Delete Investment
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <>
+              <ul>
+                {stockData.map((stock, index) => (
+                  <li key={index}>
+                    {stock?.c ||
+                    stock?.h ||
+                    stock?.l ||
+                    stock?.o ||
+                    stock?.pc != 0 ? (
+                      <>
+                        <h2 className=" pt-3 font-extrabold text-[20px]">
+                          {stock?.name}:
+                        </h2>
+                        <p className=" font-medium">
+                          Amount hold: <span className=" font-serif">₹</span>
+                          {stock?.amount} on{" "}
+                          {new Date(stock?.inv_date).toLocaleDateString(
+                            "en-GB"
+                          )}
+                        </p>
+                        <p className="font-medium">Status: {stock?.status}</p>
+                        <p>Current Price: ${stock?.c}</p>
+                        <p>Highest Price: ${stock?.h}</p>
+                        <p>Lowest Price: ${stock?.l}</p>
+                        <p>Opening: ${stock?.o}</p>
+                        <p>Previous Close: ${stock?.pc}</p>
+                        <button
+                          className=" text-left font-medium hover:underline text-red-600"
+                          onClick={() => deleteInvestment(stock?.id)}
+                        >
+                          Delete Investment
+                        </button>
+                      </>
+                    ) : (
+                      ""
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <h2 className=" inline font-extrabold text-xl">
+                <br />
+                Other than US Stock Exchange
+              </h2>
+              <ul>
+                {stockData.map((stock, index) => (
+                  <li key={index}>
+                    {stock?.c ||
+                    stock?.h ||
+                    stock?.l ||
+                    stock?.o ||
+                    stock?.pc != 0 ? (
+                      ""
+                    ) : (
+                      <>
+                        <h2 className=" pt-3 font-extrabold text-[20px]">
+                          {stock?.name}:
+                        </h2>
+                        <p className=" font-medium">
+                          Amount hold: <span className=" font-serif">₹</span>
+                          {stock?.amount} on{" "}
+                          {new Date(stock?.inv_date).toLocaleDateString(
+                            "en-GB"
+                          )}
+                        </p>
+                        <p className="font-medium">Status: {stock?.status}</p>
+                        <Link
+                          className="text-blue-600 font-medium hover:underline"
+                          href={`https://www.google.com/search?q=${stock?.name}+stock`}
+                          target="_blank"
+                        >
+                          Track Here
+                        </Link>
+                        <button
+                          className=" block text-left font-medium hover:underline text-red-600"
+                          onClick={() => deleteInvestment(stock?.id)}
+                        >
+                          Delete Investment
+                        </button>
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </div>
       </div>
