@@ -9,6 +9,7 @@ import Greeting from "./Greeting";
 
 export default async function Home() {
   const user = await currentUser();
+  const userData = JSON.parse(JSON.stringify({ ...user }));
   const username = user?.firstName;
   const suffix = username ? `${username}` : "";
 
@@ -17,8 +18,7 @@ export default async function Home() {
       <section>
         <span className="text-[28px] sm:text-2xl md:text-3xl font-bold mt-5 mb-2 flex flex-col sm:flex-row">
           <span>
-            <Greeting suffix={suffix} />
-            {/**/}
+            <Greeting suffix={suffix} userData={userData} />
           </span>
           <span className=" inline-flex flex-row">
             {suffix ? (
@@ -31,7 +31,7 @@ export default async function Home() {
                 />
               </>
             ) : (
-              ""
+              " "
             )}
           </span>
         </span>

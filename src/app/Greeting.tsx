@@ -6,11 +6,12 @@ import React, { useEffect, useState } from "react";
 import WavingHand from "../assets/Waving Hand.png";
 interface Suffix {
   suffix: string;
+  userData: object;
 }
 
-const Greeting: React.FC<Suffix> = ({ suffix }) => {
+const Greeting: React.FC<Suffix> = ({ suffix, userData }) => {
   const [greeting, setGreeting] = useState<string>("");
-
+  //console.log(userData);
   useEffect(() => {
     const currentDate = new Date(); // Client-side time
     const currentHour = currentDate.getHours();
@@ -28,9 +29,9 @@ const Greeting: React.FC<Suffix> = ({ suffix }) => {
 
   return (
     <div>
-      <span className="inline">{greeting}</span>
+      <span className="inline">{greeting ? greeting : "Good Morning"}</span>
       {suffix ? (
-        ","
+        ", "
       ) : (
         <span className=" inline-flex flex-row">
           !
