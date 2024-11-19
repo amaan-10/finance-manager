@@ -138,8 +138,6 @@ export default function BudgetsPage() {
     return months[monthNumber - 1];
   }
 
-  console.log(getMonthName(1)); // Output: January
-
   return (
     <section className="mt-5">
       <h2 className=" text-2xl font-semibold">Budgets</h2>
