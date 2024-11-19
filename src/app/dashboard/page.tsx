@@ -58,7 +58,7 @@ export default function DashboardPage() {
         const res = await fetch(`/api/budgets/monthly`);
         const data = await res.json();
         //console.log("Monthly Budget:", data);
-        setBudget(data.remaining);
+        setBudget(data[0].remaining);
         //console.log(data);
       } catch (err: any) {
         setBudgetError(err.message);
@@ -98,7 +98,7 @@ export default function DashboardPage() {
 
       <div className="mt-2">
         <div>
-          <p className="text-lg font-normal">Monthly Expenses:</p>
+          <p className="text-lg font-medium">Monthly Expenses:</p>
           {loading ? (
             <p>Loading expenses...</p> // Loading state
           ) : error ? (
@@ -120,7 +120,7 @@ export default function DashboardPage() {
         </div>
         <div className=" pt-3">
           <div>
-            <span className="text-lg">Remaining Budget: </span>
+            <span className="text-lg font-medium">Remaining Budget: </span>
             {budgetLoading ? (
               <p>Loading budgets...</p> // Loading state
             ) : budgetError ? (
@@ -137,7 +137,7 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className=" pt-3">
-          <span className="text-lg">Total Investments: </span>
+          <span className="text-lg font-medium">Total Investments: </span>
           {investmentLoading ? (
             <p>Loading Total Investments...</p> // Loading state
           ) : investmentError ? (

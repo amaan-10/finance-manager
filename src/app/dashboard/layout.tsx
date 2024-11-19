@@ -71,6 +71,12 @@ export default function DashboardLayout({
             Investments
           </NavLink>
         </span>
+        <span>
+          <span className="inline sm:hidden">- </span>
+          <NavLink className=" text-black" href="/dashboard/analytics">
+            Analytics
+          </NavLink>
+        </span>
       </nav>
       <div>{children}</div>
     </div>
