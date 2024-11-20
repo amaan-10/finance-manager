@@ -357,7 +357,7 @@ export default function AnalyticsPage() {
             ) : (
               <div className="h-[325px] ">
                 <p className="text-sm text-slate-500 pb-2">
-                  Breakdown of your this month's expenses by category
+                  Budget Spent vs Budget Remaining Analysis
                 </p>
                 <ResponsiveContainer height={200}>
                   <PieChart>
@@ -462,7 +462,7 @@ export default function AnalyticsPage() {
               // </>
               <div className="h-[400px] ">
                 <p className="text-sm text-slate-500 pb-2">
-                  Breakdown of your this month's expenses by category
+                  Breakdown of your total investment
                 </p>
                 <div className="h-[300px] xs:h-[330px]   ">
                   <ResponsiveContainer>
