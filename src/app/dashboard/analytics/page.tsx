@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key */
 "use client";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import {
   LineChart,
@@ -15,6 +15,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  Sector,
 } from "recharts";
 
 interface Expense {
@@ -51,6 +52,30 @@ export default function AnalyticsPage() {
   const [expenses, setExpenses] = useState<Expense[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [outerRadius, setOuterRadius] = useState(100);
+
+  // Adjust outer radius based on window width
+  useEffect(() => {
+    const updateRadius = () => {
+      if (window.innerWidth < 500 && window.innerWidth > 400) {
+        setOuterRadius(75); // Smaller radius for mobile
+      } else if (window.innerWidth < 400 && window.innerWidth > 0) {
+        setOuterRadius(50); // Smaller radius for mobile
+      } else {
+        setOuterRadius(100); // Larger radius for desktop/tablet
+      }
+    };
+
+    // Set the initial radius
+    updateRadius();
+
+    // Listen for window resize events
+    window.addEventListener("resize", updateRadius);
+
+    // Cleanup listener on unmount
+    return () => window.removeEventListener("resize", updateRadius);
+  }, []);
 
   useEffect(() => {
     const fetchMonthlyExpenses = async () => {
@@ -119,6 +144,22 @@ export default function AnalyticsPage() {
   }));
   //   console.log(categoryExp);
 
+  function generateUniqueColors(n: number): string[] {
+    const colors: string[] = [];
+    const step = 360 / n;
+
+    for (let i = 0; i < n; i++) {
+      const hue = Math.floor(i * step);
+      const saturation = 100;
+      const lightness = 40;
+      colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
+    }
+
+    return colors;
+  }
+
+  const colors = generateUniqueColors(categoryExp.length);
+
   const [budgets, setBudget] = useState<Budget[] | null>(null);
   const [budgetsData, setBudgetsData] = useState<any[]>([]);
   const [budgetLoading, setBudgetLoading] = useState(true);
@@ -139,7 +180,10 @@ export default function AnalyticsPage() {
 
         setBudgetsData([
           { name: "Spent", value: spentPercentage },
-          { name: "Remaining", value: remainingPercentage },
+          {
+            name: "Remaining",
+            value: remainingPercentage < 0 ? 0 : remainingPercentage,
+          },
         ]);
       } catch (err: any) {
         setBudgetError(err.message);
@@ -208,7 +252,7 @@ export default function AnalyticsPage() {
       try {
         const res = await fetch(`/api/investments/total`);
         const data = await res.json();
-        //console.log("Total Investment:", data);
+        console.log("Total Investment:", data);
         setInvestment(data.byType);
         setTotalInvestment(data.totalAmount);
         //console.log(data);
@@ -237,7 +281,7 @@ export default function AnalyticsPage() {
               <p>- No expenses found.</p> // No data found
             ) : (
               // Render expense list if data exists
-              <div className="h-[300px] ">
+              <div className="h-[350px] ">
                 <p className="text-sm text-slate-500 pb-2">
                   Your spending pattern over the time
                 </p>
@@ -270,44 +314,39 @@ export default function AnalyticsPage() {
               <p>- No expenses found.</p> // No data found
             ) : (
               // Render expense list if data exists
-              <div className="h-[300px] ">
+              <div className="h-[350px] ">
                 <p className="text-sm text-slate-500 pb-2">
                   Breakdown of your this month's expenses by category
                 </p>
-                <ResponsiveContainer>
-                  <PieChart>
-                    <Pie
-                      data={categoryExp}
-                      dataKey="totalAmount"
-                      nameKey="category"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={100}
-                      fill="#8884d8"
-                      label
-                    >
-                      {/* Optional: Custom Colors */}
-                      {categoryExp.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={
-                            ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"][
-                              index % 4
-                            ]
-                          }
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="h-[300px] xs:h-[330px]   ">
+                  <ResponsiveContainer>
+                    <PieChart>
+                      <Pie
+                        data={categoryExp}
+                        dataKey="totalAmount"
+                        nameKey="category"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={outerRadius}
+                        fill="#8884d8"
+                        label
+                      >
+                        {/* Optional: Custom Colors */}
+                        {categoryExp.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={colors[index]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
             )}
           </div>
         </div>
         <div className=" pt-3">
-          <div className=" border rounded-lg bg-white p-4 px-7 w-full">
+          <div className=" border rounded-lg bg-white p-4 px-7 w-full ">
             <span className="text-lg font-medium">Remaining Budget: </span>
             {budgetLoading ? (
               <p>Loading budgets...</p> // Loading state
@@ -316,7 +355,7 @@ export default function AnalyticsPage() {
             ) : !budgets ? (
               <p>- No budget set for this month.</p> // No data found
             ) : (
-              <div className="h-[300px] ">
+              <div className="h-[325px] ">
                 <p className="text-sm text-slate-500 pb-2">
                   Breakdown of your this month's expenses by category
                 </p>
@@ -349,7 +388,7 @@ export default function AnalyticsPage() {
                     <svg
                       width="100%"
                       height="100%"
-                      viewBox="55 60 200 200"
+                      viewBox="55 58 200 200"
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       {needle(
@@ -374,7 +413,24 @@ export default function AnalyticsPage() {
                 <div className="text-center">
                   <span className=" text-[#00C49F] text-lg">
                     ● remaining - <span className=" font-serif">₹</span>
-                    {budgets[0].remaining}
+                    {budgets[0].remaining <= 0 ? (
+                      <>
+                        {budgets[0].remaining}
+                        <div className=" text-red-600 font-semibold animate-pulse">
+                          budget limit exceeded!!
+                        </div>
+                      </>
+                    ) : budgets[0].remaining > 0 &&
+                      (budgets[0].remaining * 100) / budgets[0].budget <= 10 ? (
+                      <>
+                        {budgets[0].remaining}
+                        <div className=" text-red-600 font-semibold animate-pulse">
+                          about to run out of budget! spend wisely!!
+                        </div>
+                      </>
+                    ) : (
+                      budgets[0].remaining
+                    )}
                   </span>
                 </div>
               </div>
@@ -382,28 +438,58 @@ export default function AnalyticsPage() {
           </div>
         </div>
         <div className=" pt-3">
-          <span className="text-lg font-medium">Total Investments: </span>
-          {investmentLoading ? (
-            <p>Loading Total Investments...</p> // Loading state
-          ) : investmentError ? (
-            <p>Error: {investmentError}</p> // Error state
-          ) : !investments || investments.length === 0 ? (
-            <p>- No investment found.</p> // No data found
-          ) : (
-            // Render expense list if data exists
-            <>
-              <span className=" font-serif">₹</span>
-              {`${totalInvestment}`}
-              <div className="pt-1"></div>
-              {investments.map((investment, index) => (
-                <li key={index}>
-                  {`${investment._id} - Total: `}
-                  <span className=" font-serif">₹</span>
-                  {`${investment.totalAmount}`}
-                </li>
-              ))}
-            </>
-          )}
+          <div className=" border rounded-lg bg-white p-4 px-7 w-full">
+            <span className="text-lg font-medium">Total Investments: </span>
+            {investmentLoading ? (
+              <p>Loading Total Investments...</p> // Loading state
+            ) : investmentError ? (
+              <p>Error: {investmentError}</p> // Error state
+            ) : !investments || investments.length === 0 ? (
+              <p>- No investment found.</p> // No data found
+            ) : (
+              // Render expense list if data exists
+              // <>
+              //   <span className=" font-serif">₹</span>
+              //   {`${totalInvestment}`}
+              //   <div className="pt-1"></div>
+              //   {investments.map((investment, index) => (
+              //     <li key={index}>
+              //       {`${investment._id} - Total: `}
+              //       <span className=" font-serif">₹</span>
+              //       {`${investment.totalAmount}`}
+              //     </li>
+              //   ))}
+              // </>
+              <div className="h-[400px] ">
+                <p className="text-sm text-slate-500 pb-2">
+                  Breakdown of your this month's expenses by category
+                </p>
+                <div className="h-[300px] xs:h-[330px]   ">
+                  <ResponsiveContainer>
+                    <PieChart>
+                      <Pie
+                        data={investments}
+                        dataKey="totalAmount"
+                        nameKey="_id"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={outerRadius}
+                        fill="#8884d8"
+                        label
+                      >
+                        {/* Optional: Custom Colors */}
+                        {investments.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={colors[index]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <nav className="mt-5 flex flex-col sm:flex-row">
