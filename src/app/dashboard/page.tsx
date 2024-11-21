@@ -94,7 +94,7 @@ export default function DashboardPage() {
 
   return (
     <section className=" mt-5">
-      <h2 className=" text-2xl font-semibold">Dashboard Overview</h2>
+      <h2 className="text-[26px] font-bold">Dashboard Overview</h2>
 
       <div className="mt-2">
         <div>
