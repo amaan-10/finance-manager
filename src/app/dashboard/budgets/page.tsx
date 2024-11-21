@@ -140,84 +140,15 @@ export default function BudgetsPage() {
 
   return (
     <section className="mt-5">
-      <h2 className=" text-2xl font-semibold">Budgets</h2>
-      {loading ? (
-        <p>Loading budgets...</p> // Loading state
-      ) : error ? (
-        <p>Error: {error}</p> // Error state
-      ) : !budgets || budgets.length === 0 ? (
+      <h2 className="text-[26px] font-bold">Budgets</h2>
+      {!budgets || budgets.length === 0 ? (
         <>
-          <p>- No budgets till now.</p>
-          <p className="pt-3">Please set your budget here.</p>
+          <p className="pt-2">Please set your budget here.</p>
         </>
       ) : (
-        <>
-          {/* <ul className="mt-2">
-            {budgets.map((budget, index) => (
-              <span className="grid md:grid-cols-2 lg:grid-cols-3" key={index}>
-                <span className="">
-                  Budget - <span className=" font-serif">₹</span>
-                  {budget.amount} for {budget.month}, {budget.year}
-                </span>
-                <button
-                  className=" hover:underline max-w-32 text-start text-red-600"
-                  onClick={() => handleDeleteBudget(budget.month, budget.year)}
-                >
-                  Delete Budget
-                </button>
-              </span>
-            ))}
-          </ul> */}
-          <div className=" mt-4 md:w-2/3 lg:w-1/2 relative overflow-x-auto shadow-md rounded-lg">
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
-              <thead className=" text-sm text-gray-700 uppercase bg-gray-200 ">
-                <tr>
-                  <th scope="col" className="px-6 py-3">
-                    Month
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Budget
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    <span className="sr-only">Delete</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {budgets.map((budget, index) => (
-                  <tr
-                    key={index}
-                    className="bg-white border-b  hover:bg-gray-100 "
-                  >
-                    <th
-                      scope="row"
-                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
-                    >
-                      {getMonthName(budget.month)}, {budget.year}
-                    </th>
-                    <td className="px-6 py-4">
-                      <span className=" font-serif">₹</span>
-                      {budget.amount}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button
-                        className=" hover:underline max-w-32 font-medium text-start text-red-600"
-                        onClick={() =>
-                          handleDeleteBudget(budget.month, budget.year)
-                        }
-                      >
-                        Delete Budget
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="pt-3">
-            Please re-enter the amount with same month to update the Budget.
-          </p>
-        </>
+        <p className="pt-2">
+          Please re-enter the amount with same month to update the Budget.
+        </p>
       )}
       <div className="mt-2 flex flex-col md:flex-row gap-3">
         <div className="relative ">
@@ -271,6 +202,81 @@ export default function BudgetsPage() {
           Add Budget
         </button>
       </div>
+      {loading ? (
+        <p className="pt-3">Loading budgets...</p> // Loading state
+      ) : error ? (
+        <p className="pt-3">Error: {error}</p> // Error state
+      ) : !budgets || budgets.length === 0 ? (
+        <>
+          <p className="pt-3">- No budgets till now.</p>
+        </>
+      ) : (
+        <>
+          {/* <ul className="mt-2">
+            {budgets.map((budget, index) => (
+              <span className="grid md:grid-cols-2 lg:grid-cols-3" key={index}>
+                <span className="">
+                  Budget - <span className=" font-serif">₹</span>
+                  {budget.amount} for {budget.month}, {budget.year}
+                </span>
+                <button
+                  className=" hover:underline max-w-32 text-start text-red-600"
+                  onClick={() => handleDeleteBudget(budget.month, budget.year)}
+                >
+                  Delete Budget
+                </button>
+              </span>
+            ))}
+          </ul> */}
+
+          <div className=" mt-4 md:w-2/3 lg:w-1/2 relative overflow-x-auto shadow-md rounded-lg">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
+              <thead className=" text-sm text-gray-700 uppercase bg-gray-200 ">
+                <tr>
+                  <th scope="col" className="px-6 py-3">
+                    Month
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Budget
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    <span className="sr-only">Delete</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {budgets.map((budget, index) => (
+                  <tr
+                    key={index}
+                    className="bg-white border-b  hover:bg-gray-100 "
+                  >
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
+                    >
+                      {getMonthName(budget.month)}, {budget.year}
+                    </th>
+                    <td className="px-6 py-4">
+                      <span className=" font-serif">₹</span>
+                      {budget.amount}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        className=" hover:underline max-w-32 font-medium text-start text-red-600"
+                        onClick={() =>
+                          handleDeleteBudget(budget.month, budget.year)
+                        }
+                      >
+                        Delete Budget
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </section>
   );
 }
