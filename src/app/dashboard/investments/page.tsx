@@ -130,95 +130,8 @@ const InvestmentsPage: React.FC = () => {
 
   return (
     <section className=" mt-5">
-      <h2 className=" text-2xl font-semibold">Investments</h2>
-      {loading ? (
-        <p>Loading investments...</p> // Loading state
-      ) : error ? (
-        <p>Error: {error}</p> // Error state
-      ) : !investments || investments.length === 0 ? (
-        <p>- No investments till now.</p>
-      ) : (
-        // <ul>
-        //   {investments.map((inv) => (
-        //     <span className="grid md:grid-cols-2 lg:grid-cols-3" key={inv._id}>
-        //       {inv.type !== "stock" ? (
-        //         <>
-        //           <span className=" ">
-        //             {inv.type}: <span className=" font-serif">₹</span>
-        //             {inv.amount} on{" "}
-        //             {new Date(inv.date).toLocaleDateString("en-GB")}
-        //           </span>
-        //           <button
-        //             className=" text-left max-w-44 hover:underline text-red-600"
-        //             onClick={() => deleteInvestment(inv._id)}
-        //           >
-        //             Delete Investment
-        //           </button>
-        //         </>
-        //       ) : (
-        //         ""
-        //       )}
-        //     </span>
-        //   ))}
-        // </ul>
-        <>
-          <div className=" mt-4 md:w-2/3 lg:w-3/5 relative overflow-x-auto shadow-md rounded-lg">
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
-              <thead className=" text-sm text-gray-700 uppercase bg-gray-200 ">
-                <tr>
-                  <th scope="col" className="px-6 py-3">
-                    Type
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Amount
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Date
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    <span className="sr-only">Delete</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {investments.map((inv) =>
-                  inv.type !== "stock" ? (
-                    <tr
-                      key={inv._id}
-                      className="bg-white border-b  hover:bg-gray-100 "
-                    >
-                      <th
-                        scope="row"
-                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
-                      >
-                        {inv.type}
-                      </th>
-                      <td className="px-6 py-4">
-                        <span className=" font-serif">₹</span>
-                        {inv.amount}
-                      </td>
-                      <td className="px-6 py-4">
-                        {new Date(inv.date).toLocaleDateString("en-GB")}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          className=" text-left max-w-44 font-medium hover:underline text-red-600"
-                          onClick={() => deleteInvestment(inv._id)}
-                        >
-                          Delete Investment
-                        </button>
-                      </td>
-                    </tr>
-                  ) : (
-                    ""
-                  )
-                )}
-              </tbody>
-            </table>
-          </div>
-          <p className="pt-3">Please add your investments here.</p>
-        </>
-      )}
+      <h2 className="text-[26px] font-bold">Investments</h2>
+      <p className="pt-2">Please add your investments here.</p>
 
       <form onSubmit={handleSubmit}>
         <div className="mt-2 flex flex-col flex-wrap md:flex-row gap-3">
@@ -317,6 +230,94 @@ const InvestmentsPage: React.FC = () => {
           </button>
         </div>
       </form>
+      {loading ? (
+        <p className="pt-3">Loading investments...</p> // Loading state
+      ) : error ? (
+        <p className="pt-3">Error: {error}</p> // Error state
+      ) : !investments || investments.length === 0 ? (
+        <p className="pt-3">- No investments till now.</p>
+      ) : (
+        // <ul>
+        //   {investments.map((inv) => (
+        //     <span className="grid md:grid-cols-2 lg:grid-cols-3" key={inv._id}>
+        //       {inv.type !== "stock" ? (
+        //         <>
+        //           <span className=" ">
+        //             {inv.type}: <span className=" font-serif">₹</span>
+        //             {inv.amount} on{" "}
+        //             {new Date(inv.date).toLocaleDateString("en-GB")}
+        //           </span>
+        //           <button
+        //             className=" text-left max-w-44 hover:underline text-red-600"
+        //             onClick={() => deleteInvestment(inv._id)}
+        //           >
+        //             Delete Investment
+        //           </button>
+        //         </>
+        //       ) : (
+        //         ""
+        //       )}
+        //     </span>
+        //   ))}
+        // </ul>
+        <>
+          <div className=" mt-4 md:w-2/3 lg:w-3/5 relative overflow-x-auto shadow-md rounded-lg">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
+              <thead className=" text-sm text-gray-700 uppercase bg-gray-200 ">
+                <tr>
+                  <th scope="col" className="px-6 py-3">
+                    Type
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Amount
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Date
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    <span className="sr-only">Delete</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {investments.map((inv) =>
+                  inv.type !== "stock" ? (
+                    <tr
+                      key={inv._id}
+                      className="bg-white border-b  hover:bg-gray-100 "
+                    >
+                      <th
+                        scope="row"
+                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
+                      >
+                        {inv.type}
+                      </th>
+                      <td className="px-6 py-4">
+                        <span className=" font-serif">₹</span>
+                        {inv.amount}
+                      </td>
+                      <td className="px-6 py-4">
+                        {new Date(inv.date).toLocaleDateString("en-GB")}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          className=" text-left max-w-44 font-medium hover:underline text-red-600"
+                          onClick={() => deleteInvestment(inv._id)}
+                        >
+                          Delete Investment
+                        </button>
+                      </td>
+                    </tr>
+                  ) : (
+                    ""
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
       <div>
         <div className=" pt-5">
           <h2 className=" font-extrabold text-xl">Stock Portfolio</h2>
