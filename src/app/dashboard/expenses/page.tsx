@@ -101,13 +101,65 @@ export default function ExpensesPage() {
 
   return (
     <section className="mt-5">
-      <h2 className=" text-2xl font-semibold">Expenses</h2>
+      <h2 className="text-[26px] font-bold">Expenses</h2>
+      <p className="pt-2">Please add your expenses here.</p>
+      <div className="mt-2 flex flex-col md:flex-row gap-3">
+        <div className="relative ">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+            <svg
+              className="w-4 h-4 text-gray-500 "
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 512 512"
+            >
+              <path d="M40 48C26.7 48 16 58.7 16 72l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24L40 48zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L192 64zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zM16 232l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0z" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 "
+            placeholder="Category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+          />
+        </div>
+        <div className="relative ">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+            <svg
+              className="w-4 h-4 text-gray-500 "
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 320 512"
+            >
+              <path d="M0 64C0 46.3 14.3 32 32 32l64 0 16 0 176 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-56.2 0c9.6 14.4 16.7 30.6 20.7 48l35.6 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-35.6 0c-13.2 58.3-61.9 103.2-122.2 110.9L274.6 422c14.4 10.3 17.7 30.3 7.4 44.6s-30.3 17.7-44.6 7.4L13.4 314C2.1 306-2.7 291.5 1.5 278.2S18.1 256 32 256l80 0c32.8 0 61-19.7 73.3-48L32 208c-17.7 0-32-14.3-32-32s14.3-32 32-32l153.3 0C173 115.7 144.8 96 112 96L96 96 32 96C14.3 96 0 81.7 0 64z" />
+            </svg>
+          </div>
+          <input
+            type="number"
+            placeholder="Amount"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 "
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            required
+          />
+        </div>
+        <button
+          type="button"
+          className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+          onClick={handleAddExpense}
+        >
+          Add Expense
+        </button>
+      </div>
       {loading ? (
-        <p>Loading expenses...</p> // Loading state
+        <p className="pt-3">Loading expenses...</p> // Loading state
       ) : error ? (
-        <p>Error: {error}</p> // Error state
+        <p className="pt-3">Error: {error}</p> // Error state
       ) : !expenses || expenses.length === 0 ? (
-        <p>- No expenses till now.</p>
+        <p className="pt-3">- No expenses till now.</p>
       ) : (
         // <ul className="mt-2">
         //   {expenses.map((expense, index) => (
@@ -132,7 +184,7 @@ export default function ExpensesPage() {
         //     </span>
         //   ))}
         // </ul>
-        <div className=" mt-4 md:w-2/3 lg:w-3/5 relative overflow-x-auto shadow-md rounded-lg">
+        <div className=" mt-5 md:w-2/3 lg:w-3/5 relative overflow-x-auto shadow-md rounded-lg">
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
             <thead className=" text-sm text-gray-700 uppercase bg-gray-200 ">
               <tr>
@@ -189,58 +241,6 @@ export default function ExpensesPage() {
           </table>
         </div>
       )}
-      <p className="pt-3">Please add your expenses here.</p>
-      <div className="mt-2 flex flex-col md:flex-row gap-3">
-        <div className="relative ">
-          <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-            <svg
-              className="w-4 h-4 text-gray-500 "
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 512 512"
-            >
-              <path d="M40 48C26.7 48 16 58.7 16 72l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24L40 48zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L192 64zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zM16 232l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0z" />
-            </svg>
-          </div>
-          <input
-            type="text"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 "
-            placeholder="Category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-          />
-        </div>
-        <div className="relative ">
-          <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-            <svg
-              className="w-4 h-4 text-gray-500 "
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 320 512"
-            >
-              <path d="M0 64C0 46.3 14.3 32 32 32l64 0 16 0 176 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-56.2 0c9.6 14.4 16.7 30.6 20.7 48l35.6 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-35.6 0c-13.2 58.3-61.9 103.2-122.2 110.9L274.6 422c14.4 10.3 17.7 30.3 7.4 44.6s-30.3 17.7-44.6 7.4L13.4 314C2.1 306-2.7 291.5 1.5 278.2S18.1 256 32 256l80 0c32.8 0 61-19.7 73.3-48L32 208c-17.7 0-32-14.3-32-32s14.3-32 32-32l153.3 0C173 115.7 144.8 96 112 96L96 96 32 96C14.3 96 0 81.7 0 64z" />
-            </svg>
-          </div>
-          <input
-            type="number"
-            placeholder="Amount"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 "
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            required
-          />
-        </div>
-        <button
-          type="button"
-          className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-          onClick={handleAddExpense}
-        >
-          Add Expense
-        </button>
-      </div>
     </section>
   );
 }
