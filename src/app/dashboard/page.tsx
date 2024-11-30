@@ -58,7 +58,7 @@ export default function DashboardPage() {
         const res = await fetch(`/api/budgets/monthly`);
         const data = await res.json();
         //console.log("Monthly Budget:", data);
-        setBudget(data[0].remaining);
+        setBudget(data[0]?.remaining ?? 0);
         //console.log(data);
       } catch (err: any) {
         setBudgetError(err.message);

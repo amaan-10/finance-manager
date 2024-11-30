@@ -31,10 +31,19 @@ type categoryExpenses = {
   totalAmount: number;
 };
 
+type Transactions = {
+  category: string;
+  amount: number;
+  date: string;
+  notes?: string;
+};
+
 type Budget = {
   budget: number;
-  spent: number;
+  spend: number;
   remaining: number;
+  month: number;
+  year: number;
 };
 
 type Investment = {
@@ -49,10 +58,6 @@ type TotalInvestment = {
 
 // app/dashboard/page.tsx
 export default function AnalyticsPage() {
-  const [expenses, setExpenses] = useState<Expense[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   const [outerRadius, setOuterRadius] = useState(100);
 
   // Adjust outer radius based on window width
@@ -77,6 +82,10 @@ export default function AnalyticsPage() {
     return () => window.removeEventListener("resize", updateRadius);
   }, []);
 
+  const [expenses, setExpenses] = useState<Expense[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchMonthlyExpenses = async () => {
       try {
@@ -92,6 +101,39 @@ export default function AnalyticsPage() {
     };
     fetchMonthlyExpenses();
   }, []);
+
+  const getTotalAmountForMonth = (month: number, year: number) => {
+    if (!expenses) return 0;
+    const entry = expenses.find(
+      (item) => item._id.month === month && item._id.year === year
+    );
+    return entry ? entry.totalAmount : 0; // Return 0 if no data is found
+  };
+
+  const getComparison = () => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-based
+    const currentYear = currentDate.getFullYear();
+
+    // Handle cases where the previous month is December of the previous year
+    const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+    const previousYear = currentMonth === 1 ? currentYear - 1 : currentYear;
+
+    const currentAmount = getTotalAmountForMonth(currentMonth, currentYear);
+    const previousAmount = getTotalAmountForMonth(previousMonth, previousYear);
+
+    // Calculate percentage difference
+    if (previousAmount === 0) return { currentAmount, differencePercent: null }; // Avoid division by 0
+
+    const differencePercent =
+      ((currentAmount - previousAmount) / previousAmount) * 100;
+    return {
+      currentAmount,
+      differencePercent: parseFloat(differencePercent.toFixed(2)),
+    };
+  };
+
+  const { currentAmount, differencePercent } = getComparison();
 
   function getMonthName(monthNumber: number): string {
     const months: string[] = [
@@ -124,15 +166,53 @@ export default function AnalyticsPage() {
   const [categoryloading, setCategoryLoading] = useState(true);
   const [categoryError, setCategoryError] = useState<string | null>(null);
 
+  const [highestCategory, setHighestCategory] = useState<string>("Category");
+  const [highestPercentage, setHighestPercentage] = useState<number>(0);
+
   useEffect(() => {
     const fetchMonthlyExpenses = async () => {
       try {
         const res = await fetch(`/api/expenses/category`);
-        const data = await res.json();
+        const data: categoryExpenses[] = await res.json();
         //console.log("Monthly Expenses:", data);
         setCategoryExpenses(data);
+
+        // Calculate the total amount across all categories
+        const totalSum = data.reduce((sum, item) => sum + item.totalAmount, 0);
+        //console.log(totalSum);
+
+        // Find the category with the highest totalAmount
+        let highestCategoryData;
+
+        if (data.length > 0) {
+          highestCategoryData = data.reduce((max, item) =>
+            item.totalAmount > max.totalAmount ? item : max
+          );
+        } else {
+          highestCategoryData = null; // Or provide a default value
+        }
+
+        //console.log(highestCategoryData); // Output: null
+
+        //console.log(highestCategoryData);
+
+        // Calculate the percentage of the highest category
+        if (highestCategoryData) {
+          const highestPercentage = (
+            (highestCategoryData.totalAmount / totalSum) *
+            100
+          ).toFixed(2);
+          setHighestPercentage(parseFloat(highestPercentage));
+          setHighestCategory(highestCategoryData.category);
+        } else {
+          setHighestPercentage(0);
+          setHighestCategory("Category");
+        }
+
+        //console.log(highestPercentage);
       } catch (err: any) {
         setCategoryError(err.message);
+        console.error(err);
       } finally {
         setCategoryLoading(false);
       }
@@ -142,7 +222,81 @@ export default function AnalyticsPage() {
   const categoryExp = (categoryExpenses || []).map((item) => ({
     ...item,
   }));
-  //   console.log(categoryExp);
+  // console.log(categoryExp);
+
+  const capitalizeFirstLetter = (string: string) =>
+    string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+
+  const Category = capitalizeFirstLetter(highestCategory);
+
+  const [transactions, setTransactions] = useState(0);
+  const [percentageGrowth, setPercentageGrowth] = useState(0);
+  const [transactionsLoading, setTransactionsLoading] = useState(true);
+  const [transactionsError, setTransactionsError] = useState<string | null>(
+    null
+  );
+  const [category, setCategory] = useState("");
+  const [amount, setAmount] = useState("");
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        const response = await fetch("/api/expenses");
+        const data: Transactions[] = await response.json();
+        // console.log(data);
+
+        // Get the current date
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth(); // 0-indexed
+        const currentYear = currentDate.getFullYear();
+
+        // Calculate the previous month and year
+        const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+        const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+        // Filter expenses for the current and previous months
+        const currentMonthExpenses = data.filter((expense) => {
+          const expenseDate = new Date(expense.date);
+          return (
+            expenseDate.getMonth() === currentMonth &&
+            expenseDate.getFullYear() === currentYear
+          );
+        });
+
+        const previousMonthExpenses = data.filter((expense) => {
+          const expenseDate = new Date(expense.date);
+          return (
+            expenseDate.getMonth() === previousMonth &&
+            expenseDate.getFullYear() === previousYear
+          );
+        });
+
+        // Calculate counts
+        const currentCount = currentMonthExpenses.length;
+        const previousCount = previousMonthExpenses.length;
+
+        // Calculate percentage growth
+        if (previousCount === 0) {
+          setTransactions(currentCount);
+          setPercentageGrowth(0); // Avoid division by 0
+        } else {
+          const percentageGrowth =
+            ((currentCount - previousCount) / previousCount) * 100;
+
+          setTransactions(currentCount);
+          setPercentageGrowth(parseFloat(percentageGrowth.toFixed(2)));
+        }
+      } catch (err: any) {
+        setTransactionsError(err.message);
+      } finally {
+        setTransactionsLoading(false);
+      }
+    };
+
+    fetchExpenses();
+  }, []);
+
+  //console.log(percentageGrowth);
 
   function generateUniqueColors(n: number): string[] {
     const colors: string[] = [];
@@ -171,20 +325,22 @@ export default function AnalyticsPage() {
         const res = await fetch(`/api/budgets/monthly`);
         const data = await res.json();
         //console.log("Monthly Budget:", data);
-        //console.log(data);
+        //console.log(data[0]);
         setBudget(data);
-        const total = data[0].budget;
-        const spentPercentage = (data[0].spent / total) * 100;
-        const remainingPercentage = (data[0].remaining / total) * 100;
-        //console.log(data[0].budget);
+        if (data) {
+          const total = data[0]?.budget ?? 0;
+          const spentPercentage = ((data[0]?.spend ?? 0) / total) * 100;
+          const remainingPercentage = ((data[0]?.remaining ?? 0) / total) * 100;
+          //console.log(data[0].budget);
 
-        setBudgetsData([
-          { name: "Spent", value: spentPercentage },
-          {
-            name: "Remaining",
-            value: remainingPercentage < 0 ? 0 : remainingPercentage,
-          },
-        ]);
+          setBudgetsData([
+            { name: "Spent", value: spentPercentage },
+            {
+              name: "Remaining",
+              value: remainingPercentage < 0 ? 0 : remainingPercentage,
+            },
+          ]);
+        }
       } catch (err: any) {
         setBudgetError(err.message);
       } finally {
@@ -194,7 +350,41 @@ export default function AnalyticsPage() {
     fetchMonthlyBudget();
   }, []);
 
-  //console.log(budgetsData[0]);
+  const getSavingForMonth = (month: number, year: number) => {
+    if (!budgets) return 0;
+    const entry = budgets.find(
+      (item) => item.month === month && item.year === year
+    );
+    return entry ? entry.remaining : 0; // Return 0 if no data is found
+  };
+
+  const getSavingComparison = () => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-based
+    const currentYear = currentDate.getFullYear();
+
+    // Handle cases where the previous month is December of the previous year
+    const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+    const previousYear = currentMonth === 1 ? currentYear - 1 : currentYear;
+
+    const currentSavings = getSavingForMonth(currentMonth, currentYear);
+    const previousSavings = getSavingForMonth(previousMonth, previousYear);
+
+    // Calculate percentage difference
+    if (previousSavings === 0)
+      return { currentSavings, differencePercentSaving: null }; // Avoid division by 0
+
+    const differencePercentSaving =
+      ((currentSavings - previousSavings) / previousSavings) * 100;
+    return {
+      currentSavings,
+      differencePercentSaving: parseFloat(differencePercentSaving.toFixed(2)),
+    };
+  };
+
+  const { currentSavings, differencePercentSaving } = getSavingComparison();
+
+  // console.log(budgets);
 
   const RADIAN = Math.PI / 180;
   const COLORS = ["#FF8042", "#00C49F"];
@@ -252,7 +442,7 @@ export default function AnalyticsPage() {
       try {
         const res = await fetch(`/api/investments/total`);
         const data = await res.json();
-        console.log("Total Investment:", data);
+        // console.log("Total Investment:", data);
         setInvestment(data.byType);
         setTotalInvestment(data.totalAmount);
         //console.log(data);
@@ -269,7 +459,7 @@ export default function AnalyticsPage() {
     <section className=" mt-5">
       <h2 className="text-[26px] font-bold">Analytics</h2>
       <div className="mt-5">
-        <div className="flex gap-5 flex-col md:flex-row">
+        <div className="flex gap-5 flex-col md:flex-row w-auto">
           <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-3/4 lg:w-1/2">
             <div className="flex justify-between">
               <span className="px-7 font-medium text-base">Total Spent</span>
@@ -284,10 +474,16 @@ export default function AnalyticsPage() {
               </svg>
             </div>
             <div className="px-7 font-bold text-3xl pt-2">
-              <span className=" font-serif">₹</span>6969
+              <span className=" font-serif">₹</span>
+              {currentAmount}
             </div>
             <div className="px-7 text-sm font-normal text-slate-500">
-              <span className="">+20% from last month</span>
+              <span className="">
+                {differencePercent !== null
+                  ? `${differencePercent > 0 ? "+" : ""}${differencePercent}%`
+                  : "0%"}{" "}
+                from last month
+              </span>
             </div>
           </div>
           <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-3/4 lg:w-1/2">
@@ -303,10 +499,18 @@ export default function AnalyticsPage() {
               </svg>
             </div>
             <div className="px-7 font-bold text-3xl pt-2">
-              <span className=" font-serif">₹</span>969
+              <span className=" font-serif">₹</span>
+              {currentSavings}
             </div>
             <div className="px-7 text-sm font-normal text-slate-500">
-              <span className="">+20% from last month</span>
+              <span className="">
+                {differencePercentSaving !== null
+                  ? `${
+                      differencePercentSaving > 0 ? "+" : ""
+                    }${differencePercentSaving}%`
+                  : "0%"}{" "}
+                from last month
+              </span>
             </div>
           </div>
           <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-3/4 lg:w-1/2">
@@ -321,14 +525,14 @@ export default function AnalyticsPage() {
                 <path d="M544.018 223.25C535.768 103.75 440.268 8.25 320.768 0C320.518 0 320.143 0 319.768 0C311.143 0 304.018 7.5 304.018 16.25V240H527.768C536.893 240 544.643 232.375 544.018 223.25ZM352.018 192V53.5C419.518 71 473.018 124.5 490.518 192H352.018ZM256.018 288V50.75C256.018 41.875 248.893 34.5 240.268 34.5C239.518 34.5 238.893 34.5 238.143 34.625C119.018 51.5 27.893 155.625 32.143 280.375C36.518 407.5 145.143 512 272.143 512C273.143 512 274.018 512 275.018 512C325.393 511.375 372.018 495.125 410.268 468C418.268 462.375 418.768 450.75 411.893 443.875L256.018 288ZM274.518 464H272.143C171.518 464 83.518 379.125 80.143 278.75C77.268 193.375 130.268 118.375 208.018 91.125V307.875L222.018 322L348.268 448.125C325.143 458.25 300.143 463.625 274.518 464ZM559.768 288H322.518L480.518 446C483.768 449.25 488.018 450.875 492.143 450.875C496.018 450.875 499.768 449.5 502.768 446.75C541.393 410.25 568.018 361.125 575.893 305.875C577.268 296.375 569.393 288 559.768 288Z" />
               </svg>
             </div>
-            <div className="px-7 font-bold text-3xl pt-2">Food</div>
+            <div className="px-7 font-bold text-3xl pt-2">{Category}</div>
             <div className="px-7 text-sm font-normal text-slate-500">
-              <span className="">20% of total spending</span>
+              <span className="">{highestPercentage}% of total spending</span>
             </div>
           </div>
           <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-3/4 lg:w-1/2">
             <div className="flex justify-between">
-              <span className="px-7 font-medium">Transactions</span>
+              <span className="px-7 font-medium ">Transactions</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className=" pt-1 h-6 pl-[30px] transform scale-x-[-1]"
@@ -338,9 +542,14 @@ export default function AnalyticsPage() {
                 <path d="M0 80l0 48c0 17.7 14.3 32 32 32l16 0 48 0 0-80c0-26.5-21.5-48-48-48S0 53.5 0 80zM112 32c10 13.4 16 30 16 48l0 304c0 35.3 28.7 64 64 64s64-28.7 64-64l0-5.3c0-32.4 26.3-58.7 58.7-58.7L480 320l0-192c0-53-43-96-96-96L112 32zM464 480c61.9 0 112-50.1 112-112c0-8.8-7.2-16-16-16l-245.3 0c-14.7 0-26.7 11.9-26.7 26.7l0 5.3c0 53-43 96-96 96l176 0 96 0z" />
               </svg>
             </div>
-            <div className="px-7 font-bold text-3xl pt-2">69</div>
+            <div className="px-7 font-bold text-3xl pt-2">{transactions}</div>
             <div className="px-7 text-sm font-normal text-slate-500">
-              <span className="">+20% from last month</span>
+              <span className="">
+                {percentageGrowth !== null
+                  ? `${percentageGrowth > 0 ? "+" : ""}${percentageGrowth}%`
+                  : "0%"}{" "}
+                from last month
+              </span>
             </div>
           </div>
         </div>
@@ -429,7 +638,7 @@ export default function AnalyticsPage() {
               <p>Loading budgets...</p> // Loading state
             ) : budgetError ? (
               <p>Error: {budgetError}</p> // Error state
-            ) : !budgets ? (
+            ) : !budgets || budgets.length === 0 ? (
               <p>- No budget set for this month.</p> // No data found
             ) : (
               <div className="h-[325px] ">
@@ -484,29 +693,31 @@ export default function AnalyticsPage() {
                 <div className="text-center">
                   <span className=" text-[#FF8042] text-lg">
                     ● spent - <span className=" font-serif">₹</span>
-                    {budgets[0].spent}
+                    {budgets[0]?.spend ?? 0}
                   </span>
                 </div>
                 <div className="text-center">
                   <span className=" text-[#00C49F] text-lg">
                     ● remaining - <span className=" font-serif">₹</span>
-                    {budgets[0].remaining <= 0 ? (
+                    {(budgets[0]?.remaining ?? 0) <= 0 ? (
                       <>
-                        {budgets[0].remaining}
+                        {budgets[0]?.remaining ?? 0}
                         <div className=" text-red-600 font-semibold animate-pulse">
                           budget limit exceeded!!
                         </div>
                       </>
-                    ) : budgets[0].remaining > 0 &&
-                      (budgets[0].remaining * 100) / budgets[0].budget <= 10 ? (
+                    ) : (budgets[0]?.remaining ?? 0) > 0 &&
+                      ((budgets[0]?.remaining ?? 0) * 100) /
+                        (budgets[0]?.budget ?? 0) <=
+                        10 ? (
                       <>
-                        {budgets[0].remaining}
+                        {budgets[0]?.remaining ?? 0}
                         <div className=" text-red-600 font-semibold animate-pulse">
                           about to run out of budget! spend wisely!!
                         </div>
                       </>
                     ) : (
-                      budgets[0].remaining
+                      budgets[0]?.remaining ?? 0
                     )}
                   </span>
                 </div>
