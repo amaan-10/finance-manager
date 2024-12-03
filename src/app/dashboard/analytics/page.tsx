@@ -46,6 +46,12 @@ type Budget = {
   year: number;
 };
 
+type thisMonthBudget = {
+  budget: number;
+  spent: number;
+  remaining: number;
+};
+
 type Investment = {
   totalAmount: number;
   _id: string;
@@ -315,7 +321,6 @@ export default function AnalyticsPage() {
   const colors = generateUniqueColors(categoryExp.length);
 
   const [budgets, setBudget] = useState<Budget[] | null>(null);
-  const [budgetsData, setBudgetsData] = useState<any[]>([]);
   const [budgetLoading, setBudgetLoading] = useState(true);
   const [budgetError, setBudgetError] = useState<string | null>(null);
 
@@ -327,10 +332,33 @@ export default function AnalyticsPage() {
         //console.log("Monthly Budget:", data);
         //console.log(data[0]);
         setBudget(data);
+      } catch (err: any) {
+        setBudgetError(err.message);
+      } finally {
+        setBudgetLoading(false);
+      }
+    };
+    fetchMonthlyBudget();
+  }, []);
+
+  const [budgetsData, setBudgetsData] = useState<any[]>([]);
+  const [thisMonthBudget, setThisMonthBudget] = useState<thisMonthBudget[]>([]);
+  const [budgetDataLoading, setBudgetDataLoading] = useState(true);
+  const [budgetDataError, setBudgetDataError] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchThisMonthBudget = async () => {
+      try {
+        const res = await fetch(`/api/budgets/this-month`);
+        const data = await res.json();
+        //console.log("This Month Budget:", data);
+
+        setThisMonthBudget([data]);
         if (data) {
-          const total = data[0]?.budget ?? 0;
-          const spentPercentage = ((data[0]?.spend ?? 0) / total) * 100;
-          const remainingPercentage = ((data[0]?.remaining ?? 0) / total) * 100;
+          const total = data?.budget ?? 0;
+          // console.log(total);
+          const spentPercentage = ((data?.spent ?? 0) / total) * 100;
+          // console.log(spentPercentage);
+          const remainingPercentage = ((data?.remaining ?? 0) / total) * 100;
           //console.log(data[0].budget);
 
           setBudgetsData([
@@ -342,13 +370,15 @@ export default function AnalyticsPage() {
           ]);
         }
       } catch (err: any) {
-        setBudgetError(err.message);
+        setBudgetDataError(err.message);
       } finally {
-        setBudgetLoading(false);
+        setBudgetDataLoading(false);
       }
     };
-    fetchMonthlyBudget();
+    fetchThisMonthBudget();
   }, []);
+
+  // console.log(budgetsData);
 
   const getSavingForMonth = (month: number, year: number) => {
     if (!budgets) return 0;
@@ -455,101 +485,110 @@ export default function AnalyticsPage() {
     fetchTotalInvestment();
   }, []);
 
+  let invColors: (string | undefined)[];
+  if (investments) {
+    invColors = generateUniqueColors(investments.length);
+  }
+
   return (
     <section className=" mt-5">
       <h2 className="text-[26px] font-bold">Analytics</h2>
       <div className="mt-5">
-        <div className="flex gap-5 flex-col md:flex-row w-auto">
-          <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-3/4 lg:w-1/2">
-            <div className="flex justify-between">
-              <span className="px-7 font-medium text-base">Total Spent</span>
+        <div className="flex gap-5 flex-col lg:flex-row ">
+          <div className="flex gap-5 flex-col  md:flex-row lg:w-1/2 ">
+            <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-1/2">
+              <div className="flex justify-between">
+                <span className="px-7 font-medium text-base">Total Spent</span>
 
-              <svg
-                className=" pt-1 h-6 pr-[30px]"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 320 512"
-                fill="#64748b"
-              >
-                <path d="M0 64C0 46.3 14.3 32 32 32l64 0 16 0 176 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-56.2 0c9.6 14.4 16.7 30.6 20.7 48l35.6 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-35.6 0c-13.2 58.3-61.9 103.2-122.2 110.9L274.6 422c14.4 10.3 17.7 30.3 7.4 44.6s-30.3 17.7-44.6 7.4L13.4 314C2.1 306-2.7 291.5 1.5 278.2S18.1 256 32 256l80 0c32.8 0 61-19.7 73.3-48L32 208c-17.7 0-32-14.3-32-32s14.3-32 32-32l153.3 0C173 115.7 144.8 96 112 96L96 96 32 96C14.3 96 0 81.7 0 64z" />
-              </svg>
+                <svg
+                  className=" pt-1 h-6 pr-[30px]"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 320 512"
+                  fill="#64748b"
+                >
+                  <path d="M0 64C0 46.3 14.3 32 32 32l64 0 16 0 176 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-56.2 0c9.6 14.4 16.7 30.6 20.7 48l35.6 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-35.6 0c-13.2 58.3-61.9 103.2-122.2 110.9L274.6 422c14.4 10.3 17.7 30.3 7.4 44.6s-30.3 17.7-44.6 7.4L13.4 314C2.1 306-2.7 291.5 1.5 278.2S18.1 256 32 256l80 0c32.8 0 61-19.7 73.3-48L32 208c-17.7 0-32-14.3-32-32s14.3-32 32-32l153.3 0C173 115.7 144.8 96 112 96L96 96 32 96C14.3 96 0 81.7 0 64z" />
+                </svg>
+              </div>
+              <div className="px-7 font-bold text-3xl pt-2">
+                <span className=" font-serif">₹</span>
+                {currentAmount}
+              </div>
+              <div className="px-7 text-sm font-normal text-slate-500">
+                <span className="">
+                  {differencePercent !== null
+                    ? `${differencePercent > 0 ? "+" : ""}${differencePercent}%`
+                    : "0%"}{" "}
+                  from last month
+                </span>
+              </div>
             </div>
-            <div className="px-7 font-bold text-3xl pt-2">
-              <span className=" font-serif">₹</span>
-              {currentAmount}
-            </div>
-            <div className="px-7 text-sm font-normal text-slate-500">
-              <span className="">
-                {differencePercent !== null
-                  ? `${differencePercent > 0 ? "+" : ""}${differencePercent}%`
-                  : "0%"}{" "}
-                from last month
-              </span>
-            </div>
-          </div>
-          <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-3/4 lg:w-1/2">
-            <div className="flex justify-between">
-              <span className="px-7 font-medium">Savings</span>
-              <svg
-                className=" pt-1 h-6 pr-[30px]"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="#64748b"
-                viewBox="0 0 512 512"
-              >
-                <path d="M512 80c0 18-14.3 34.6-38.4 48c-29.1 16.1-72.5 27.5-122.3 30.9c-3.7-1.8-7.4-3.5-11.3-5C300.6 137.4 248.2 128 192 128c-8.3 0-16.4 .2-24.5 .6l-1.1-.6C142.3 114.6 128 98 128 80c0-44.2 86-80 192-80S512 35.8 512 80zM160.7 161.1c10.2-.7 20.7-1.1 31.3-1.1c62.2 0 117.4 12.3 152.5 31.4C369.3 204.9 384 221.7 384 240c0 4-.7 7.9-2.1 11.7c-4.6 13.2-17 25.3-35 35.5c0 0 0 0 0 0c-.1 .1-.3 .1-.4 .2c0 0 0 0 0 0s0 0 0 0c-.3 .2-.6 .3-.9 .5c-35 19.4-90.8 32-153.6 32c-59.6 0-112.9-11.3-148.2-29.1c-1.9-.9-3.7-1.9-5.5-2.9C14.3 274.6 0 258 0 240c0-34.8 53.4-64.5 128-75.4c10.5-1.5 21.4-2.7 32.7-3.5zM416 240c0-21.9-10.6-39.9-24.1-53.4c28.3-4.4 54.2-11.4 76.2-20.5c16.3-6.8 31.5-15.2 43.9-25.5l0 35.4c0 19.3-16.5 37.1-43.8 50.9c-14.6 7.4-32.4 13.7-52.4 18.5c.1-1.8 .2-3.5 .2-5.3zm-32 96c0 18-14.3 34.6-38.4 48c-1.8 1-3.6 1.9-5.5 2.9C304.9 404.7 251.6 416 192 416c-62.8 0-118.6-12.6-153.6-32C14.3 370.6 0 354 0 336l0-35.4c12.5 10.3 27.6 18.7 43.9 25.5C83.4 342.6 135.8 352 192 352s108.6-9.4 148.1-25.9c7.8-3.2 15.3-6.9 22.4-10.9c6.1-3.4 11.8-7.2 17.2-11.2c1.5-1.1 2.9-2.3 4.3-3.4l0 3.4 0 5.7 0 26.3zm32 0l0-32 0-25.9c19-4.2 36.5-9.5 52.1-16c16.3-6.8 31.5-15.2 43.9-25.5l0 35.4c0 10.5-5 21-14.9 30.9c-16.3 16.3-45 29.7-81.3 38.4c.1-1.7 .2-3.5 .2-5.3zM192 448c56.2 0 108.6-9.4 148.1-25.9c16.3-6.8 31.5-15.2 43.9-25.5l0 35.4c0 44.2-86 80-192 80S0 476.2 0 432l0-35.4c12.5 10.3 27.6 18.7 43.9 25.5C83.4 438.6 135.8 448 192 448z" />
-              </svg>
-            </div>
-            <div className="px-7 font-bold text-3xl pt-2">
-              <span className=" font-serif">₹</span>
-              {currentSavings}
-            </div>
-            <div className="px-7 text-sm font-normal text-slate-500">
-              <span className="">
-                {differencePercentSaving !== null
-                  ? `${
-                      differencePercentSaving > 0 ? "+" : ""
-                    }${differencePercentSaving}%`
-                  : "0%"}{" "}
-                from last month
-              </span>
-            </div>
-          </div>
-          <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-3/4 lg:w-1/2">
-            <div className="flex justify-between">
-              <span className="px-7 font-medium">Top Category</span>
-              <svg
-                className=" pt-1 h-6 pr-[30px]"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="#64748b"
-                viewBox="0 0 576 512"
-              >
-                <path d="M544.018 223.25C535.768 103.75 440.268 8.25 320.768 0C320.518 0 320.143 0 319.768 0C311.143 0 304.018 7.5 304.018 16.25V240H527.768C536.893 240 544.643 232.375 544.018 223.25ZM352.018 192V53.5C419.518 71 473.018 124.5 490.518 192H352.018ZM256.018 288V50.75C256.018 41.875 248.893 34.5 240.268 34.5C239.518 34.5 238.893 34.5 238.143 34.625C119.018 51.5 27.893 155.625 32.143 280.375C36.518 407.5 145.143 512 272.143 512C273.143 512 274.018 512 275.018 512C325.393 511.375 372.018 495.125 410.268 468C418.268 462.375 418.768 450.75 411.893 443.875L256.018 288ZM274.518 464H272.143C171.518 464 83.518 379.125 80.143 278.75C77.268 193.375 130.268 118.375 208.018 91.125V307.875L222.018 322L348.268 448.125C325.143 458.25 300.143 463.625 274.518 464ZM559.768 288H322.518L480.518 446C483.768 449.25 488.018 450.875 492.143 450.875C496.018 450.875 499.768 449.5 502.768 446.75C541.393 410.25 568.018 361.125 575.893 305.875C577.268 296.375 569.393 288 559.768 288Z" />
-              </svg>
-            </div>
-            <div className="px-7 font-bold text-3xl pt-2">{Category}</div>
-            <div className="px-7 text-sm font-normal text-slate-500">
-              <span className="">{highestPercentage}% of total spending</span>
+            <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-1/2 ">
+              <div className="flex justify-between">
+                <span className="px-7 font-medium">Savings</span>
+                <svg
+                  className=" pt-1 h-6 pr-[30px]"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="#64748b"
+                  viewBox="0 0 512 512"
+                >
+                  <path d="M512 80c0 18-14.3 34.6-38.4 48c-29.1 16.1-72.5 27.5-122.3 30.9c-3.7-1.8-7.4-3.5-11.3-5C300.6 137.4 248.2 128 192 128c-8.3 0-16.4 .2-24.5 .6l-1.1-.6C142.3 114.6 128 98 128 80c0-44.2 86-80 192-80S512 35.8 512 80zM160.7 161.1c10.2-.7 20.7-1.1 31.3-1.1c62.2 0 117.4 12.3 152.5 31.4C369.3 204.9 384 221.7 384 240c0 4-.7 7.9-2.1 11.7c-4.6 13.2-17 25.3-35 35.5c0 0 0 0 0 0c-.1 .1-.3 .1-.4 .2c0 0 0 0 0 0s0 0 0 0c-.3 .2-.6 .3-.9 .5c-35 19.4-90.8 32-153.6 32c-59.6 0-112.9-11.3-148.2-29.1c-1.9-.9-3.7-1.9-5.5-2.9C14.3 274.6 0 258 0 240c0-34.8 53.4-64.5 128-75.4c10.5-1.5 21.4-2.7 32.7-3.5zM416 240c0-21.9-10.6-39.9-24.1-53.4c28.3-4.4 54.2-11.4 76.2-20.5c16.3-6.8 31.5-15.2 43.9-25.5l0 35.4c0 19.3-16.5 37.1-43.8 50.9c-14.6 7.4-32.4 13.7-52.4 18.5c.1-1.8 .2-3.5 .2-5.3zm-32 96c0 18-14.3 34.6-38.4 48c-1.8 1-3.6 1.9-5.5 2.9C304.9 404.7 251.6 416 192 416c-62.8 0-118.6-12.6-153.6-32C14.3 370.6 0 354 0 336l0-35.4c12.5 10.3 27.6 18.7 43.9 25.5C83.4 342.6 135.8 352 192 352s108.6-9.4 148.1-25.9c7.8-3.2 15.3-6.9 22.4-10.9c6.1-3.4 11.8-7.2 17.2-11.2c1.5-1.1 2.9-2.3 4.3-3.4l0 3.4 0 5.7 0 26.3zm32 0l0-32 0-25.9c19-4.2 36.5-9.5 52.1-16c16.3-6.8 31.5-15.2 43.9-25.5l0 35.4c0 10.5-5 21-14.9 30.9c-16.3 16.3-45 29.7-81.3 38.4c.1-1.7 .2-3.5 .2-5.3zM192 448c56.2 0 108.6-9.4 148.1-25.9c16.3-6.8 31.5-15.2 43.9-25.5l0 35.4c0 44.2-86 80-192 80S0 476.2 0 432l0-35.4c12.5 10.3 27.6 18.7 43.9 25.5C83.4 438.6 135.8 448 192 448z" />
+                </svg>
+              </div>
+              <div className="px-7 font-bold text-3xl pt-2">
+                <span className=" font-serif">₹</span>
+                {currentSavings}
+              </div>
+              <div className="px-7 text-sm font-normal text-slate-500">
+                <span className="">
+                  {differencePercentSaving !== null
+                    ? `${
+                        differencePercentSaving > 0 ? "+" : ""
+                      }${differencePercentSaving}%`
+                    : "0%"}{" "}
+                  from last month
+                </span>
+              </div>
             </div>
           </div>
-          <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-3/4 lg:w-1/2">
-            <div className="flex justify-between">
-              <span className="px-7 font-medium ">Transactions</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className=" pt-1 h-6 pl-[30px] transform scale-x-[-1]"
-                fill="#64748b"
-                viewBox="0 0 576 512"
-              >
-                <path d="M0 80l0 48c0 17.7 14.3 32 32 32l16 0 48 0 0-80c0-26.5-21.5-48-48-48S0 53.5 0 80zM112 32c10 13.4 16 30 16 48l0 304c0 35.3 28.7 64 64 64s64-28.7 64-64l0-5.3c0-32.4 26.3-58.7 58.7-58.7L480 320l0-192c0-53-43-96-96-96L112 32zM464 480c61.9 0 112-50.1 112-112c0-8.8-7.2-16-16-16l-245.3 0c-14.7 0-26.7 11.9-26.7 26.7l0 5.3c0 53-43 96-96 96l176 0 96 0z" />
-              </svg>
+          <div className="flex gap-5 flex-col md:flex-row lg:w-1/2 ">
+            <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-1/2 ">
+              <div className="flex justify-between">
+                <span className="px-7 font-medium">Top Category</span>
+                <svg
+                  className=" pt-1 h-6 pr-[30px]"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="#64748b"
+                  viewBox="0 0 576 512"
+                >
+                  <path d="M544.018 223.25C535.768 103.75 440.268 8.25 320.768 0C320.518 0 320.143 0 319.768 0C311.143 0 304.018 7.5 304.018 16.25V240H527.768C536.893 240 544.643 232.375 544.018 223.25ZM352.018 192V53.5C419.518 71 473.018 124.5 490.518 192H352.018ZM256.018 288V50.75C256.018 41.875 248.893 34.5 240.268 34.5C239.518 34.5 238.893 34.5 238.143 34.625C119.018 51.5 27.893 155.625 32.143 280.375C36.518 407.5 145.143 512 272.143 512C273.143 512 274.018 512 275.018 512C325.393 511.375 372.018 495.125 410.268 468C418.268 462.375 418.768 450.75 411.893 443.875L256.018 288ZM274.518 464H272.143C171.518 464 83.518 379.125 80.143 278.75C77.268 193.375 130.268 118.375 208.018 91.125V307.875L222.018 322L348.268 448.125C325.143 458.25 300.143 463.625 274.518 464ZM559.768 288H322.518L480.518 446C483.768 449.25 488.018 450.875 492.143 450.875C496.018 450.875 499.768 449.5 502.768 446.75C541.393 410.25 568.018 361.125 575.893 305.875C577.268 296.375 569.393 288 559.768 288Z" />
+                </svg>
+              </div>
+              <div className="px-7 font-bold text-3xl pt-2">{Category}</div>
+              <div className="px-7 text-sm font-normal text-slate-500">
+                <span className="">{highestPercentage}% of total spending</span>
+              </div>
             </div>
-            <div className="px-7 font-bold text-3xl pt-2">{transactions}</div>
-            <div className="px-7 text-sm font-normal text-slate-500">
-              <span className="">
-                {percentageGrowth !== null
-                  ? `${percentageGrowth > 0 ? "+" : ""}${percentageGrowth}%`
-                  : "0%"}{" "}
-                from last month
-              </span>
+            <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-1/2 ">
+              <div className="flex justify-between">
+                <span className="px-7 font-medium ">Transactions</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className=" pt-1 h-6 pl-[30px] transform scale-x-[-1]"
+                  fill="#64748b"
+                  viewBox="0 0 576 512"
+                >
+                  <path d="M0 80l0 48c0 17.7 14.3 32 32 32l16 0 48 0 0-80c0-26.5-21.5-48-48-48S0 53.5 0 80zM112 32c10 13.4 16 30 16 48l0 304c0 35.3 28.7 64 64 64s64-28.7 64-64l0-5.3c0-32.4 26.3-58.7 58.7-58.7L480 320l0-192c0-53-43-96-96-96L112 32zM464 480c61.9 0 112-50.1 112-112c0-8.8-7.2-16-16-16l-245.3 0c-14.7 0-26.7 11.9-26.7 26.7l0 5.3c0 53-43 96-96 96l176 0 96 0z" />
+                </svg>
+              </div>
+              <div className="px-7 font-bold text-3xl pt-2">{transactions}</div>
+              <div className="px-7 text-sm font-normal text-slate-500">
+                <span className="">
+                  {percentageGrowth !== null
+                    ? `${percentageGrowth > 0 ? "+" : ""}${percentageGrowth}%`
+                    : "0%"}{" "}
+                  from last month
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -634,11 +673,11 @@ export default function AnalyticsPage() {
         <div className=" pt-5">
           <div className=" border rounded-lg bg-white p-4 px-7 w-full ">
             <span className="text-xl font-semibold">Remaining Budget: </span>
-            {budgetLoading ? (
+            {budgetDataLoading ? (
               <p>Loading budgets...</p> // Loading state
-            ) : budgetError ? (
-              <p>Error: {budgetError}</p> // Error state
-            ) : !budgets || budgets.length === 0 ? (
+            ) : budgetDataError ? (
+              <p>Error: {budgetDataError}</p> // Error state
+            ) : !thisMonthBudget || thisMonthBudget.length === 0 ? (
               <p>- No budget set for this month.</p> // No data found
             ) : (
               <div className="h-[325px] ">
@@ -693,31 +732,31 @@ export default function AnalyticsPage() {
                 <div className="text-center">
                   <span className=" text-[#FF8042] text-lg">
                     ● spent - <span className=" font-serif">₹</span>
-                    {budgets[0]?.spend ?? 0}
+                    {thisMonthBudget[0]?.spent ?? 0}
                   </span>
                 </div>
                 <div className="text-center">
                   <span className=" text-[#00C49F] text-lg">
                     ● remaining - <span className=" font-serif">₹</span>
-                    {(budgets[0]?.remaining ?? 0) <= 0 ? (
+                    {(thisMonthBudget[0]?.remaining ?? 0) <= 0 ? (
                       <>
-                        {budgets[0]?.remaining ?? 0}
+                        {thisMonthBudget[0]?.remaining ?? 0}
                         <div className=" text-red-600 font-semibold animate-pulse">
                           budget limit exceeded!!
                         </div>
                       </>
-                    ) : (budgets[0]?.remaining ?? 0) > 0 &&
-                      ((budgets[0]?.remaining ?? 0) * 100) /
-                        (budgets[0]?.budget ?? 0) <=
+                    ) : (thisMonthBudget[0]?.remaining ?? 0) > 0 &&
+                      ((thisMonthBudget[0]?.remaining ?? 0) * 100) /
+                        (thisMonthBudget[0]?.budget ?? 0) <=
                         10 ? (
                       <>
-                        {budgets[0]?.remaining ?? 0}
+                        {thisMonthBudget[0]?.remaining ?? 0}
                         <div className=" text-red-600 font-semibold animate-pulse">
                           about to run out of budget! spend wisely!!
                         </div>
                       </>
                     ) : (
-                      budgets[0]?.remaining ?? 0
+                      thisMonthBudget[0].remaining ?? 0
                     )}
                   </span>
                 </div>
@@ -767,7 +806,7 @@ export default function AnalyticsPage() {
                       >
                         {/* Optional: Custom Colors */}
                         {investments.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={colors[index]} />
+                          <Cell key={`cell-${index}`} fill={invColors[index]} />
                         ))}
                       </Pie>
                       <Tooltip />
