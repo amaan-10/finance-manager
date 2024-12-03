@@ -352,13 +352,13 @@ export default function AnalyticsPage() {
         const data = await res.json();
         //console.log("This Month Budget:", data);
 
-        setThisMonthBudget([data]);
+        setThisMonthBudget(data);
         if (data) {
-          const total = data?.budget ?? 0;
+          const total = data[0]?.budget ?? 0;
           // console.log(total);
-          const spentPercentage = ((data?.spent ?? 0) / total) * 100;
+          const spentPercentage = ((data[0]?.spent ?? 0) / total) * 100;
           // console.log(spentPercentage);
-          const remainingPercentage = ((data?.remaining ?? 0) / total) * 100;
+          const remainingPercentage = ((data[0]?.remaining ?? 0) / total) * 100;
           //console.log(data[0].budget);
 
           setBudgetsData([
@@ -378,7 +378,7 @@ export default function AnalyticsPage() {
     fetchThisMonthBudget();
   }, []);
 
-  // console.log(budgetsData);
+  // console.log(thisMonthBudget.length);
 
   const getSavingForMonth = (month: number, year: number) => {
     if (!budgets) return 0;
