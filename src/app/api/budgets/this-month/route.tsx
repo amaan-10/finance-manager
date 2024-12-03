@@ -37,11 +37,13 @@ export async function GET(req: NextRequest) {
     ]);
     const spent = totalExpenses[0]?.totalAmount || 0;
     const remaining = budget.amount - spent;
-    return NextResponse.json({
-      budget: budget.amount,
-      spent,
-      remaining,
-    });
+    return NextResponse.json([
+      {
+        budget: budget.amount,
+        spent,
+        remaining,
+      },
+    ]);
   } catch (error) {
     console.error("Error fetching budget:", error);
     return NextResponse.json(
