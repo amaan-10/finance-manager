@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-key */
 "use client";
+import * as React from "react";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 
@@ -16,7 +17,62 @@ import {
   Pie,
   Cell,
   Sector,
+  Label,
 } from "recharts";
+
+import { TrendingUp } from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from "@/components/ui/chart";
+
+const chartData = [
+  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
+  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
+  { browser: "firefox", visitors: 287, fill: "var(--color-firefox)" },
+  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
+  { browser: "other", visitors: 190, fill: "var(--color-other)" },
+];
+
+const chartConfig = {
+  visitors: {
+    label: "Visitors",
+  },
+  chrome: {
+    label: "Chrome",
+    color: "hsl(var(--chart-1))",
+  },
+  safari: {
+    label: "Safari",
+    color: "hsl(var(--chart-2))",
+  },
+  firefox: {
+    label: "Firefox",
+    color: "hsl(var(--chart-3))",
+  },
+  edge: {
+    label: "Edge",
+    color: "hsl(var(--chart-4))",
+  },
+  other: {
+    label: "Other",
+    color: "hsl(var(--chart-5))",
+  },
+} satisfies ChartConfig;
 
 interface Expense {
   totalAmount: number;
@@ -61,6 +117,82 @@ type TotalInvestment = {
   totalAmount: number;
   _id: null;
 };
+
+function convertToCamelCase(str: string) {
+  return str
+    .toLowerCase() // Convert the string to lowercase
+    .replace(
+      /(?:^\w|[A-Z]|\b\w|\s+)/g, // Use regex to match spaces and capitalize next letters
+      (match: any, index: any) =>
+        index === 0 ? match.toLowerCase() : match.toUpperCase()
+    )
+    .replace(/\s+/g, ""); // Remove spaces
+}
+
+const lineChartConfig = {
+  expense: {
+    label: "Expense",
+    color: "hsl(12 76% 61%)",
+  },
+} satisfies ChartConfig;
+
+function generatePieChartConfig(
+  data: Array<{ category: string; totalAmount: number }>,
+  colors: string[]
+): ChartConfig {
+  return data.reduce((config, item, index) => {
+    config[convertToCamelCase(item.category)] = {
+      label: convertToCamelCase(item.category),
+      color: colors[index],
+    };
+    return config;
+  }, {} as ChartConfig);
+}
+
+function generateDonutChartConfig(
+  data: Array<{ _id: string; totalAmount: number }>,
+  colors: string[]
+): ChartConfig {
+  return data.reduce((config, item, index) => {
+    config[convertToCamelCase(item._id)] = {
+      label: convertToCamelCase(item._id),
+      color: colors[index],
+    };
+    return config;
+  }, {} as ChartConfig);
+}
+
+interface PieChartDataItem {
+  category: string;
+  totalAmount: number;
+  fill: string;
+}
+
+function generatePieChartData(
+  data: Array<{ category: string; totalAmount: number }>
+): PieChartDataItem[] {
+  return data.map((item) => ({
+    ...item,
+    category: convertToCamelCase(item.category),
+    fill: `var(--color-${convertToCamelCase(item.category)})`,
+  }));
+}
+
+interface DonutChartDataItem {
+  _id: string;
+  totalAmount: number;
+  fill: string;
+}
+
+function generateDonutChartData(
+  data: Array<{ _id: string; totalAmount: number }>
+): DonutChartDataItem[] {
+  return data.map((item) => ({
+    ...item,
+    _id: convertToCamelCase(item._id),
+    fill: `var(--color-${convertToCamelCase(item._id)})`,
+  }));
+}
 
 // app/dashboard/page.tsx
 export default function AnalyticsPage() {
@@ -305,13 +437,35 @@ export default function AnalyticsPage() {
   //console.log(percentageGrowth);
 
   function generateUniqueColors(n: number): string[] {
-    const colors: string[] = [];
-    const step = 360 / n;
+    const colors = [
+      "hsl(12 76% 61%)",
+      "hsl(173 58% 39%)",
+      "hsl(197 37% 24%)",
+      "hsl(43 74% 66%)",
+      "hsl(27 87% 67%)",
+    ];
 
-    for (let i = 0; i < n; i++) {
-      const hue = Math.floor(i * step);
-      const saturation = 100;
-      const lightness = 40;
+    // Define the base hues for the palette
+    const hues = [12, 173, 197, 43, 27]; // Red-Orange, Green, Blue, Yellow-Orange, Red-Orange
+
+    // Define ranges for saturation and lightness
+    const saturationRange = [58, 87]; // Between 58% and 87% saturation
+    const lightnessRange = [24, 66]; // Between 24% and 67% lightness
+
+    // Generate the specified number of colors
+    for (let i = 1; i <= n; i++) {
+      // Select the hue based on the index, wrapping around using modulo
+      const hue = hues[(i - 1) % hues.length];
+
+      // Randomize saturation and lightness within the defined ranges
+      const saturation =
+        Math.floor(Math.random() * (saturationRange[1] - saturationRange[0])) +
+        saturationRange[0];
+      const lightness =
+        Math.floor(Math.random() * (lightnessRange[1] - lightnessRange[0])) +
+        lightnessRange[0];
+
+      // Create the HSL color and add to the array
       colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
     }
 
@@ -485,10 +639,20 @@ export default function AnalyticsPage() {
     fetchTotalInvestment();
   }, []);
 
-  let invColors: (string | undefined)[];
+  let invColors: string[] = [];
   if (investments) {
-    invColors = generateUniqueColors(investments.length);
+    invColors = generateUniqueColors(investments.length) as string[];
   }
+
+  const piechartConfig = generatePieChartConfig(categoryExp, colors);
+  const pieChartData = generatePieChartData(categoryExp);
+
+  const donutChartConfig = generateDonutChartConfig(
+    investments || [],
+    invColors
+  );
+  const donutChartData = generateDonutChartData(investments || []);
+  console.log(donutChartConfig);
 
   return (
     <section className=" mt-5">
@@ -596,7 +760,7 @@ export default function AnalyticsPage() {
 
       <div className="mt-5">
         <div className="flex gap-5 flex-col md:flex-row">
-          <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-3/4 lg:w-1/2">
+          <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-1/2">
             <p className="text-xl font-semibold px-7">Monthly Expenses Trend</p>
             {loading ? (
               <p className="px-7">Loading expenses...</p> // Loading state
@@ -606,11 +770,11 @@ export default function AnalyticsPage() {
               <p className="px-7">- No expenses found.</p> // No data found
             ) : (
               // Render expense list if data exists
-              <div className="h-[350px] pr-7">
+              <div className="pr-7">
                 <p className="text-base text-slate-500 pb-2 px-7">
                   Your spending pattern over the time
                 </p>
-                <ResponsiveContainer>
+                {/* <ResponsiveContainer>
                   <LineChart data={monthlyExpense}>
                     <Line type="monotone" dataKey="expense" stroke="#8884d8" />
 
@@ -625,11 +789,66 @@ export default function AnalyticsPage() {
                       wrapperStyle={{ paddingBottom: 5 }}
                     />
                   </LineChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer> */}
+                <Card className="border-0 shadow-none pt-5">
+                  {/* <CardHeader>
+                    <CardTitle>Line Chart - Dots</CardTitle>
+                    <CardDescription>January - June 2024</CardDescription>
+                  </CardHeader> */}
+                  <CardContent>
+                    <ChartContainer config={lineChartConfig}>
+                      <ResponsiveContainer>
+                        <LineChart
+                          accessibilityLayer
+                          data={monthlyExpense}
+                          margin={{
+                            left: -20,
+                            right: 12,
+                          }}
+                        >
+                          <CartesianGrid vertical={false} />
+                          <XAxis
+                            dataKey="label"
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={8}
+                            tickFormatter={(value) => value.slice(0, 3)}
+                          />
+                          <YAxis />
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                          />
+                          <Line
+                            dataKey="expense"
+                            type="monotone"
+                            stroke="var(--color-expense)"
+                            strokeWidth={2}
+                            dot={{
+                              fill: "var(--color-expense)",
+                            }}
+                            activeDot={{
+                              r: 6,
+                            }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </CardContent>
+                  {/* <CardFooter className="flex-col items-start gap-2 text-sm">
+                    <div className="flex gap-2 font-medium leading-none">
+                      Trending up by 5.2% this month{" "}
+                      <TrendingUp className="h-4 w-4" />
+                    </div>
+                    <div className="leading-none text-muted-foreground">
+                      Showing total visitors for the last 6 months
+                    </div>
+                  </CardFooter> */}
+                </Card>
               </div>
             )}
           </div>
-          <div className=" border rounded-lg bg-white p-4 px-7 pb-12 md:w-3/4 lg:w-1/2">
+          <div className=" border rounded-lg bg-white p-4 px-7 pb-12 md:w-1/2">
             <p className="text-xl font-semibold">Expenses by Category</p>
             {categoryloading ? (
               <p>Loading expenses...</p> // Loading state
@@ -639,12 +858,12 @@ export default function AnalyticsPage() {
               <p>- No expenses found.</p> // No data found
             ) : (
               // Render expense list if data exists
-              <div className="h-[350px] ">
+              <>
                 <p className="text-base text-slate-500 pb-2">
                   Breakdown of your this month's expenses by category
                 </p>
-                <div className="h-[300px] xs:h-[330px]   ">
-                  <ResponsiveContainer>
+                <div>
+                  {/* <ResponsiveContainer>
                     <PieChart>
                       <Pie
                         data={categoryExp}
@@ -656,7 +875,6 @@ export default function AnalyticsPage() {
                         fill="#8884d8"
                         label
                       >
-                        {/* Optional: Custom Colors */}
                         {categoryExp.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={colors[index]} />
                         ))}
@@ -664,9 +882,46 @@ export default function AnalyticsPage() {
                       <Tooltip />
                       <Legend />
                     </PieChart>
-                  </ResponsiveContainer>
+                  </ResponsiveContainer> */}
+                  <Card className="border-0 shadow-none  ">
+                    {/* <CardHeader className="items-center pb-0">
+                      <CardTitle>Pie Chart - Label</CardTitle>
+                      <CardDescription>January - June 2024</CardDescription>
+                    </CardHeader> */}
+                    <CardContent className="flex-1 pb-0">
+                      <ChartContainer
+                        config={piechartConfig}
+                        className="mx-auto aspect-square max-h-[250px] lg:max-h-[300px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
+                      >
+                        <PieChart>
+                          <ChartTooltip
+                            content={<ChartTooltipContent hideLabel />}
+                          />
+                          <Pie
+                            data={pieChartData}
+                            dataKey="totalAmount"
+                            label
+                            nameKey="category"
+                          />
+                          <ChartLegend
+                            content={<ChartLegendContent nameKey="category" />}
+                            className="translate-y-2 flex-wrap gap-2 text-sm [&>*]:basis-1/4 [&>*]:justify-center"
+                          />
+                        </PieChart>
+                      </ChartContainer>
+                    </CardContent>
+                    {/* <CardFooter className="flex-col gap-2 text-sm">
+                      <div className="flex items-center gap-2 font-medium leading-none">
+                        Trending up by 5.2% this month{" "}
+                        <TrendingUp className="h-4 w-4" />
+                      </div>
+                      <div className="leading-none text-muted-foreground">
+                        Showing total visitors for the last 6 months
+                      </div>
+                    </CardFooter> */}
+                  </Card>
                 </div>
-              </div>
+              </>
             )}
           </div>
         </div>
@@ -692,8 +947,8 @@ export default function AnalyticsPage() {
                       nameKey="name"
                       cx="50%"
                       cy="75%"
-                      innerRadius="50"
-                      outerRadius="100"
+                      innerRadius="65"
+                      outerRadius="125"
                       fill="#8884d8"
                       startAngle={180}
                       endAngle={0}
@@ -712,8 +967,8 @@ export default function AnalyticsPage() {
                     {/* Render Needle */}
                     <svg
                       width="100%"
-                      height="100%"
-                      viewBox="55 58 200 200"
+                      height="120%"
+                      viewBox="55 80 200 204"
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       {needle(
@@ -730,14 +985,16 @@ export default function AnalyticsPage() {
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="text-center">
-                  <span className=" text-[#FF8042] text-lg">
-                    ● spent - <span className=" font-serif">₹</span>
+                  <span className=" text-black text-sm">
+                    <div className="h-2 w-2 shrink-0 rounded-[2px] bg-[#FF8042] inline-block mr-1"></div>{" "}
+                    spent - <span className=" font-serif">₹</span>
                     {thisMonthBudget[0]?.spent ?? 0}
                   </span>
                 </div>
                 <div className="text-center">
-                  <span className=" text-[#00C49F] text-lg">
-                    ● remaining - <span className=" font-serif">₹</span>
+                  <span className=" text-black text-sm">
+                    <div className="h-2 w-2 shrink-0 rounded-[2px] bg-[#00C49F] inline-block mr-1"></div>{" "}
+                    remaining - <span className=" font-serif">₹</span>
                     {(thisMonthBudget[0]?.remaining ?? 0) <= 0 ? (
                       <>
                         {thisMonthBudget[0]?.remaining ?? 0}
@@ -787,12 +1044,12 @@ export default function AnalyticsPage() {
               //     </li>
               //   ))}
               // </>
-              <div className="h-[400px] ">
+              <div>
                 <p className="text-base text-slate-500 pb-2">
                   Breakdown of your total investment
                 </p>
-                <div className="h-[300px] xs:h-[330px]   ">
-                  <ResponsiveContainer>
+                <div>
+                  {/* <ResponsiveContainer>
                     <PieChart>
                       <Pie
                         data={investments}
@@ -804,7 +1061,6 @@ export default function AnalyticsPage() {
                         fill="#8884d8"
                         label
                       >
-                        {/* Optional: Custom Colors */}
                         {investments.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={invColors[index]} />
                         ))}
@@ -812,7 +1068,81 @@ export default function AnalyticsPage() {
                       <Tooltip />
                       <Legend />
                     </PieChart>
-                  </ResponsiveContainer>
+                  </ResponsiveContainer> */}
+                  <Card className="border-0 shadow-none">
+                    {/* <CardHeader className="items-center pb-0">
+                      <CardTitle>Pie Chart - Donut with Text</CardTitle>
+                      <CardDescription>January - June 2024</CardDescription>
+                    </CardHeader> */}
+                    <CardContent className="flex-1 pb-0">
+                      <ChartContainer
+                        config={donutChartConfig}
+                        className="mx-auto aspect-square max-h-[250px] lg:max-h-[300px]"
+                      >
+                        <PieChart>
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                          />
+                          <Pie
+                            data={donutChartData}
+                            dataKey="totalAmount"
+                            nameKey="_id"
+                            innerRadius={60}
+                            outerRadius={90}
+                            strokeWidth={5}
+                          >
+                            <Label
+                              content={({ viewBox }) => {
+                                if (
+                                  viewBox &&
+                                  "cx" in viewBox &&
+                                  "cy" in viewBox
+                                ) {
+                                  return (
+                                    <text
+                                      x={viewBox.cx}
+                                      y={viewBox.cy}
+                                      textAnchor="middle"
+                                      dominantBaseline="middle"
+                                    >
+                                      <tspan
+                                        x={viewBox.cx}
+                                        y={viewBox.cy}
+                                        className="fill-foreground text-[26px] font-bold font-mono"
+                                      >
+                                        ₹{totalInvestment}
+                                      </tspan>
+                                      <tspan
+                                        x={viewBox.cx}
+                                        y={(viewBox.cy || 0) + 24}
+                                        className="fill-muted-foreground text-[13px]"
+                                      >
+                                        Investments
+                                      </tspan>
+                                    </text>
+                                  );
+                                }
+                              }}
+                            />
+                          </Pie>
+                          <ChartLegend
+                            content={<ChartLegendContent nameKey="_id" />}
+                            className="-translate-y-2 flex-wrap gap-2 text-sm [&>*]:basis-1/4 [&>*]:justify-center"
+                          />
+                        </PieChart>
+                      </ChartContainer>
+                    </CardContent>
+                    {/* <CardFooter className="flex-col gap-2 text-sm">
+                      <div className="flex items-center gap-2 font-medium leading-none">
+                        Trending up by 5.2% this month{" "}
+                        <TrendingUp className="h-4 w-4" />
+                      </div>
+                      <div className="leading-none text-muted-foreground">
+                        Showing total visitors for the last 6 months
+                      </div>
+                    </CardFooter> */}
+                  </Card>
                 </div>
               </div>
             )}
