@@ -59,19 +59,26 @@ const InvestmentsPage: React.FC = () => {
 
   async function deleteInvestment(id: string) {
     try {
-      const response = await fetch(`/api/investments`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(id),
-      });
-      //console.log(id);
-      const data = await response.json();
-      if (response.ok) {
-        setInvestments((prev) => prev.filter((inv) => inv._id !== id));
-        alert(data.message);
-        window.location.reload();
+      const userConfirmed = confirm(
+        "Are you sure you want to delete this investment record?"
+      );
+      if (userConfirmed) {
+        const response = await fetch(`/api/investments`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(id),
+        });
+        //console.log(id);
+        const data = await response.json();
+        if (response.ok) {
+          setInvestments((prev) => prev.filter((inv) => inv._id !== id));
+          alert(data.message);
+          window.location.reload();
+        } else {
+          alert(data.message);
+        }
       } else {
-        alert(data.message);
+        alert("Action canceled!");
       }
     } catch (error: any) {
       alert(error.message);
@@ -224,7 +231,7 @@ const InvestmentsPage: React.FC = () => {
           </div>
           <button
             type="submit"
-            className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+            className="border focus:outline-none focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 me-2 bg-gray-800 text-white border-gray-600 hover:bg-gray-700 hover:border-gray-600 focus:ring-gray-700"
           >
             Add Investment
           </button>
