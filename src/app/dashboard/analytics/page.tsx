@@ -39,41 +39,6 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
-
-const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 287, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 190, fill: "var(--color-other)" },
-];
-
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  chrome: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
-  },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
-  },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
-  },
-} satisfies ChartConfig;
-
 interface Expense {
   totalAmount: number;
   _id: {
@@ -197,16 +162,28 @@ function generateDonutChartData(
 // app/dashboard/page.tsx
 export default function AnalyticsPage() {
   const [outerRadius, setOuterRadius] = useState(100);
+  const [innerRadius, setInnerRadius] = useState(100);
+  const [donutInnerRadius, setDonutInnerRadius] = useState(100);
+  const [padding, setPadding] = useState(24);
 
   // Adjust outer radius based on window width
   useEffect(() => {
     const updateRadius = () => {
-      if (window.innerWidth < 500 && window.innerWidth > 400) {
-        setOuterRadius(75); // Smaller radius for mobile
-      } else if (window.innerWidth < 400 && window.innerWidth > 0) {
-        setOuterRadius(50); // Smaller radius for mobile
+      if (window.innerWidth < 400 && window.innerWidth > 0) {
+        setOuterRadius(95); // Smaller radius for mobile
+        setInnerRadius(45);
+        setDonutInnerRadius(40);
+        setPadding(20);
+      } else if (window.innerWidth < 500 && window.innerWidth > 400) {
+        setOuterRadius(115); // Smaller radius for mobile
+        setInnerRadius(55);
+        setDonutInnerRadius(55);
+        setPadding(22);
       } else {
-        setOuterRadius(100); // Larger radius for desktop/tablet
+        setOuterRadius(125); // Larger radius for desktop/tablet
+        setInnerRadius(65);
+        setDonutInnerRadius(70);
+        setPadding(24);
       }
     };
 
@@ -652,7 +629,7 @@ export default function AnalyticsPage() {
     invColors
   );
   const donutChartData = generateDonutChartData(investments || []);
-  console.log(donutChartConfig);
+  // console.log(donutChartConfig);
 
   return (
     <section className=" mt-5">
@@ -891,7 +868,7 @@ export default function AnalyticsPage() {
                     <CardContent className="flex-1 pb-0">
                       <ChartContainer
                         config={piechartConfig}
-                        className="mx-auto aspect-square max-h-[250px] lg:max-h-[300px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
+                        className="mx-auto aspect-square max-h-[300px] lg:max-h-[300px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
                       >
                         <PieChart>
                           <ChartTooltip
@@ -947,8 +924,8 @@ export default function AnalyticsPage() {
                       nameKey="name"
                       cx="50%"
                       cy="75%"
-                      innerRadius="65"
-                      outerRadius="125"
+                      innerRadius={innerRadius}
+                      outerRadius={outerRadius}
                       fill="#8884d8"
                       startAngle={180}
                       endAngle={0}
@@ -1069,15 +1046,15 @@ export default function AnalyticsPage() {
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer> */}
-                  <Card className="border-0 shadow-none">
+                  <Card className="border-0 shadow-none ">
                     {/* <CardHeader className="items-center pb-0">
                       <CardTitle>Pie Chart - Donut with Text</CardTitle>
                       <CardDescription>January - June 2024</CardDescription>
                     </CardHeader> */}
-                    <CardContent className="flex-1 pb-0">
+                    <CardContent className="flex-1 pb-0 ">
                       <ChartContainer
                         config={donutChartConfig}
-                        className="mx-auto aspect-square max-h-[250px] lg:max-h-[300px]"
+                        className="mx-auto w-[50vw] h-[350px] lg:max-h-[400px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
                       >
                         <PieChart>
                           <ChartTooltip
@@ -1088,8 +1065,7 @@ export default function AnalyticsPage() {
                             data={donutChartData}
                             dataKey="totalAmount"
                             nameKey="_id"
-                            innerRadius={60}
-                            outerRadius={90}
+                            innerRadius={donutInnerRadius}
                             strokeWidth={5}
                           >
                             <Label
@@ -1109,14 +1085,14 @@ export default function AnalyticsPage() {
                                       <tspan
                                         x={viewBox.cx}
                                         y={viewBox.cy}
-                                        className="fill-foreground text-[26px] font-bold font-mono"
+                                        className="fill-foreground text-xl xs:text-[24px] font-extrabold sm:text-[26px] sm:font-bold font-mono"
                                       >
                                         ₹{totalInvestment}
                                       </tspan>
                                       <tspan
                                         x={viewBox.cx}
-                                        y={(viewBox.cy || 0) + 24}
-                                        className="fill-muted-foreground text-[13px]"
+                                        y={(viewBox.cy || 0) + padding}
+                                        className="fill-muted-foreground text-[9px] xs:text-xs sm:text-[13px]"
                                       >
                                         Investments
                                       </tspan>
