@@ -59,7 +59,7 @@ export default async function Home() {
               </p>
             </div>
           </div>
-          <div className="flex gap-11 lg:gap-16 md:flex-row-reverse flex-col">
+          {/* <div className="flex gap-11 lg:gap-16 md:flex-row-reverse flex-col">
             <Image
               src={FinanceSVG}
               alt="Finance SVG"
@@ -77,7 +77,7 @@ export default async function Home() {
                 view.
               </p>
             </div>
-          </div>
+          </div> */}
           <div className="flex gap-11 lg:gap-16 flex-col md:flex-row">
             <Image
               src={DataSVG}
