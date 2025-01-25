@@ -130,7 +130,7 @@ export default function DashboardPage() {
               // Render expense list if data exists
               <>
                 <span className=" font-serif">₹</span>
-                {budgets}
+                {budgets.toString()}
               </>
             )}
           </div>
