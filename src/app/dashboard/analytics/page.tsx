@@ -737,7 +737,7 @@ export default function AnalyticsPage() {
 
       <div className="mt-5">
         <div className="flex gap-5 flex-col md:flex-row">
-          <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 md:w-1/2">
+          <div className=" border rounded-lg bg-white pt-4  pb-12 sm:pb-7 w-full">
             <p className="text-xl font-semibold px-7">Monthly Expenses Trend</p>
             {loading ? (
               <p className="px-7">Loading expenses...</p> // Loading state
@@ -773,14 +773,17 @@ export default function AnalyticsPage() {
                     <CardDescription>January - June 2024</CardDescription>
                   </CardHeader> */}
                   <CardContent>
-                    <ChartContainer config={lineChartConfig}>
+                    <ChartContainer
+                      className="max-h-[55vh] sm:min-w-[70vw] lg:min-w-[85vw]"
+                      config={lineChartConfig}
+                    >
                       <ResponsiveContainer>
                         <LineChart
                           accessibilityLayer
                           data={monthlyExpense}
                           margin={{
-                            left: -20,
-                            right: 12,
+                            left: -5,
+                            right: 5,
                           }}
                         >
                           <CartesianGrid vertical={false} />
@@ -825,22 +828,25 @@ export default function AnalyticsPage() {
               </div>
             )}
           </div>
-          <div className=" border rounded-lg bg-white p-4 px-7 pb-12 md:w-1/2">
-            <p className="text-xl font-semibold">Expenses by Category</p>
-            {categoryloading ? (
-              <p>Loading expenses...</p> // Loading state
-            ) : categoryError ? (
-              <p>Error: {categoryError}</p> // Error state
-            ) : !categoryExp || categoryExp.length === 0 ? (
-              <p>- No expenses found.</p> // No data found
-            ) : (
-              // Render expense list if data exists
-              <>
-                <p className="text-base text-slate-500 pb-2">
-                  Breakdown of your this month's expenses by category
-                </p>
-                <div>
-                  {/* <ResponsiveContainer>
+        </div>
+        <div className="pt-5">
+          <div className="flex gap-5 flex-col md:flex-row">
+            <div className=" border rounded-lg bg-white p-4 px-7 pb-12 md:w-1/2">
+              <p className="text-xl font-semibold">Expenses by Category</p>
+              {categoryloading ? (
+                <p>Loading expenses...</p> // Loading state
+              ) : categoryError ? (
+                <p>Error: {categoryError}</p> // Error state
+              ) : !categoryExp || categoryExp.length === 0 ? (
+                <p>- No expenses found.</p> // No data found
+              ) : (
+                // Render expense list if data exists
+                <>
+                  <p className="text-base text-slate-500 pb-2">
+                    Breakdown of your this month's expenses by category
+                  </p>
+                  <div>
+                    {/* <ResponsiveContainer>
                     <PieChart>
                       <Pie
                         data={categoryExp}
@@ -860,34 +866,36 @@ export default function AnalyticsPage() {
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer> */}
-                  <Card className="border-0 shadow-none  ">
-                    {/* <CardHeader className="items-center pb-0">
+                    <Card className="border-0 shadow-none  ">
+                      {/* <CardHeader className="items-center pb-0">
                       <CardTitle>Pie Chart - Label</CardTitle>
                       <CardDescription>January - June 2024</CardDescription>
                     </CardHeader> */}
-                    <CardContent className="flex-1 pb-0">
-                      <ChartContainer
-                        config={piechartConfig}
-                        className="mx-auto aspect-square max-h-[300px] lg:max-h-[300px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
-                      >
-                        <PieChart>
-                          <ChartTooltip
-                            content={<ChartTooltipContent hideLabel />}
-                          />
-                          <Pie
-                            data={pieChartData}
-                            dataKey="totalAmount"
-                            label
-                            nameKey="category"
-                          />
-                          <ChartLegend
-                            content={<ChartLegendContent nameKey="category" />}
-                            className="translate-y-2 flex-wrap gap-2 text-sm [&>*]:basis-1/4 [&>*]:justify-center"
-                          />
-                        </PieChart>
-                      </ChartContainer>
-                    </CardContent>
-                    {/* <CardFooter className="flex-col gap-2 text-sm">
+                      <CardContent className="flex-1 pb-0">
+                        <ChartContainer
+                          config={piechartConfig}
+                          className="mx-auto aspect-square max-h-[300px] lg:max-h-[300px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
+                        >
+                          <PieChart>
+                            <ChartTooltip
+                              content={<ChartTooltipContent hideLabel />}
+                            />
+                            <Pie
+                              data={pieChartData}
+                              dataKey="totalAmount"
+                              label
+                              nameKey="category"
+                            />
+                            <ChartLegend
+                              content={
+                                <ChartLegendContent nameKey="category" />
+                              }
+                              className="translate-y-2 flex-wrap gap-2 text-sm [&>*]:basis-1/4 [&>*]:justify-center"
+                            />
+                          </PieChart>
+                        </ChartContainer>
+                      </CardContent>
+                      {/* <CardFooter className="flex-col gap-2 text-sm">
                       <div className="flex items-center gap-2 font-medium leading-none">
                         Trending up by 5.2% this month{" "}
                         <TrendingUp className="h-4 w-4" />
@@ -896,106 +904,106 @@ export default function AnalyticsPage() {
                         Showing total visitors for the last 6 months
                       </div>
                     </CardFooter> */}
-                  </Card>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-        <div className=" pt-5">
-          <div className=" border rounded-lg bg-white p-4 px-7 w-full ">
-            <span className="text-xl font-semibold">Remaining Budget: </span>
-            {budgetDataLoading ? (
-              <p>Loading budgets...</p> // Loading state
-            ) : budgetDataError ? (
-              <p>Error: {budgetDataError}</p> // Error state
-            ) : !thisMonthBudget || thisMonthBudget.length === 0 ? (
-              <p>- No budget set for this month.</p> // No data found
-            ) : (
-              <div className="h-[325px] ">
-                <p className="text-base text-slate-500 pb-2">
-                  Budget Spent vs Budget Remaining Analysis
-                </p>
-                <ResponsiveContainer height={200}>
-                  <PieChart>
-                    <Pie
-                      data={budgetsData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="75%"
-                      innerRadius={innerRadius}
-                      outerRadius={outerRadius}
-                      fill="#8884d8"
-                      startAngle={180}
-                      endAngle={0}
-                      isAnimationActive={true} // Enable animation
-                      animationDuration={1500} // Animation duration in ms
-                      animationBegin={0} // Delay before animation starts
-                    >
-                      {budgetsData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
+                    </Card>
+                  </div>
+                </>
+              )}
+            </div>
 
-                    {/* Render Needle */}
-                    <svg
-                      width="100%"
-                      height="120%"
-                      viewBox="55 80 200 204"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      {needle(
-                        budgetsData[0].value,
-                        budgetsData,
-                        cx,
-                        cy,
-                        iR,
-                        oR,
-                        "#d0d000"
+            <div className=" border rounded-lg bg-white p-4 px-7 md:w-1/2 ">
+              <span className="text-xl font-semibold">Remaining Budget: </span>
+              {budgetDataLoading ? (
+                <p>Loading budgets...</p> // Loading state
+              ) : budgetDataError ? (
+                <p>Error: {budgetDataError}</p> // Error state
+              ) : !thisMonthBudget || thisMonthBudget.length === 0 ? (
+                <p>- No budget set for this month.</p> // No data found
+              ) : (
+                <div className="h-[325px] ">
+                  <p className="text-base text-slate-500 pb-2">
+                    Budget Spent vs Budget Remaining Analysis
+                  </p>
+                  <ResponsiveContainer height={200}>
+                    <PieChart>
+                      <Pie
+                        data={budgetsData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="75%"
+                        innerRadius={innerRadius}
+                        outerRadius={outerRadius}
+                        fill="#8884d8"
+                        startAngle={180}
+                        endAngle={0}
+                        isAnimationActive={true} // Enable animation
+                        animationDuration={1500} // Animation duration in ms
+                        animationBegin={0} // Delay before animation starts
+                      >
+                        {budgetsData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
+                        ))}
+                      </Pie>
+
+                      {/* Render Needle */}
+                      <svg
+                        width="100%"
+                        height="120%"
+                        viewBox="55 80 200 204"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        {needle(
+                          budgetsData[0].value,
+                          budgetsData,
+                          cx,
+                          cy,
+                          iR,
+                          oR,
+                          "#d0d000"
+                        )}
+                        {/* Adjust radius for alignment */}
+                      </svg>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="text-center">
+                    <span className=" text-black text-sm">
+                      <div className="h-2 w-2 shrink-0 rounded-[2px] bg-[#FF8042] inline-block mr-1"></div>{" "}
+                      spent - <span className=" font-serif">₹</span>
+                      {thisMonthBudget[0]?.spent ?? 0}
+                    </span>
+                  </div>
+                  <div className="text-center">
+                    <span className=" text-black text-sm">
+                      <div className="h-2 w-2 shrink-0 rounded-[2px] bg-[#00C49F] inline-block mr-1"></div>{" "}
+                      remaining - <span className=" font-serif">₹</span>
+                      {(thisMonthBudget[0]?.remaining ?? 0) <= 0 ? (
+                        <>
+                          {thisMonthBudget[0]?.remaining ?? 0}
+                          <div className=" text-red-600 font-semibold animate-pulse">
+                            budget limit exceeded!!
+                          </div>
+                        </>
+                      ) : (thisMonthBudget[0]?.remaining ?? 0) > 0 &&
+                        ((thisMonthBudget[0]?.remaining ?? 0) * 100) /
+                          (thisMonthBudget[0]?.budget ?? 0) <=
+                          10 ? (
+                        <>
+                          {thisMonthBudget[0]?.remaining ?? 0}
+                          <div className=" text-red-600 font-semibold animate-pulse">
+                            about to run out of budget! spend wisely!!
+                          </div>
+                        </>
+                      ) : (
+                        thisMonthBudget[0].remaining ?? 0
                       )}
-                      {/* Adjust radius for alignment */}
-                    </svg>
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="text-center">
-                  <span className=" text-black text-sm">
-                    <div className="h-2 w-2 shrink-0 rounded-[2px] bg-[#FF8042] inline-block mr-1"></div>{" "}
-                    spent - <span className=" font-serif">₹</span>
-                    {thisMonthBudget[0]?.spent ?? 0}
-                  </span>
+                    </span>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <span className=" text-black text-sm">
-                    <div className="h-2 w-2 shrink-0 rounded-[2px] bg-[#00C49F] inline-block mr-1"></div>{" "}
-                    remaining - <span className=" font-serif">₹</span>
-                    {(thisMonthBudget[0]?.remaining ?? 0) <= 0 ? (
-                      <>
-                        {thisMonthBudget[0]?.remaining ?? 0}
-                        <div className=" text-red-600 font-semibold animate-pulse">
-                          budget limit exceeded!!
-                        </div>
-                      </>
-                    ) : (thisMonthBudget[0]?.remaining ?? 0) > 0 &&
-                      ((thisMonthBudget[0]?.remaining ?? 0) * 100) /
-                        (thisMonthBudget[0]?.budget ?? 0) <=
-                        10 ? (
-                      <>
-                        {thisMonthBudget[0]?.remaining ?? 0}
-                        <div className=" text-red-600 font-semibold animate-pulse">
-                          about to run out of budget! spend wisely!!
-                        </div>
-                      </>
-                    ) : (
-                      thisMonthBudget[0].remaining ?? 0
-                    )}
-                  </span>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
         <div className=" pt-5">
