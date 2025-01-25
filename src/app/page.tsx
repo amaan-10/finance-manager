@@ -6,6 +6,7 @@ import FinanceSVG from "../assets/finance-animate.svg";
 import DataSVG from "../assets/financial-data-animate.svg";
 import RevenueSVG from "../assets/revenue-animate.svg";
 import Greeting from "./Greeting";
+import Link from "next/link";
 
 export default async function Home() {
   const user = await currentUser();
@@ -15,31 +16,56 @@ export default async function Home() {
 
   return (
     <div>
-      <section>
-        <span className="text-[28px] sm:text-2xl md:text-3xl font-bold mt-5 mb-2 flex flex-col sm:flex-row">
-          <span>
-            <Greeting suffix={suffix} userData={userData} />
+      <section className=" flex flex-col md:flex-row  h-[75vh] md:items-center ">
+        <div className="md:w-1/2">
+          <span className="text-[28px] sm:text-2xl md:text-3xl font-bold mt-5 mb-2 flex flex-wrap">
+            <span>
+              <Greeting suffix={suffix} userData={userData} />
+            </span>
+            <span className=" inline-flex flex-row">
+              {suffix ? (
+                <>
+                  {suffix}!
+                  <Image
+                    className="ml-2 h-[34px] w-[38px] sm:h-[28px] sm:w-[32px] md:h-[34px] md:w-[38px] self-center justify-center"
+                    src={WavingHand}
+                    alt="Waving Hand"
+                  />
+                </>
+              ) : (
+                " "
+              )}
+            </span>
           </span>
-          <span className=" inline-flex flex-row">
-            {suffix ? (
-              <>
-                {suffix}!
-                <Image
-                  className="ml-2 h-[34px] w-[38px] sm:h-[28px] sm:w-[32px] md:h-[34px] md:w-[38px] self-center justify-center"
-                  src={WavingHand}
-                  alt="Waving Hand"
-                />
-              </>
-            ) : (
-              " "
-            )}
-          </span>
-        </span>
-        <p className=" text-base md:text-lg">
-          Welcome to Personal Finance Manager <br />
-          Track your expenses, create budgets, and manage your investments.
-        </p>
-        <div className="flex flex-col lg:px-7">
+          <p className=" text-base md:text-lg">
+            Welcome to Personal Finance Manager <br />
+            Track your expenses, create budgets, and manage your investments.
+          </p>
+
+          <div className="mt-4 flex gap-4">
+            <Link
+              href={"/dashboard"}
+              className="font-medium bg-indigo-600 text-white hover:bg-indigo-700"
+            >
+              Get Started
+            </Link>
+            <Link
+              href={"https://github.com/amaan-10/finance-manager"}
+              target="_blank"
+              className="font-medium bg-gray-200 text-black hover:bg-gray-300"
+            >
+              Learn More
+            </Link>
+          </div>
+        </div>
+        <div className=" md:w-1/2 flex justify-center">
+          <Image
+            src={AnalysisSVG}
+            alt="Analysis SVG"
+            unoptimized // This ensures the GIF is not optimized, preserving the animation.
+          />
+        </div>
+        {/* <div className="flex flex-col lg:px-7">
           <div className="flex gap-11 lg:gap-16 flex-col md:flex-row">
             <Image
               src={AnalysisSVG}
@@ -59,7 +85,7 @@ export default async function Home() {
               </p>
             </div>
           </div>
-          {/* <div className="flex gap-11 lg:gap-16 md:flex-row-reverse flex-col">
+          <div className="flex gap-11 lg:gap-16 md:flex-row-reverse flex-col">
             <Image
               src={FinanceSVG}
               alt="Finance SVG"
@@ -77,7 +103,7 @@ export default async function Home() {
                 view.
               </p>
             </div>
-          </div> */}
+          </div>
           <div className="flex gap-11 lg:gap-16 flex-col md:flex-row">
             <Image
               src={DataSVG}
@@ -114,7 +140,7 @@ export default async function Home() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </section>
     </div>
   );
