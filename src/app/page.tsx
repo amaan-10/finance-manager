@@ -45,14 +45,14 @@ export default async function Home() {
           <div className="mt-4 flex gap-4">
             <Link
               href={"/dashboard"}
-              className="font-medium bg-indigo-600 text-white hover:bg-indigo-700"
+              className="font-medium p-1 bg-indigo-600 text-white hover:bg-indigo-700"
             >
               Get Started
             </Link>
             <Link
               href={"https://github.com/amaan-10/finance-manager"}
               target="_blank"
-              className="font-medium bg-gray-200 text-black hover:bg-gray-300"
+              className="font-medium p-1 bg-gray-200 text-black hover:bg-gray-300"
             >
               Learn More
             </Link>

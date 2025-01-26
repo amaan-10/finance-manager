@@ -15,6 +15,29 @@ const Navbar = () => {
 
   const pathname = usePathname();
 
+  const HomeLink = ({
+    href,
+    children,
+    className,
+  }: {
+    className: string;
+    href: string;
+    children: ReactNode;
+  }) => {
+    const isActive = pathname === href || pathname.startsWith(`${href}/`);
+
+    return (
+      <Link
+        href={href}
+        className={`${
+          isActive ? " underline-offset-2 underline " : ""
+        }${className}`}
+      >
+        {children}
+      </Link>
+    );
+  };
+
   const DashboardLink = ({
     href,
     children,
@@ -45,7 +68,7 @@ const Navbar = () => {
     );
   };
 
-  const HomeLink = ({
+  const SplitItUpLink = ({
     href,
     children,
     className,
@@ -80,6 +103,10 @@ const Navbar = () => {
             <DashboardLink className="mt-1 sm:mt-0 " href="/dashboard">
               Dashboard
             </DashboardLink>
+
+            <SplitItUpLink className="ml-4 sm:ml-0" href="/split-it-up">
+              SplitItUp
+            </SplitItUpLink>
           </SignedIn>
           <SignedOut>
             <HomeLink className="" href="/">
@@ -90,6 +117,12 @@ const Navbar = () => {
               href="/dashboard"
             >
               Dashboard
+            </Link>
+            <Link
+              className=" mt-1 sm:mt-0 text-gray-400 active:underline"
+              href="/split-it-up"
+            >
+              SplitItUp
             </Link>
           </SignedOut>
         </span>
