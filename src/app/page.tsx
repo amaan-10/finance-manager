@@ -39,7 +39,13 @@ export default async function Home() {
           </span>
           <p className=" text-base md:text-lg">
             Welcome to Personal Finance Manager <br />
-            Track your expenses, create budgets, and manage your investments.
+            Track your expenses, create budgets, and manage your investments{" "}
+            <br />
+            Try splitting up your bills with{" "}
+            <Link href={"/split-it-up"} className="cursor-pointer underline">
+              SplitItUp
+            </Link>
+            .
           </p>
 
           <div className="mt-4 flex gap-4">
