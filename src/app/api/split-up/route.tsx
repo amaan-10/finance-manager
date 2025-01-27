@@ -46,9 +46,11 @@ export async function DELETE(req: NextRequest) {
     await connectToDatabase(); // Ensure MongoDB is connected
 
     const body = await req.json(); // Get the request body
-    const { _id } = body;
 
-    if (_id) {
+    const _id = body.id;
+    console.log(_id);
+
+    if (!_id) {
       return NextResponse.json(
         { message: "Data id required." },
         { status: 400 }
@@ -64,6 +66,8 @@ export async function DELETE(req: NextRequest) {
       userId,
       _id,
     });
+
+    console.log(deleteTransaction);
 
     if (!deleteTransaction) {
       return NextResponse.json({ message: "Data not found" }, { status: 404 });
