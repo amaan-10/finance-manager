@@ -28,6 +28,33 @@ interface StockData {
   t: number;
 }
 
+const months = [
+  { name: "Select Month", value: "placeholder", disabled: true },
+  { name: "All", value: "all", disabled: false },
+  { name: "January", value: 1 },
+  { name: "February", value: 2 },
+  { name: "March", value: 3 },
+  { name: "April", value: 4 },
+  { name: "May", value: 5 },
+  { name: "June", value: 6 },
+  { name: "July", value: 7 },
+  { name: "August", value: 8 },
+  { name: "September", value: 9 },
+  { name: "October", value: 10 },
+  { name: "November", value: 11 },
+  { name: "December", value: 12 },
+];
+
+const years = [
+  { name: "Select Year", value: "placeholder", disabled: true },
+  { name: "All", value: "all", disabled: false },
+  ...Array.from({ length: 5 }, (_, i) => ({
+    name: new Date().getFullYear() - i,
+    value: new Date().getFullYear() - i,
+    disabled: false,
+  })),
+];
+
 const InvestmentsPage: React.FC = () => {
   const [investments, setInvestments] = useState<Investment[]>([]);
   //const [stockData, setStockData] = useState<StockData | null>(null);
@@ -56,6 +83,32 @@ const InvestmentsPage: React.FC = () => {
   useEffect(() => {
     fetchInvestments();
   }, []);
+
+  const [selectedMonth, setSelectedMonth] = useState(
+    new Date().getMonth() + 1 || ""
+  );
+  const [selectedYear, setSelectedYear] = useState(
+    new Date().getFullYear() || ""
+  );
+
+  // Filtering expenses by month and year
+  const filteredInvestment = investments.filter((investment) => {
+    const investmentDate = new Date(investment.date);
+
+    if (selectedMonth === "placeholder" || selectedYear === "placeholder")
+      return true;
+
+    if (selectedMonth === "all" && selectedYear === "all") return true;
+
+    const matchesMonth =
+      selectedMonth === "all" ||
+      investmentDate.getMonth() + 1 === Number(selectedMonth);
+    const matchesYear =
+      selectedYear === "all" ||
+      investmentDate.getFullYear() === Number(selectedYear);
+
+    return matchesMonth && matchesYear;
+  });
 
   async function deleteInvestment(id: string) {
     try {
@@ -244,85 +297,102 @@ const InvestmentsPage: React.FC = () => {
       ) : !investments || investments.length === 0 ? (
         <p className="pt-3">- No investments till now.</p>
       ) : (
-        // <ul>
-        //   {investments.map((inv) => (
-        //     <span className="grid md:grid-cols-2 lg:grid-cols-3" key={inv._id}>
-        //       {inv.type !== "stock" ? (
-        //         <>
-        //           <span className=" ">
-        //             {inv.type}: <span className=" font-serif">₹</span>
-        //             {inv.amount} on{" "}
-        //             {new Date(inv.date).toLocaleDateString("en-GB")}
-        //           </span>
-        //           <button
-        //             className=" text-left max-w-44 hover:underline text-red-600"
-        //             onClick={() => deleteInvestment(inv._id)}
-        //           >
-        //             Delete Investment
-        //           </button>
-        //         </>
-        //       ) : (
-        //         ""
-        //       )}
-        //     </span>
-        //   ))}
-        // </ul>
-        <>
-          <div className=" mt-4 md:w-2/3 lg:w-3/5 relative overflow-x-auto shadow-md rounded-lg">
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
-              <thead className=" text-sm text-gray-700 uppercase bg-gray-200 ">
-                <tr>
-                  <th scope="col" className="px-6 py-3">
-                    Type
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Amount
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Date
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    <span className="sr-only">Delete</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {investments.map((inv) =>
-                  inv.type !== "stock" ? (
-                    <tr
-                      key={inv._id}
-                      className="bg-white border-b  hover:bg-gray-100 "
-                    >
-                      <th
-                        scope="row"
-                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
-                      >
-                        {inv.type}
-                      </th>
-                      <td className="px-6 py-4">
-                        <span className=" font-serif">₹</span>
-                        {inv.amount}
-                      </td>
-                      <td className="px-6 py-4">
-                        {new Date(inv.date).toLocaleDateString("en-GB")}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          className=" text-left max-w-44 font-medium hover:underline text-red-600"
-                          onClick={() => deleteInvestment(inv._id)}
-                        >
-                          Delete Investment
-                        </button>
-                      </td>
-                    </tr>
-                  ) : (
-                    ""
-                  )
-                )}
-              </tbody>
-            </table>
+        <div className="mt-5 md:w-2/3 lg:w-3/5">
+          {/* Dropdown Filters */}
+          <div className="flex justify-end gap-4 mb-4 mr-2">
+            {/* Month Dropdown */}
+            <select
+              className="p-2 border rounded-lg"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+            >
+              {months.map((month) => (
+                <option
+                  key={month.value}
+                  value={month.value}
+                  disabled={month.disabled}
+                >
+                  {month.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Year Dropdown */}
+            <select
+              className="p-2 border rounded-lg"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+            >
+              {years.map((year) => (
+                <option
+                  key={year.value}
+                  value={year.value}
+                  disabled={year.disabled}
+                >
+                  {year.name}
+                </option>
+              ))}
+            </select>
           </div>
-        </>
+          {filteredInvestment.length > 0 ? (
+            <div className=" mt-4 relative overflow-x-auto shadow-md rounded-lg">
+              <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
+                <thead className=" text-sm text-gray-700 uppercase bg-gray-200 ">
+                  <tr>
+                    <th scope="col" className="px-6 py-3">
+                      Type
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Amount
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Date
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      <span className="sr-only">Delete</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredInvestment.map((inv) =>
+                    inv.type !== "stock" ? (
+                      <tr
+                        key={inv._id}
+                        className="bg-white border-b  hover:bg-gray-100 "
+                      >
+                        <th
+                          scope="row"
+                          className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
+                        >
+                          {inv.type}
+                        </th>
+                        <td className="px-6 py-4">
+                          <span className=" font-serif">₹</span>
+                          {inv.amount}
+                        </td>
+                        <td className="px-6 py-4">
+                          {new Date(inv.date).toLocaleDateString("en-GB")}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            className=" text-left max-w-44 font-medium hover:underline text-red-600"
+                            onClick={() => deleteInvestment(inv._id)}
+                          >
+                            Delete Investment
+                          </button>
+                        </td>
+                      </tr>
+                    ) : (
+                      ""
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p>- No investments found for the selected month & year.</p>
+          )}
+        </div>
       )}
 
       <div>
