@@ -8,6 +8,16 @@ interface Budget {
   year: number;
 }
 
+const years = [
+  { name: "Select Year", value: "placeholder", disabled: true },
+  { name: "All", value: "all", disabled: false },
+  ...Array.from({ length: 5 }, (_, i) => ({
+    name: new Date().getFullYear() - i,
+    value: new Date().getFullYear() - i,
+    disabled: false,
+  })),
+];
+
 export default function BudgetsPage() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
@@ -138,6 +148,20 @@ export default function BudgetsPage() {
     return months[monthNumber - 1];
   }
 
+  // Filtering budget by year
+  const [selectedYear, setSelectedYear] = useState(
+    new Date().getFullYear() || ""
+  );
+
+  const filteredBudget = budgets.filter((budget) => {
+    if (selectedYear === "placeholder") return true;
+
+    if (selectedYear === "all") return true;
+
+    const budgetDate = budget.year;
+    return selectedYear === "all" || budgetDate === Number(selectedYear);
+  });
+
   return (
     <section className="mt-5">
       <h2 className="text-[26px] font-bold">Budgets</h2>
@@ -211,71 +235,77 @@ export default function BudgetsPage() {
           <p className="pt-3">- No budgets till now.</p>
         </>
       ) : (
-        <>
-          {/* <ul className="mt-2">
-            {budgets.map((budget, index) => (
-              <span className="grid md:grid-cols-2 lg:grid-cols-3" key={index}>
-                <span className="">
-                  Budget - <span className=" font-serif">₹</span>
-                  {budget.amount} for {budget.month}, {budget.year}
-                </span>
-                <button
-                  className=" hover:underline max-w-32 text-start text-red-600"
-                  onClick={() => handleDeleteBudget(budget.month, budget.year)}
+        <div className="mt-5 md:w-2/3 lg:w-3/5">
+          {/* Dropdown Filters */}
+          <div className="flex justify-end gap-4 mb-4 mr-2">
+            {/* Year Dropdown */}
+            <select
+              className="p-2 border rounded-lg"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+            >
+              {years.map((year) => (
+                <option
+                  key={year.value}
+                  value={year.value}
+                  disabled={year.disabled}
                 >
-                  Delete Budget
-                </button>
-              </span>
-            ))}
-          </ul> */}
-
-          <div className=" mt-4 md:w-2/3 lg:w-1/2 relative overflow-x-auto shadow-md rounded-lg">
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
-              <thead className=" text-sm text-gray-700 uppercase bg-gray-200 ">
-                <tr>
-                  <th scope="col" className="px-6 py-3">
-                    Month
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Budget
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    <span className="sr-only">Delete</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {budgets.map((budget, index) => (
-                  <tr
-                    key={index}
-                    className="bg-white border-b  hover:bg-gray-100 "
-                  >
-                    <th
-                      scope="row"
-                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
-                    >
-                      {getMonthName(budget.month)}, {budget.year}
-                    </th>
-                    <td className="px-6 py-4">
-                      <span className=" font-serif">₹</span>
-                      {budget.amount}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button
-                        className=" hover:underline max-w-32 font-medium text-start text-red-600"
-                        onClick={() =>
-                          handleDeleteBudget(budget.month, budget.year)
-                        }
-                      >
-                        Delete Budget
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                  {year.name}
+                </option>
+              ))}
+            </select>
           </div>
-        </>
+          {filteredBudget.length > 0 ? (
+            <div className=" mt-4 relative overflow-x-auto shadow-md rounded-lg">
+              <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
+                <thead className=" text-sm text-gray-700 uppercase bg-gray-200 ">
+                  <tr>
+                    <th scope="col" className="px-6 py-3">
+                      Month
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Budget
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      <span className="sr-only">Delete</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredBudget.map((budget, index) => (
+                    <tr
+                      key={index}
+                      className="bg-white border-b  hover:bg-gray-100 "
+                    >
+                      <th
+                        scope="row"
+                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
+                      >
+                        {getMonthName(budget.month)}, {budget.year}
+                      </th>
+                      <td className="px-6 py-4">
+                        <span className=" font-serif">₹</span>
+                        {budget.amount}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          className=" hover:underline max-w-32 font-medium text-start text-red-600"
+                          onClick={() =>
+                            handleDeleteBudget(budget.month, budget.year)
+                          }
+                        >
+                          Delete Budget
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p>- No budgets found for the selected year.</p>
+          )}
+        </div>
       )}
     </section>
   );
