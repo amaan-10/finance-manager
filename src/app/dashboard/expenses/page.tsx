@@ -3,11 +3,39 @@
 import { useEffect, useState } from "react";
 
 interface Expense {
+  _id?: string;
   category: string;
   amount: number;
   date: Date;
   notes?: string;
 }
+
+const months = [
+  { name: "Select Month", value: "placeholder", disabled: true },
+  { name: "All", value: "all" },
+  { name: "January", value: 1 },
+  { name: "February", value: 2 },
+  { name: "March", value: 3 },
+  { name: "April", value: 4 },
+  { name: "May", value: 5 },
+  { name: "June", value: 6 },
+  { name: "July", value: 7 },
+  { name: "August", value: 8 },
+  { name: "September", value: 9 },
+  { name: "October", value: 10 },
+  { name: "November", value: 11 },
+  { name: "December", value: 12 },
+];
+
+const years = [
+  { name: "Select Year", value: "placeholder", disabled: true },
+  { name: "All", value: "all", disabled: false },
+  ...Array.from({ length: 5 }, (_, i) => ({
+    name: new Date().getFullYear() - i,
+    value: new Date().getFullYear() - i,
+    disabled: false,
+  })),
+];
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -31,6 +59,32 @@ export default function ExpensesPage() {
 
     fetchExpenses();
   }, []);
+
+  const [selectedMonth, setSelectedMonth] = useState(
+    new Date().getMonth() + 1 || ""
+  );
+  const [selectedYear, setSelectedYear] = useState(
+    new Date().getFullYear() || ""
+  );
+
+  // Filtering expenses
+  const filteredExpenses = expenses.filter((expense) => {
+    const expenseDate = new Date(expense.date);
+
+    if (selectedMonth === "placeholder" || selectedYear === "placeholder")
+      return true;
+
+    if (selectedMonth === "all" && selectedYear === "all") return true;
+
+    const matchesMonth =
+      selectedMonth === "all" ||
+      expenseDate.getMonth() + 1 === Number(selectedMonth);
+    const matchesYear =
+      selectedYear === "all" ||
+      expenseDate.getFullYear() === Number(selectedYear);
+
+    return matchesMonth && matchesYear;
+  });
 
   const handleAddExpense = async () => {
     const newExpense = {
@@ -161,84 +215,103 @@ export default function ExpensesPage() {
       ) : !expenses || expenses.length === 0 ? (
         <p className="pt-3">- No expenses till now.</p>
       ) : (
-        // <ul className="mt-2">
-        //   {expenses.map((expense, index) => (
-        //     <span className="grid md:grid-cols-2 lg:grid-cols-3" key={index}>
-        //       <span className=" ">
-        //         {expense.category} - <span className=" font-serif">₹</span>
-        //         {expense.amount} on{" "}
-        //         {new Date(expense.date).toLocaleDateString("en-UK")}
-        //       </span>
-        //       <button
-        //         className=" text-left max-w-36 hover:underline text-red-600"
-        //         onClick={() =>
-        //           handleDeleteExpenses(
-        //             expense.category,
-        //             expense.amount,
-        //             expense.date
-        //           )
-        //         }
-        //       >
-        //         Delete Expense
-        //       </button>
-        //     </span>
-        //   ))}
-        // </ul>
-        <div className=" mt-5 md:w-2/3 lg:w-3/5 relative overflow-x-auto shadow-md rounded-lg">
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
-            <thead className=" text-sm text-gray-700 uppercase bg-gray-200 ">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  Category
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Price
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Date
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  <span className="sr-only">Delete</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {expenses.map((expense, index) => (
-                <tr
-                  key={index}
-                  className="bg-white border-b  hover:bg-gray-100 "
+        <div className="mt-5 md:w-2/3 lg:w-3/5">
+          {/* Dropdown Filters */}
+          <div className="flex justify-end gap-4 mb-4 mr-2">
+            {/* Month Dropdown */}
+            <select
+              className="p-2 border rounded-lg"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+            >
+              {months.map((month) => (
+                <option
+                  key={month.value}
+                  value={month.value}
+                  disabled={month.disabled}
                 >
-                  <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
-                  >
-                    {expense.category}
-                  </th>
-                  <td className="px-6 py-4">
-                    <span className=" font-serif">₹</span>
-                    {expense.amount}
-                  </td>
-                  <td className="px-6 py-4">
-                    {new Date(expense.date).toLocaleDateString("en-UK")}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      className=" text-left font-medium max-w-36 hover:underline text-red-600"
-                      onClick={() =>
-                        handleDeleteExpenses(
-                          expense.category,
-                          expense.amount,
-                          expense.date
-                        )
-                      }
-                    >
-                      Delete Expense
-                    </button>
-                  </td>
-                </tr>
+                  {month.name}
+                </option>
               ))}
-            </tbody>
-          </table>
+            </select>
+
+            {/* Year Dropdown */}
+            <select
+              className="p-2 border rounded-lg"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+            >
+              {years.map((year) => (
+                <option
+                  key={year.value}
+                  value={year.value}
+                  disabled={year.disabled}
+                >
+                  {year.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {filteredExpenses.length > 0 ? (
+            <div className=" mt-5 relative overflow-x-auto shadow-md rounded-lg">
+              <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
+                <thead className=" text-sm text-gray-700 uppercase bg-gray-200 ">
+                  <tr>
+                    <th scope="col" className="px-6 py-3">
+                      Category
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Price
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Date
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      <span className="sr-only">Delete</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredExpenses.map((expense, index) => (
+                    <tr
+                      key={index}
+                      className="bg-white border-b  hover:bg-gray-100 "
+                    >
+                      <th
+                        scope="row"
+                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
+                      >
+                        {expense.category}
+                      </th>
+                      <td className="px-6 py-4">
+                        <span className=" font-serif">₹</span>
+                        {expense.amount}
+                      </td>
+                      <td className="px-6 py-4">
+                        {new Date(expense.date).toLocaleDateString("en-UK")}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          className=" text-left font-medium max-w-36 hover:underline text-red-600"
+                          onClick={() =>
+                            handleDeleteExpenses(
+                              expense.category,
+                              expense.amount,
+                              expense.date
+                            )
+                          }
+                        >
+                          Delete Expense
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p>- No expenses found for the selected month & year.</p>
+          )}
         </div>
       )}
     </section>
