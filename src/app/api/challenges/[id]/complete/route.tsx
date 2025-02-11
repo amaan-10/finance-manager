@@ -6,11 +6,11 @@ import { predefinedChallenges } from "@/lib/predefinedChallenges";
 
 export async function POST(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  await connectToDatabase(); // Ensure MongoDB is connected
-  const { userId } = getAuth(req); // Get the authenticated user ID
-  const challengeId = context.params.id; // Access params from context
+  await connectToDatabase();
+  const { userId } = getAuth(req);
+  const challengeId = params.id;
   const data = await req.json();
 
   const challenge = await ChallengeModel.findOne({
