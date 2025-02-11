@@ -22,7 +22,7 @@ export default function ChallengesPage() {
 
   const completeChallenge = async (challenge: Challenge) => {
     const id = challenge.id;
-    const res = await fetch(`/api/challenges/${id}/complete`, {
+    const res = await fetch(`/api/challenges/complete`, {
       method: "POST",
       body: JSON.stringify(challenge),
     });
