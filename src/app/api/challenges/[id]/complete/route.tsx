@@ -10,13 +10,14 @@ export async function POST(
 ) {
   await connectToDatabase(); // Ensure MongoDB is connected
   const { userId } = getAuth(req); // Get the authenticated user ID
-  const challengeId = context.params.id;
+  const challengeId = context.params.id; // Access params from context
   const data = await req.json();
 
   const challenge = await ChallengeModel.findOne({
     id: challengeId,
     userId: userId,
   });
+
   if (!challenge) {
     const newchallenge = new ChallengeModel({
       userId: userId,
@@ -24,6 +25,7 @@ export async function POST(
       streak: 1,
       ...data,
     });
+
     if (newchallenge.progress >= newchallenge.goal) {
       newchallenge.badge = predefinedChallenges.find(
         (ch) => ch.id === challengeId
@@ -32,10 +34,11 @@ export async function POST(
 
     await newchallenge.save();
     return NextResponse.json({
-      message: "challenge set successfully",
+      message: "Challenge set successfully",
       newchallenge,
     });
   }
+
   challenge.progress += 1;
   challenge.streak += 1;
 
