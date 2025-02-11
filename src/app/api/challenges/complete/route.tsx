@@ -4,10 +4,7 @@ import ChallengeModel from "@/app/models/Challenge";
 import { getAuth } from "@clerk/nextjs/server";
 import { predefinedChallenges } from "@/lib/predefinedChallenges";
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest) {
   await connectToDatabase();
 
   const data = await req.json();
