@@ -91,6 +91,29 @@ const Navbar = () => {
     );
   };
 
+  const ChallengesLink = ({
+    href,
+    children,
+    className,
+  }: {
+    className: string;
+    href: string;
+    children: ReactNode;
+  }) => {
+    const isActive = pathname === href || pathname.startsWith(`${href}/`);
+
+    return (
+      <Link
+        href={href}
+        className={`${
+          isActive ? " underline-offset-2 underline " : ""
+        }${className}`}
+      >
+        {children}
+      </Link>
+    );
+  };
+
   return (
     <div>
       <div className="ml-5 text-sm sm:text-base">
@@ -107,6 +130,10 @@ const Navbar = () => {
             <SplitItUpLink className="ml-4 sm:ml-0" href="/split-it-up">
               SplitItUp
             </SplitItUpLink>
+
+            <ChallengesLink className="ml-4 sm:ml-0" href="/challenges">
+              Challenges
+            </ChallengesLink>
           </SignedIn>
           <SignedOut>
             <HomeLink className="" href="/">
@@ -123,6 +150,12 @@ const Navbar = () => {
               href="/split-it-up"
             >
               SplitItUp
+            </Link>
+            <Link
+              className=" mt-1 sm:mt-0 text-gray-400 active:underline"
+              href="/challenges"
+            >
+              Challenges
             </Link>
           </SignedOut>
         </span>
