@@ -10,6 +10,11 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.0.0",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-regular-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@svgr/webpack": "^8.1.0",
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.1",
@@ -19,6 +24,7 @@
     "mongodb": "^6.10.0",
     "mongoose": "^8.7.3",
     "next": "^15.0.1",
+    "next-auth": "^4.24.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.15.0",
@@ -28,6 +34,7 @@
   "devDependencies": {
     "@types/mongoose": "^5.11.97",
     "@types/next": "^9.0.0",
+    "@types/next-auth": "^3.15.0",
     "@types/node": "^20.17.1",
     "@types/react": "^18",
     "@types/react-dom": "^18",
