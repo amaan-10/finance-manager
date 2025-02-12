@@ -496,16 +496,16 @@ const SettleUpApp = () => {
                   className="p-4 bg-white border rounded-lg cursor-pointer"
                   onClick={() => handleTransactionClick(transaction._id)}
                 >
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">
+                  <div className="flex sm:justify-between flex-col sm:flex-row sm:items-center">
+                    <h3 className="text-base sm:text-lg font-semibold">
                       {transaction.transactionName}
                     </h3>
-                    <span className="text-sm inline-flex gap-4 text-gray-500">
+                    <span className="text-sm flex sm:inline-flex justify-between gap-3 sm:gap-4 text-gray-500">
                       {formatDate(transaction.createdAt)}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 512 512"
-                        className="w-4 h-4 text-gray-500 mr-2 mt-[2px]"
+                        className="w-4 h-4 text-gray-500 sm:mr-2 mt-[1px] sm:mt-[2px]"
                         fill="currentColor"
                       >
                         {expandedTransactionId === transaction._id ? (
