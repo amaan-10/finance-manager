@@ -57,9 +57,9 @@ const Navbar = () => {
         }${className}`}
       >
         <nav
-          className={` sm:hidden inline-flex transition-transform font-mono ${
+          className={` md:hidden inline-flex transition-transform font-mono ${
             isActive ? "rotate-0 " : "-rotate-90"
-          } mr-2 mb-1`}
+          } mr-2`}
         >
           ▼ {/* Triangle symbol */}
         </nav>
@@ -116,22 +116,22 @@ const Navbar = () => {
 
   return (
     <div>
-      <div className="ml-5 text-sm sm:text-base">
-        <span className=" flex-col inline-flex sm:flex-row ">
+      <div className="mx-5 flex justify-between text-sm md:text-base">
+        <span className=" flex-col inline-flex md:flex-row ">
           <SignedIn>
-            <HomeLink className=" ml-4 sm:ml-0" href="/">
+            <HomeLink className=" ml-4 md:ml-0" href="/">
               Home
             </HomeLink>
 
-            <DashboardLink className="mt-1 sm:mt-0 " href="/dashboard">
+            <DashboardLink className="mt-0 " href="/dashboard">
               Dashboard
             </DashboardLink>
 
-            <SplitItUpLink className="ml-4 sm:ml-0" href="/split-it-up">
+            <SplitItUpLink className="ml-4 md:ml-0" href="/split-it-up">
               SplitItUp
             </SplitItUpLink>
 
-            <ChallengesLink className="ml-4 sm:ml-0" href="/challenges">
+            <ChallengesLink className="ml-4 md:ml-0" href="/challenges">
               Challenges
             </ChallengesLink>
           </SignedIn>
@@ -140,26 +140,26 @@ const Navbar = () => {
               Home
             </HomeLink>
             <Link
-              className=" mt-1 sm:mt-0 text-gray-400 active:underline"
+              className=" mt-1 md:mt-0 text-gray-400 active:underline"
               href="/dashboard"
             >
               Dashboard
             </Link>
             <Link
-              className=" mt-1 sm:mt-0 text-gray-400 active:underline"
+              className=" mt-1 md:mt-0 text-gray-400 active:underline"
               href="/split-it-up"
             >
               SplitItUp
             </Link>
             <Link
-              className=" mt-1 sm:mt-0 text-gray-400 active:underline"
+              className=" mt-1 md:mt-0 text-gray-400 active:underline"
               href="/challenges"
             >
               Challenges
             </Link>
           </SignedOut>
         </span>
-        <span className=" inline-flex sm:inline mr-5 absolute right-0 sign-in-container">
+        <span className="mb-0 my-auto inline-flex md:inline sign-in-container">
           <SignedOut>
             <span className=" m-[6px] md:m-2 bg-blue-500 hover:bg-blue-700 text-white text-xs sm:text-sm md:text-base font-bold py-[6px] md:py-2 px-3 md:px-4 rounded">
               <SignInButton />
@@ -169,7 +169,7 @@ const Navbar = () => {
             </span>
           </SignedOut>
           <SignedIn>
-            <UserButton showName />
+            <UserButton />
           </SignedIn>
         </span>
       </div>
