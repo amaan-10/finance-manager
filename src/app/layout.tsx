@@ -10,16 +10,19 @@ import Navbar from "./Navbar";
 const ibm = IBM_Plex_Mono({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700"],
+  fallback: ["serif"],
 });
 
 const courier = Courier_Prime({
   subsets: ["latin"],
   weight: ["400", "700"],
+  fallback: ["serif"],
 });
 
 const roboto = Roboto_Mono({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700"],
+  fallback: ["serif"],
 });
 
 export const metadata = {
@@ -38,10 +41,10 @@ export default function RootLayout({
         <body className={`${roboto.className}`}>
           <header>
             <nav>
-              <div className=" md:p-5 p-10 px-5 flex items-center font-extrabold">
+              <div className="p-5 flex items-center font-extrabold">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className=" md:w-[30px] md:h-[30px] sm:w-[40px] sm:h-[40px] xs:w-[50px] xs:h-[50px] w-[60px] h-[60px] font-normal"
+                  className=" h-[30px] w-[30px] font-normal"
                   viewBox="0 0 24 24"
                   fill="white"
                 >
