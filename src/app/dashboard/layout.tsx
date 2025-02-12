@@ -37,42 +37,42 @@ export default function DashboardLayout({
   };
   return (
     <div>
-      <nav className=" flex-col inline-flex sm:flex-row">
+      <nav className=" flex-col inline-flex md:flex-row">
         <span>
-          <span className="inline sm:hidden">- </span>
+          <span className="inline md:hidden">- </span>
           <NavLink className=" text-black" href="/dashboard">
             Overview
           </NavLink>
         </span>
         <span>
-          <span className="inline sm:hidden">- </span>
+          <span className="inline md:hidden">- </span>
           <NavLink
-            className=" mt-[2px] sm:mt-0 text-black"
+            className=" mt-[2px] md:mt-0 text-black"
             href="/dashboard/expenses"
           >
             Expenses
           </NavLink>
         </span>
         <span>
-          <span className="inline sm:hidden">- </span>
+          <span className="inline md:hidden">- </span>
           <NavLink
-            className=" mt-[2px] sm:mt-0 text-black"
+            className=" mt-[2px] md:mt-0 text-black"
             href="/dashboard/budgets"
           >
             Budgets
           </NavLink>
         </span>
         <span>
-          <span className="inline sm:hidden">- </span>
+          <span className="inline md:hidden">- </span>
           <NavLink
-            className=" mt-[2px] sm:mt-0 text-black"
+            className=" mt-[2px] md:mt-0 text-black"
             href="/dashboard/investments"
           >
             Investments
           </NavLink>
         </span>
         <span>
-          <span className="inline sm:hidden">- </span>
+          <span className="inline md:hidden">- </span>
           <NavLink className=" text-black" href="/dashboard/analytics">
             Analytics
           </NavLink>
