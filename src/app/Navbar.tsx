@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   SignedIn,
@@ -11,7 +11,19 @@ import {
 } from "@clerk/nextjs";
 
 const Navbar = () => {
-  const headers = new Headers(); // Placeholder: Replace with actual headers if needed
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 375);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const headers = new Headers();
 
   const pathname = usePathname();
 
@@ -169,7 +181,7 @@ const Navbar = () => {
             </span>
           </SignedOut>
           <SignedIn>
-            <UserButton />
+            <UserButton showName={!isMobile} />
           </SignedIn>
         </span>
       </div>
