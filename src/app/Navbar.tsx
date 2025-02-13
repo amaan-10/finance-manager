@@ -13,7 +13,6 @@ import { useLoader } from "@/context/LoaderContext";
 
 const Navbar = () => {
   const [isMobile, setIsMobile] = useState(false);
-  const { setLoading } = useLoader();
 
   useEffect(() => {
     const handleResize = () => {
@@ -22,10 +21,7 @@ const Navbar = () => {
 
     handleResize();
     window.addEventListener("resize", handleResize);
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
