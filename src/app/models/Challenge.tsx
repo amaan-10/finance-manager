@@ -5,6 +5,7 @@ export interface IChallenge extends Document {
   goal: number;
   progress: number;
   isCompleted: boolean;
+  lastCompleted: Date;
   userId: string; // User-specific challenges
   streak: number;
   badge?: string;
@@ -16,6 +17,7 @@ const ChallengeSchema = new Schema({
   name: String,
   goal: Number,
   progress: { type: Number, default: 0 },
+  lastCompleted: { type: Date, default: Date.now },
   isCompleted: { type: Boolean, default: false },
   userId: String,
   streak: { type: Number, default: 0 },
