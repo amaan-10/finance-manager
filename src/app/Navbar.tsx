@@ -123,6 +123,13 @@ const Navbar = () => {
           isActive ? " underline-offset-2 underline " : ""
         }${className}`}
       >
+        <nav
+          className={` md:hidden inline-flex transition-transform font-mono ${
+            isActive ? "rotate-0 " : "-rotate-90"
+          } mr-2`}
+        >
+          ▼ {/* Triangle symbol */}
+        </nav>
         {children}
       </Link>
     );
@@ -158,7 +165,7 @@ const Navbar = () => {
                   SplitItUp
                 </SplitItUpLink>
 
-                <FunZoneLink className="ml-4 md:ml-0" href="/fun-zone">
+                <FunZoneLink className="mt-0" href="/fun-zone">
                   Fun-zone
                 </FunZoneLink>
               </SignedIn>
