@@ -105,7 +105,7 @@ const Navbar = () => {
     );
   };
 
-  const ChallengesLink = ({
+  const FunZoneLink = ({
     href,
     children,
     className,
@@ -158,9 +158,9 @@ const Navbar = () => {
                   SplitItUp
                 </SplitItUpLink>
 
-                <ChallengesLink className="ml-4 md:ml-0" href="/challenges">
-                  Challenges
-                </ChallengesLink>
+                <FunZoneLink className="ml-4 md:ml-0" href="/fun-zone">
+                  Fun-zone
+                </FunZoneLink>
               </SignedIn>
               <SignedOut>
                 <HomeLink className="" href="/">
@@ -180,9 +180,9 @@ const Navbar = () => {
                 </Link>
                 <Link
                   className=" mt-1 md:mt-0 text-gray-400 active:underline"
-                  href="/challenges"
+                  href="/fun-zone"
                 >
-                  Challenges
+                  Fun-Zone
                 </Link>
               </SignedOut>
             </span>
