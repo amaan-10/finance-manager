@@ -1,12 +1,12 @@
-name: Daily Streak Reset
+name: Run Daily Cron Job
 on:
   schedule:
     - cron: "30 18 * * *" # Runs at 6:30 PM UTC = 12:00 AM IST
   workflow_dispatch: # Allows manual triggering
 
 jobs:
-  reset_streak:
+  update-challenges:
     runs-on: ubuntu-latest
     steps:
-      - name: Call Reset Streak API
-        run: curl -X GET "https://spend-less.vercel.app/api/challenges/reset-streak"
+      - name: Call the API to update challenges
+        run: curl -X GET "https://spend-less.vercel.app/api/cron"
