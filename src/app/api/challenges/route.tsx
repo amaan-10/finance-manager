@@ -19,22 +19,6 @@ export async function GET() {
   return NextResponse.json(mergedChallenges, { status: 200 });
 }
 
-// export async function POST(req: Request) {
-//   try {
-//     const { name, goal, userId } = await req.json();
-//     await connectToDatabase(); // Ensure MongoDB is connected
-//     const newChallenge = new ChallengeModel({ name, goal, userId });
-//     await newChallenge.save();
-
-//     return NextResponse.json(newChallenge, { status: 201 });
-//   } catch (error) {
-//     return NextResponse.json(
-//       { error: "Failed to create challenge" },
-//       { status: 500 }
-//     );
-//   }
-// }
-
 export async function POST(req: NextRequest) {
   try {
     const {
