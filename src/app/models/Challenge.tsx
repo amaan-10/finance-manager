@@ -2,9 +2,13 @@ import { Schema, Document, models, model } from "mongoose";
 import moment from "moment-timezone";
 
 export interface IChallenge extends Document {
-  name: string;
-  goal: number;
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  total: number;
   progress: number;
+  daysLeft: number;
   isCompleted: boolean;
   isClaimed: boolean;
   lastCompleted: Date;
@@ -12,14 +16,18 @@ export interface IChallenge extends Document {
   streak: number;
   badge?: string;
   points?: number;
-  id: string;
+  difficulty: string;
+  category: string;
 }
 
 const ChallengeSchema = new Schema({
   id: { type: String, required: true },
-  name: { type: String, required: true },
-  goal: { type: Number, required: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  icon: { type: String, required: true },
+  total: { type: Number, required: true },
   progress: { type: Number, default: 0 },
+  daysLeft: { type: Number, required: true },
   lastCompleted: {
     type: Date,
     default: () => moment().tz("Asia/Kolkata").toDate(),
@@ -30,6 +38,8 @@ const ChallengeSchema = new Schema({
   streak: { type: Number, default: 0 },
   badge: { type: String },
   points: { type: Number },
+  difficulty: { type: String, required: true },
+  category: { type: String, required: true },
 });
 
 // Middleware to ensure lastCompleted is stored in IST before saving
