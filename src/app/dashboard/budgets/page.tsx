@@ -1,5 +1,6 @@
 // app/dashboard/expenses/page.tsx
 "use client";
+import { trackDeposit } from "@/utils/challengeApi";
 import { useEffect, useState } from "react";
 
 interface Budget {
@@ -73,6 +74,13 @@ export default function BudgetsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newBudget),
       });
+
+      const handleDeposit = async () => {
+        await trackDeposit(newBudget.amount);
+        console.log("Deposit tracked!");
+      };
+
+      handleDeposit(); // Track deposit for challenge
 
       //Refresh the budgets list
       setBudgets([...budgets, newBudget]);

@@ -1,6 +1,8 @@
 "use client";
+import EarnPoints from "@/components/EarnPoints";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 
 interface Expense {
   totalAmount: number;
@@ -31,6 +33,8 @@ export default function DashboardPage() {
   const [expenses, setExpenses] = useState<Expense[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { user, isLoaded } = useUser();
 
   useEffect(() => {
     const fetchMonthlyExpenses = async () => {
@@ -94,7 +98,6 @@ export default function DashboardPage() {
   return (
     <section className=" mt-5">
       <h2 className="text-[26px] font-bold">Dashboard Overview</h2>
-
       <div className="mt-2">
         <div>
           <p className="text-lg font-medium">Monthly Expenses:</p>
