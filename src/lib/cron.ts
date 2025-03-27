@@ -1,8 +1,8 @@
 import cron from "node-cron";
 import axios from "axios";
 
-// Runs every midnight (IST) to trigger the API route
-cron.schedule("0 0 * * *", async () => {
+// Runs at 6:30 PM UTC = 12:00 AM IST
+cron.schedule("30 18 * * *", async () => {
   try {
     console.log("Running daily challenge update...");
     await axios.get("http://localhost:3000/api/cron"); 
