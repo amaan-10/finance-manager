@@ -1,55 +1,50 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowRight, Gift, Sparkles, Check } from "lucide-react";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Check, Clock, Star } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "./ui/badge";
 
-interface BonusCardProps {
-  title?: string;
-  description?: string;
-  points?: number;
-  maxPoints?: number;
-  rewardAmount?: string;
-  isRedeemed?: boolean;
-  backgroundColor?: string;
-  textColor?: string;
+type Challenge = {
+  isCompleted: any;
+  lastCompleted: any;
+  id: number;
+  title: string;
+  description: string;
+  icon: string;
+  points: number;
+  progress: number;
+  total: number;
+  daysLeft: number;
+  difficulty: "easy" | "medium" | "hard";
+  category: "savings" | "spending" | "investing";
+};
+
+interface ChallengeCardProps {
+  challenge: Challenge;
+  IconComponent?: any;
+  userPoints: number;
+  startChallenge: () => void;
   onRedeem?: () => void;
   completeChallenge?: (challenge: any) => void;
 }
 
 export default function ChallengeCard({
-  title = "Loyalty Bonus",
-  description = "Complete purchases to earn your reward",
-  points = 75,
-  maxPoints = 100,
-  rewardAmount = "$25",
-  isRedeemed = false,
-  backgroundColor = "bg-gradient-to-br from-violet-500 to-indigo-700",
-  textColor = "text-white",
-  onRedeem = () => console.log("Redeem clicked"),
-  completeChallenge = (challenge) =>
-    console.log("Challenge completed", challenge),
-}: BonusCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isClaimed, setIsClaimed] = useState(isRedeemed);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const progress = (points / maxPoints) * 100;
-
-  const handleRedeem = () => {
-    if (progress >= 100 && !isClaimed) {
-      setShowConfetti(true);
-      setIsClaimed(true);
-      isRedeemed = true;
-      onRedeem();
-
-      // Hide confetti after animation completes
-      setTimeout(() => {
-        setShowConfetti(false);
-      }, 3000);
-    }
-  };
+  challenge,
+  IconComponent,
+  userPoints,
+  startChallenge,
+}: ChallengeCardProps) {
+  const isClaimed = challenge.isCompleted;
+  const showConfetti = challenge.isCompleted;
 
   // Generate confetti particles
   const confettiElements = Array.from({ length: 50 }).map((_, index) => {
@@ -85,11 +80,7 @@ export default function ChallengeCard({
 
   return (
     <Card
-      className={`w-full max-w-md overflow-hidden border-0 shadow-lg ${backgroundColor} relative transition-all duration-500 ${
-        isClaimed ? "scale-[1.02]" : ""
-      }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className={` overflow-hidden border-0 shadow-sm hover:shadow-lg relative transition-all duration-500`}
     >
       {/* Confetti container */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -105,86 +96,85 @@ export default function ChallengeCard({
         </div>
       )}
 
-      <div className="absolute top-0 right-0 p-4">
-        <div className="relative">
-          <Sparkles className={`${textColor} w-6 h-6 opacity-75`} />
-          <div
-            className={`absolute -top-1 -right-1 w-3 h-3 rounded-full bg-yellow-300 ${
-              isHovered ? "animate-ping" : ""
-            }`}
-          ></div>
-        </div>
-      </div>
-
-      <CardContent
-        className={`p-6 pt-10 transition-opacity duration-500 ${
-          isClaimed ? "opacity-50" : "opacity-100"
-        }`}
-      >
-        <div className="flex items-start gap-4">
-          <div
-            className={`p-3 rounded-full bg-white/20 backdrop-blur-sm ${textColor}`}
+      <CardHeader className="pb-2">
+        <div className="flex justify-between items-start">
+          <div className="flex items-center gap-3">
+            <div
+              className={`p-2 rounded-lg ${
+                challenge.category === "savings"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : challenge.category === "spending"
+                  ? "bg-blue-100 text-blue-700"
+                  : "bg-purple-100 text-purple-700"
+              }`}
+            >
+              {IconComponent ? (
+                <IconComponent className="h-5 w-5" />
+              ) : (
+                <p>🚫</p>
+              )}
+            </div>
+            <div>
+              <CardTitle className="text-base">{challenge.title}</CardTitle>
+              <CardDescription className="text-xs mt-1">
+                {challenge.description}
+              </CardDescription>
+            </div>
+          </div>
+          <Badge
+            variant={
+              challenge.difficulty === "easy"
+                ? "outline"
+                : challenge.difficulty === "medium"
+                ? "secondary"
+                : "destructive"
+            }
+            className="text-xs rounded-full"
           >
-            <Gift className="w-6 h-6" />
-          </div>
-          <div className="space-y-1">
-            <h3 className={`text-xl font-bold ${textColor}`}>{title}</h3>
-            <p className={`${textColor} opacity-90 text-sm`}>{description}</p>
-          </div>
+            {challenge.difficulty}
+          </Badge>
         </div>
-
-        <div className="mt-8 space-y-2">
-          <div className="flex justify-between">
-            <span className={`text-sm font-medium ${textColor}`}>
-              {points} streak
-            </span>
-            <span className={`text-sm ${textColor} opacity-75`}>
-              {maxPoints} streak
+      </CardHeader>
+      <CardContent className="pb-2">
+        <div className="mt-2">
+          <div className="flex justify-between text-sm mb-1">
+            <span>Progress</span>
+            <span className="font-medium">
+              {challenge.progress} / {challenge.total}
             </span>
           </div>
-          <Progress value={progress} className="h-2 bg-white/20" />
-        </div>
-
-        <div className={`mt-6 text-center ${textColor}`}>
-          <div className="text-xs uppercase tracking-wider opacity-75">
-            Reward
-          </div>
-          <div className="text-3xl font-bold mt-1">{rewardAmount}</div>
+          <Progress
+            value={(challenge.progress / challenge.total) * 100}
+            className="h-2"
+          />
         </div>
       </CardContent>
-
-      <CardFooter className="p-6 pt-0">
-        <Button
-          className={`w-full group transition-all ${
-            progress >= 100 && !isClaimed
-              ? "bg-white hover:bg-white/90 text-indigo-700"
-              : isClaimed
-              ? "bg-green-500 text-white"
-              : "bg-white/20 hover:bg-white/30 text-white"
-          }`}
-          onClick={progress >= 100 ? handleRedeem : completeChallenge}
-        >
-          {isClaimed
-            ? "Claimed!"
-            : progress >= 100
-            ? "Redeem Now"
-            : "Mark as Completed"}
-          {!isClaimed && (
-            <ArrowRight
-              className={`ml-2 w-4 h-4 transition-transform ${
-                isHovered && progress >= 100 ? "translate-x-1" : ""
-              }`}
-            />
-          )}
-        </Button>
-        {/* //     <button
-            //       onClick={() => completeChallenge(challenge)}
-            //       className="mt-2 flex gap-2 bg-blue-500 text-white px-4 py-2 rounded"
-            //     >
-            //       <Image src={squareCheck} className="w-4 h-4 mt-1" alt="check" />{" "}
-            //       Mark as Completed
-            //     </button> */}
+      <CardFooter className="flex justify-between pt-0">
+        <div className="flex items-center text-sm text-slate-500">
+          <Clock className="h-3 w-3 mr-1" />
+          {challenge.daysLeft > 0
+            ? `${challenge.daysLeft} days left`
+            : "Completed!"}
+        </div>
+        <div className="flex items-center text-sm font-medium">
+          <Star className="h-4 w-4 text-amber-500 mr-1" />
+          {challenge.points} points
+        </div>
       </CardFooter>
+      <Button
+        disabled={challenge.lastCompleted}
+        variant={userPoints >= challenge.total ? "default" : "outline"}
+        onClick={startChallenge}
+        className={`flex justify-self-end mb-5 mr-6 ${
+          challenge.isCompleted ? "bg-green-600" : ""
+        }`}
+      >
+        {challenge.isCompleted
+          ? "Challenge Completed"
+          : !challenge.lastCompleted
+          ? "Start Challenge"
+          : "Ongoing Challenge"}
+      </Button>
 
       <style jsx global>{`
         @keyframes confetti {
