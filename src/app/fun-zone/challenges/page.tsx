@@ -109,24 +109,26 @@ const buttonVariants = {
 // Component
 export default function ChallengesRewards() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/challenges")
       .then((res) => res.json())
-      .then((data) => setChallenges(data));
+      .then((data) => {
+        setChallenges(data);
+        setLoading(false);
+      });
   }, []);
 
   // console.log(challenges);
 
   const [rewards, setRewards] = useState<Reward[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/rewards")
       .then((res) => res.json())
       .then((data) => {
         setRewards(data);
-        setLoading(false);
       });
   }, []);
 
@@ -184,7 +186,9 @@ export default function ChallengesRewards() {
   return (
     <>
       {loading ? (
-        "loading..."
+        <div className="flex justify-center items-center h-[75vh]">
+          <div className="loader"></div>
+        </div>
       ) : (
         <div className="container py-8 max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -409,6 +413,7 @@ export default function ChallengesRewards() {
                                       startChallenge={() =>
                                         startChallenge(challenge)
                                       }
+                                      isInView={isInView}
                                     />
                                   </motion.div>
                                 );

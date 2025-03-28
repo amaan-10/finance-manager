@@ -1,54 +1,3 @@
-// "use client";
-// import { faMedal, faSackDollar } from "@fortawesome/free-solid-svg-icons";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { useEffect, useState } from "react";
-
-// interface Leaderboard {
-//   id: string;
-//   name: string;
-//   goal: number;
-//   totalPoints: number;
-// }
-
-// export default function Leaderboard() {
-//   const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
-
-//   useEffect(() => {
-//     fetch("/api/challenges/leaderboard")
-//       .then((res) => res.json())
-//       .then((data) => setLeaderboard(data));
-//   }, []);
-
-//   console.log(leaderboard);
-
-//   return (
-//     <div className="mt-5 max-w-2xl ">
-//       <h1 className="text-3xl font-bold mb-4">
-//         <FontAwesomeIcon
-//           className="w-7 h-7 mt-1 text-[#D6AF36] "
-//           icon={faMedal}
-//         />{" "}
-//         Savings Leaderboard
-//       </h1>
-
-//       {leaderboard.map((user, index) => (
-//         <div key={index} className="mb-4 p-4 bg-white shadow rounded">
-//           <h3 className="font-semibold">
-//             #{index + 1} {user.name}
-//           </h3>
-//           <p>
-//             <FontAwesomeIcon
-//               className="w-5 h-5 mt-1 text-[#C4A484] "
-//               icon={faSackDollar}
-//             />{" "}
-//             Total Points: {user.totalPoints}
-//           </p>
-//         </div>
-//       ))}
-//     </div>
-//   );
-// }
-
 "use client";
 
 import { useState } from "react";
@@ -279,7 +228,8 @@ export default function Leaderboard() {
                             <div className="flex items-center">
                               <IndianRupee className="h-4 w-4 text-emerald-500 mr-1" />
                               <span className="font-bold text-lg">
-                                ${user.savings.toLocaleString()}
+                                <span className=" font-sans">₹</span>
+                                {user.savings.toLocaleString()}
                               </span>
                             </div>
                           </div>
