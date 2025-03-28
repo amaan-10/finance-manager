@@ -36,7 +36,7 @@ interface ChallengeCardProps {
   startChallenge: () => void;
   onRedeem?: () => void;
   completeChallenge?: (challenge: any) => void;
-  isInView: boolean;
+  isInView?: boolean;
 }
 
 export default function ChallengeCard({
