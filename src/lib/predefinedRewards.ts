@@ -54,7 +54,7 @@ export const predefinedRewards = [
     },
     {
       id: 7,
-      title: "$15 Uber Gift Card",
+      title: "₹150 Uber Gift Card",
       description: "Redeem your points for an Uber ride",
       pointsCost: 1500,
       image: "/uber-gift-card.png",
