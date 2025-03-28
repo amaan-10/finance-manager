@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "./ui/badge";
+import AnimatedProgress from "./AnimatedProgress";
 
 type Challenge = {
   isCompleted: any;
@@ -35,6 +36,7 @@ interface ChallengeCardProps {
   startChallenge: () => void;
   onRedeem?: () => void;
   completeChallenge?: (challenge: any) => void;
+  isInView: boolean;
 }
 
 export default function ChallengeCard({
@@ -42,6 +44,7 @@ export default function ChallengeCard({
   IconComponent,
   userPoints,
   startChallenge,
+  isInView,
 }: ChallengeCardProps) {
   const isClaimed = challenge.isCompleted;
   const showConfetti = challenge.isCompleted;
@@ -143,9 +146,10 @@ export default function ChallengeCard({
               {challenge.progress} / {challenge.total}
             </span>
           </div>
-          <Progress
+          <AnimatedProgress
+            isInView={isInView}
             value={(challenge.progress / challenge.total) * 100}
-            className="h-2"
+            className="bg-gray-300"
           />
         </div>
       </CardContent>
