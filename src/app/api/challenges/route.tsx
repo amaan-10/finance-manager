@@ -3,10 +3,15 @@ import { connectToDatabase } from "@/lib/mongoose";
 import ChallengeModel from "@/app/models/Challenge";
 import { predefinedChallenges } from "@/lib/predefinedChallenges";
 import { getAuth } from "@clerk/nextjs/server";
+import UserModel from "@/app/models/User";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   await connectToDatabase(); // Ensure MongoDB is connected
-  const dbChallenges = await ChallengeModel.find(); // Fetch challenges from MongoDB
+  const { userId } = getAuth(req);
+  if (!userId)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const dbChallenges = await ChallengeModel.find({ userId }); // Fetch challenges from MongoDB
 
   // Convert DB challenges to a Map for efficient lookup
   const dbChallengeMap = new Map(dbChallenges.map((c) => [c.id, c]));
@@ -53,6 +58,14 @@ export async function POST(req: NextRequest) {
       isClaimed: false,
       streak: 0,
     });
+
+    const user = await UserModel.findOne({ id: userId });
+
+    if (challenge.progress === 0) {
+      user.challengesInProgress++;
+    }
+
+    user.save();
 
     return NextResponse.json(challenge, { status: 201 });
   } catch (error) {
