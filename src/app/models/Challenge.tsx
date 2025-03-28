@@ -28,10 +28,7 @@ const ChallengeSchema = new Schema({
   total: { type: Number, required: true },
   progress: { type: Number, default: 0 },
   daysLeft: { type: Number, required: true },
-  lastCompleted: {
-    type: Date,
-    default: () => moment().tz("Asia/Kolkata").toDate(),
-  },
+  lastCompleted: { type: Date, default: Date.now },
   isCompleted: { type: Boolean, default: false },
   isClaimed: { type: Boolean, default: false },
   userId: { type: String, required: true },
