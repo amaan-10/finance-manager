@@ -1,16 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BarChart3,
   Clock,
-  DollarSign,
   Gift,
   icons,
-  IndianRupee,
   LucideIcon,
   Medal,
-  Percent,
   Star,
   Target,
   Trophy,
@@ -18,7 +15,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,25 +25,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import AnimatedProgress from "@/components/AnimatedProgress";
 import ScrollReveal from "@/components/ScrollAnimation";
 import CountUp from "react-countup";
-import moment from "moment";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-};
-
-const progressVariants = {
-  initial: { width: "0%" },
-  animate: (value: number) => ({
-    width: `${value}%`,
-    transition: { duration: 1.2, ease: "easeInOut" },
-  }),
 };
 
 const barVariants = {
@@ -73,128 +59,65 @@ const itemVariants = {
 };
 
 // Sample data for the overview page
-const userStats = {
-  name: "Jordan Lee",
-  points: 7450,
-  rank: 4,
-  savingsGoal: 10000,
-  currentSavings: 8650,
-  challengesCompleted: 12,
-  challengesInProgress: 5,
-  rewardsRedeemed: 3,
-  streakDays: 28,
-  nextRewardPoints: 10000,
-  pointsThisMonth: 2350,
-  achievements: [
-    {
-      id: 1,
-      title: "Savings Starter",
-      description: "Save your first ₹100",
-      date: "Mar 15, 2023",
-      icon: IndianRupee,
-    },
-    {
-      id: 2,
-      title: "Challenge Champion",
-      description: "Complete 10 challenges",
-      date: "Feb 28, 2023",
-      icon: Trophy,
-    },
-    {
-      id: 3,
-      title: "Streak Master",
-      description: "Maintain a 25-day streak",
-      date: "Mar 22, 2023",
-      icon: Zap,
-    },
-  ],
-  recentActivity: [
-    {
-      id: 1,
-      type: "challenge",
-      title: "Completed: Save ₹500 this month",
-      points: 1000,
-      date: "Mar 20, 2023",
-    },
-    {
-      id: 2,
-      type: "reward",
-      title: "Redeemed: ₹25 Amazon Gift Card",
-      points: -2500,
-      date: "Mar 18, 2023",
-    },
-    {
-      id: 3,
-      type: "challenge",
-      title: "Completed: No unnecessary purchases for a week",
-      points: 750,
-      date: "Mar 12, 2023",
-    },
-  ],
-};
-
-// Featured challenges
-// const featuredChallenges = [
-//   {
-//     id: 1,
-//     title: "Save ₹500 this month",
-//     description: "Deposit at least ₹500 into your savings account",
-//     icon: IndianRupee,
-//     points: 1000,
-//     progress: 350,
-//     total: 500,
-//     daysLeft: 12,
-//     category: "savings",
-//   },
-//   {
-//     id: 2,
-//     title: "Complete financial profile",
-//     description: "Fill out all sections of your financial profile",
-//     icon: Target,
-//     points: 500,
-//     progress: 80,
-//     total: 100,
-//     daysLeft: 30,
-//     category: "savings",
-//   },
-//   {
-//     id: 3,
-//     title: "Invest in 3 different assets",
-//     description: "Diversify your portfolio by investing in different assets",
-//     icon: Percent,
-//     points: 1500,
-//     progress: 2,
-//     total: 3,
-//     daysLeft: 20,
-//     category: "investing",
-//   },
-// ];
-
-// Featured rewards
-// const featuredRewards = [
-//   {
-//     id: 1,
-//     title: "₹25 Amazon Gift Card",
-//     pointsCost: 2500,
-//     image: "/amazon-gift-card.png",
-//     category: "gift-card",
-//     brand: "Amazon",
-//   },
-//   {
-//     id: 2,
-//     title: "5% Cashback Boost",
-//     pointsCost: 3000,
-//     image: "/5-percent-cashback-gift-card.png",
-//     category: "cashback",
-//   },
-//   {
-//     id: 3,
-//     title: "Premium Subscription",
-//     pointsCost: 2000,
-//     image: "/membership-card.png",
-//     category: "experience",
-//   },
-// ];
+// const userStats = {
+//   name: "Jordan Lee",
+//   points: 7450,
+//   rank: 4,
+//   savingsGoal: 10000,
+//   currentSavings: 8650,
+//   challengesCompleted: 12,
+//   challengesInProgress: 5,
+//   rewardsRedeemed: 3,
+//   streakDays: 28,
+//   nextRewardPoints: 10000,
+//   pointsThisMonth: 2350,
+//   achievements: [
+//     {
+//       id: 1,
+//       title: "Savings Starter",
+//       description: "Save your first ₹100",
+//       date: "Mar 15, 2023",
+//       icon: IndianRupee,
+//     },
+//     {
+//       id: 2,
+//       title: "Challenge Champion",
+//       description: "Complete 10 challenges",
+//       date: "Feb 28, 2023",
+//       icon: Trophy,
+//     },
+//     {
+//       id: 3,
+//       title: "Streak Master",
+//       description: "Maintain a 25-day streak",
+//       date: "Mar 22, 2023",
+//       icon: Zap,
+//     },
+//   ],
+//   recentActivity: [
+//     {
+//       id: 1,
+//       type: "challenge",
+//       title: "Completed: Save ₹500 this month",
+//       points: 1000,
+//       date: "Mar 20, 2023",
+//     },
+//     {
+//       id: 2,
+//       type: "reward",
+//       title: "Redeemed: ₹25 Amazon Gift Card",
+//       points: -2500,
+//       date: "Mar 18, 2023",
+//     },
+//     {
+//       id: 3,
+//       type: "challenge",
+//       title: "Completed: No unnecessary purchases for a week",
+//       points: 750,
+//       date: "Mar 12, 2023",
+//     },
+//   ],
+// };
 
 type Challenge = {
   isCompleted: any;
@@ -230,6 +153,14 @@ type RecentActivity = {
   date: Date;
 };
 
+type Achievements = {
+  id: string;
+  title: string;
+  description: string;
+  date: Date;
+  icon: string;
+};
+
 type UserStats = {
   name: string;
   points: number;
@@ -242,30 +173,8 @@ type UserStats = {
   streakDays: number;
   nextRewardPoints: number;
   pointsThisMonth: number;
-  // achievements: [
-  //   {
-  //     id: 1,
-  //     title: "Savings Starter",
-  //     description: "Save your first ₹100",
-  //     date: "Mar 15, 2023",
-  //     icon: IndianRupee,
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "Challenge Champion",
-  //     description: "Complete 10 challenges",
-  //     date: "Feb 28, 2023",
-  //     icon: Trophy,
-  //   },
-  //   {
-  //     id: 3,
-  //     title: "Streak Master",
-  //     description: "Maintain a 25-day streak",
-  //     date: "Mar 22, 2023",
-  //     icon: Zap,
-  //   },
-  // ],
-  recentActivity: [RecentActivity];
+  achievements: Achievements[];
+  recentActivity: RecentActivity[];
 };
 
 const getLucideIcon = (iconName: string): LucideIcon | null => {
@@ -284,14 +193,10 @@ const monthlyPointsData = [
 
 // Component
 export default function FunZoneOverview() {
-  const [activeTab, setActiveTab] = useState("overview");
-
   const [featuredRewards, setRewards] = useState<Reward[]>([]);
   const [featuredChallenges, setChallenges] = useState<Challenge[]>([]);
   const [userStats, setuserStats] = useState<UserStats>();
   const [loading, setLoading] = useState(true);
-
-  console.log(userStats);
 
   useEffect(() => {
     fetch("/api/challenges")
@@ -828,7 +733,7 @@ export default function FunZoneOverview() {
                           <div className="flex items-center justify-between">
                             <CardTitle>Popular Rewards</CardTitle>
                             <Link
-                              href="/fun-zone/challenges"
+                              href="/fun-zone/rewards"
                               className="text-sm text-primary hover:underline"
                             >
                               View All
@@ -905,57 +810,64 @@ export default function FunZoneOverview() {
                           initial="hidden"
                           animate={isInView ? "visible" : "hidden"}
                         >
-                          {userStats.recentActivity.map((activity, index) => (
-                            <motion.div
-                              key={activity.id}
-                              variants={itemVariants}
-                              className="flex items-start gap-3 pb-3"
-                              custom={index}
-                              initial="hidden"
-                              animate={isInView ? "visible" : "hidden"}
-                            >
-                              <div
-                                className={`p-2 rounded-full shrink-0 ${
-                                  activity.type === "challenge"
-                                    ? "bg-emerald-100 text-emerald-700"
-                                    : "bg-amber-100 text-amber-700"
-                                }`}
-                              >
-                                {activity.type === "challenge" ? (
-                                  <Trophy className="h-4 w-4" />
-                                ) : (
-                                  <Gift className="h-4 w-4" />
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between gap-2">
-                                  <h3 className="font-medium text-sm">
-                                    {activity.title}
-                                  </h3>
-                                  <div
-                                    className={`text-xs font-medium ${
-                                      activity.points > 0
-                                        ? "text-emerald-600"
-                                        : "text-amber-600"
-                                    }`}
+                          {userStats.recentActivity.length === 0 ? (
+                            "No Recent Activity found"
+                          ) : (
+                            <>
+                              {userStats.recentActivity.map(
+                                (activity, index) => (
+                                  <motion.div
+                                    key={activity.id}
+                                    variants={itemVariants}
+                                    className="flex items-start gap-3 pb-3"
+                                    custom={index}
+                                    initial="hidden"
+                                    animate={isInView ? "visible" : "hidden"}
                                   >
-                                    {activity.points > 0 ? "+" : ""}
-                                    {activity.points} points
-                                  </div>
-                                </div>
-                                <div className="text-xs text-slate-500 mt-1">
-                                  {new Date(activity.date).toLocaleDateString(
-                                    "en-US",
-                                    {
-                                      month: "short",
-                                      day: "2-digit",
-                                      year: "numeric",
-                                    }
-                                  )}
-                                </div>
-                              </div>
-                            </motion.div>
-                          ))}
+                                    <div
+                                      className={`p-2 rounded-full shrink-0 ${
+                                        activity.type === "challenge"
+                                          ? "bg-emerald-100 text-emerald-700"
+                                          : "bg-amber-100 text-amber-700"
+                                      }`}
+                                    >
+                                      {activity.type === "challenge" ? (
+                                        <Trophy className="h-4 w-4" />
+                                      ) : (
+                                        <Gift className="h-4 w-4" />
+                                      )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-start justify-between gap-2">
+                                        <h3 className="font-medium text-sm">
+                                          {activity.title}
+                                        </h3>
+                                        <div
+                                          className={`text-xs font-medium ${
+                                            activity.points > 0
+                                              ? "text-emerald-600"
+                                              : "text-amber-600"
+                                          }`}
+                                        >
+                                          {activity.points > 0 ? "+" : ""}
+                                          {activity.points} points
+                                        </div>
+                                      </div>
+                                      <div className="text-xs text-slate-500 mt-1">
+                                        {new Date(
+                                          activity.date
+                                        ).toLocaleDateString("en-US", {
+                                          month: "short",
+                                          day: "2-digit",
+                                          year: "numeric",
+                                        })}
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                )
+                              )}
+                            </>
+                          )}
                         </motion.div>
                       </CardContent>
                       <CardFooter className="pt-0">
@@ -972,65 +884,89 @@ export default function FunZoneOverview() {
                 </ScrollReveal>
 
                 {/* Achievements */}
-                {/* <ScrollReveal variants={cardVariants}>
-          {(isInView) => (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle>Recent Achievements</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <motion.div
-                  variants={listVariants}
-                  initial="hidden"
-                  animate={isInView ? "visible" : "hidden"}
-                >
-                  {userStats.achievements.map((achievement, index) => (
-                    <motion.div
-                      key={achievement.id}
-                      variants={itemVariants}
-                      className="flex items-start gap-3 pb-3"
-                      custom={index}
-                      initial="hidden"
-                      animate={isInView ? "visible" : "hidden"}
-                    >
-                      <div className="p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-full shrink-0">
-                        <achievement.icon className="h-4 w-4 text-amber-700" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <h3 className="font-medium text-sm">
-                            {achievement.title}
-                          </h3>
-                          <Badge
-                            variant="outline"
-                            className="text-xs border-amber-200 text-amber-700"
-                          >
-                            Achievement
-                          </Badge>
-                        </div>
-                        <div className="text-xs text-slate-500 mt-1">
-                          {achievement.description}
-                        </div>
-                        <div className="text-xs text-slate-400 mt-1">
-                          Earned on {achievement.date}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </motion.div>
-              </CardContent>
-              <CardFooter className="pt-0">
-                <motion.button
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  className="w-full border rounded-md py-2 text-sm font-semibold text-gray-900 hover:bg-gray-100"
-                >
-                  View All Achievements
-                </motion.button>
-              </CardFooter>
-            </Card>
-          )}
-        </ScrollReveal> */}
+                <ScrollReveal variants={cardVariants}>
+                  {(isInView) => (
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle>Recent Achievements</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <motion.div
+                          variants={listVariants}
+                          initial="hidden"
+                          animate={isInView ? "visible" : "hidden"}
+                        >
+                          {userStats.achievements.length === 0 ? (
+                            "No Achievements found"
+                          ) : (
+                            <>
+                              {userStats.achievements.map(
+                                (achievement, index) => {
+                                  const IconComponent = getLucideIcon(
+                                    achievement.icon
+                                  );
+                                  return (
+                                    <motion.div
+                                      key={achievement.id}
+                                      variants={itemVariants}
+                                      className="flex items-start gap-3 pb-3"
+                                      custom={index}
+                                      initial="hidden"
+                                      animate={isInView ? "visible" : "hidden"}
+                                    >
+                                      <div className="p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-full shrink-0">
+                                        {IconComponent ? (
+                                          <IconComponent className="h-4 w-4 text-amber-700" />
+                                        ) : (
+                                          <p>🚫</p>
+                                        )}
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-start justify-between gap-2">
+                                          <h3 className="font-medium text-sm">
+                                            {achievement.title}
+                                          </h3>
+                                          <Badge
+                                            variant="outline"
+                                            className="text-xs border-amber-200 text-amber-700"
+                                          >
+                                            Achievement
+                                          </Badge>
+                                        </div>
+                                        <div className="text-xs text-slate-500 mt-1">
+                                          {achievement.description}
+                                        </div>
+                                        <div className="text-xs text-slate-400 mt-1">
+                                          Earned on{" "}
+                                          {new Date(
+                                            achievement.date
+                                          ).toLocaleDateString("en-US", {
+                                            month: "short",
+                                            day: "2-digit",
+                                            year: "numeric",
+                                          })}
+                                        </div>
+                                      </div>
+                                    </motion.div>
+                                  );
+                                }
+                              )}
+                            </>
+                          )}
+                        </motion.div>
+                      </CardContent>
+                      <CardFooter className="pt-0">
+                        <motion.button
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.99 }}
+                          className="w-full border rounded-md py-2 text-sm font-semibold text-gray-900 hover:bg-gray-100"
+                        >
+                          View All Achievements
+                        </motion.button>
+                      </CardFooter>
+                    </Card>
+                  )}
+                </ScrollReveal>
               </div>
             </div>
           )}
