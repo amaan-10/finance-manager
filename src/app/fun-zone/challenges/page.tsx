@@ -5,16 +5,11 @@ import {
   Calendar,
   ChevronRight,
   CreditCard,
-  Gift,
   icons,
   type LucideIcon,
-  Search,
   Star,
   Trophy,
 } from "lucide-react";
-import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -23,7 +18,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ChallengeCard from "@/components/ChallengeCard";
 import { AnimatePresence, motion } from "framer-motion";
@@ -46,31 +40,8 @@ type Challenge = {
   category: "savings" | "spending" | "investing";
 };
 
-type Reward = {
-  id: number;
-  title: string;
-  description: string;
-  pointsCost: number;
-  image: string;
-  category: "gift-card" | "cashback" | "discount" | "experience";
-  featured?: boolean;
-  brand?: string;
-};
-
 const getLucideIcon = (iconName: string): LucideIcon | null => {
   return icons[iconName as keyof typeof icons] || null;
-};
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  exit: { opacity: 0, y: -20, transition: { duration: 0.3 } },
-};
-
-const fadeInVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-  exit: { opacity: 0, y: -20, transition: { duration: 0.4 } },
 };
 
 const cardVariants = {
@@ -101,11 +72,6 @@ const iconVariants = {
   },
 };
 
-const buttonVariants = {
-  hover: { scale: 1.05 },
-  tap: { scale: 0.95 },
-};
-
 // Component
 export default function ChallengesRewards() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -121,16 +87,6 @@ export default function ChallengesRewards() {
   }, []);
 
   // console.log(challenges);
-
-  const [rewards, setRewards] = useState<Reward[]>([]);
-
-  useEffect(() => {
-    fetch("/api/rewards")
-      .then((res) => res.json())
-      .then((data) => {
-        setRewards(data);
-      });
-  }, []);
 
   const startChallenge = async (challenge: Challenge) => {
     try {
@@ -150,18 +106,7 @@ export default function ChallengesRewards() {
     }
   };
 
-  const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("all");
-
-  // Filter rewards based on search and category
-  const filteredRewards = rewards.filter((reward) => {
-    const matchesSearch =
-      reward.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      reward.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      activeCategory === "all" || reward.category === activeCategory;
-    return matchesSearch && matchesCategory;
-  });
 
   // Filter challenges based on category
   const filteredChallenges = challenges.filter((challenge) => {
@@ -181,8 +126,6 @@ export default function ChallengesRewards() {
 
   const userPoints = calculateTotalPoints(challenges);
 
-  console.log(loading);
-
   return (
     <>
       {loading ? (
@@ -193,9 +136,7 @@ export default function ChallengesRewards() {
         <div className="container py-8 max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">
-                Challenges & Rewards
-              </h1>
+              <h1 className="text-3xl font-bold text-slate-900">Challenges</h1>
               <p className="text-slate-500 mt-1">
                 Complete challenges to earn points and redeem for rewards
               </p>
@@ -220,7 +161,7 @@ export default function ChallengesRewards() {
           <Tabs defaultValue="challenges" className="mb-8">
             <TabsList className="grid grid-cols-2 w-full md:w-[400px] bg-slate-200">
               <TabsTrigger value="challenges">Challenges</TabsTrigger>
-              <TabsTrigger value="rewards">Rewards & Gift Cards</TabsTrigger>
+              <TabsTrigger value="history">Points Histroy</TabsTrigger>
             </TabsList>
 
             {/* Challenges Tab */}
@@ -441,224 +382,6 @@ export default function ChallengesRewards() {
                 </div>
               </motion.div>
             </TabsContent>
-
-            {/* Rewards Tab */}
-            <TabsContent value="rewards" className="mt-6">
-              {/* Featured Rewards */}
-
-              <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10"
-                initial="hidden"
-                animate="visible"
-                variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
-              >
-                {rewards
-                  .filter((r) => r.featured)
-                  .map((reward) => (
-                    <motion.div key={reward.id} variants={cardVariants}>
-                      <Card className="flex overflow-hidden border-0 shadow-md">
-                        <div className="w-1/3 bg-slate-100 flex items-center justify-center p-4">
-                          <Image
-                            src={reward.image || "/placeholder.svg"}
-                            alt={reward.title}
-                            width={120}
-                            height={120}
-                            className="object-contain rounded"
-                          />
-                        </div>
-                        <div className="w-2/3">
-                          <CardHeader className="pb-2">
-                            <CardTitle className="text-lg">
-                              {reward.title}
-                            </CardTitle>
-                            <CardDescription>
-                              {reward.description}
-                            </CardDescription>
-                          </CardHeader>
-                          <CardFooter className="flex justify-between items-center">
-                            <div className="flex items-center">
-                              <Star className="h-4 w-4 text-amber-500 mr-1" />
-                              <span className="font-bold">
-                                {reward.pointsCost.toLocaleString()}
-                              </span>
-                              <span className="text-sm text-slate-500 ml-1">
-                                points
-                              </span>
-                            </div>
-                            <motion.div
-                              whileHover="hover"
-                              whileTap="tap"
-                              variants={buttonVariants}
-                            >
-                              <Button
-                                disabled={userPoints < reward.pointsCost}
-                                variant={
-                                  userPoints >= reward.pointsCost
-                                    ? "default"
-                                    : "outline"
-                                }
-                              >
-                                Redeem
-                              </Button>
-                            </motion.div>
-                          </CardFooter>
-                        </div>
-                      </Card>
-                    </motion.div>
-                  ))}
-              </motion.div>
-
-              {/* Header with Tabs */}
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                variants={fadeIn}
-                className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4"
-              >
-                <Tabs defaultValue="all" className="w-auto">
-                  <TabsList className="bg-slate-200">
-                    {["all", "gift-card", "cashback", "experience"].map(
-                      (category) => (
-                        <TabsTrigger
-                          key={category}
-                          value={category}
-                          onClick={() => setActiveCategory(category)}
-                        >
-                          {category.charAt(0).toUpperCase() + category.slice(1)}
-                        </TabsTrigger>
-                      )
-                    )}
-                  </TabsList>
-                </Tabs>
-                <div className="relative w-full md:w-64">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
-                  <Input
-                    placeholder="Search rewards..."
-                    className="pl-8 w-full"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-              </motion.div>
-
-              {/* All Rewards Grid */}
-              <ScrollReveal variants={containerVariants}>
-                {(isInView) => (
-                  <>
-                    <AnimatePresence mode="wait">
-                      <h2 className="text-xl font-semibold mb-4">
-                        {activeCategory === "all"
-                          ? "All Rewards"
-                          : activeCategory === "gift-card"
-                          ? "Gift Cards"
-                          : activeCategory === "cashback"
-                          ? "Cashback Rewards"
-                          : "Experiences"}
-                      </h2>
-                      <motion.div
-                        key={activeCategory} // Re-renders when category changes
-                        initial="hidden"
-                        animate={isInView ? "visible" : "hidden"}
-                        exit="hidden"
-                        variants={containerVariants}
-                        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
-                      >
-                        {filteredRewards.map((reward) => (
-                          <motion.div key={reward.id} variants={itemVariants}>
-                            <Card className="overflow-hidden border hover:shadow-md transition-shadow">
-                              <div className="h-36 bg-slate-100 flex items-center justify-center">
-                                <Image
-                                  src={reward.image || "/placeholder.svg"}
-                                  alt={reward.title}
-                                  width={120}
-                                  height={120}
-                                  className="object-contain rounded"
-                                />
-                              </div>
-                              <CardHeader className="pb-2">
-                                <CardTitle className="text-base">
-                                  {reward.title}
-                                </CardTitle>
-                                <CardDescription className="text-xs mt-1">
-                                  {reward.description}
-                                </CardDescription>
-                              </CardHeader>
-                              <CardFooter className="flex justify-between items-center pt-2">
-                                <div className="flex items-center">
-                                  <Star className="h-4 w-4 text-amber-500 mr-1" />
-                                  <span className="font-bold">
-                                    {reward.pointsCost.toLocaleString()}
-                                  </span>
-                                </div>
-                                <motion.div
-                                  whileHover="hover"
-                                  whileTap="tap"
-                                  variants={buttonVariants}
-                                >
-                                  <Button
-                                    size="sm"
-                                    disabled={userPoints < reward.pointsCost}
-                                    variant={
-                                      userPoints >= reward.pointsCost
-                                        ? "default"
-                                        : "outline"
-                                    }
-                                  >
-                                    Redeem
-                                  </Button>
-                                </motion.div>
-                              </CardFooter>
-                            </Card>
-                          </motion.div>
-                        ))}
-                      </motion.div>
-                    </AnimatePresence>
-                  </>
-                )}
-              </ScrollReveal>
-
-              {/* Redemption History */}
-              <ScrollReveal variants={fadeInVariants}>
-                {(isInView) => (
-                  <motion.div
-                    initial="hidden"
-                    animate={isInView ? "visible" : "hidden"}
-                    exit="exit"
-                    variants={fadeInVariants}
-                    className="mt-12"
-                  >
-                    <h2 className="text-xl font-semibold mb-4">
-                      Your Redemption History
-                    </h2>
-                    <Card>
-                      <CardContent className="p-6">
-                        <motion.div
-                          variants={fadeInVariants}
-                          className="flex flex-col items-center justify-center py-8 text-center"
-                        >
-                          <Gift className="h-12 w-12 text-slate-300 mb-4" />
-                          <h3 className="text-xl font-medium mb-2">
-                            No redemptions yet
-                          </h3>
-                          <p className="text-slate-500 max-w-md mb-6">
-                            Complete challenges to earn points and redeem them
-                            for exciting rewards
-                          </p>
-                          <motion.div
-                            whileHover="hover"
-                            whileTap="tap"
-                            variants={buttonVariants}
-                          >
-                            <Button>Browse Rewards</Button>
-                          </motion.div>
-                        </motion.div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                )}
-              </ScrollReveal>
-            </TabsContent>
           </Tabs>
 
           {/* Points Summary Card */}
@@ -694,13 +417,16 @@ export default function ChallengesRewards() {
                           Total Points Earned
                         </div>
                         <div className="text-2xl font-bold">
-                          <CountUp
-                            start={0}
-                            end={userPoints}
-                            separator=","
-                            duration={1.5}
-                            delay={0.5}
-                          />
+                          {isInView ? (
+                            <CountUp
+                              start={0}
+                              end={userPoints}
+                              separator=","
+                              duration={1.5}
+                            />
+                          ) : (
+                            0
+                          )}
                         </div>
                       </div>
                     </motion.div>
@@ -721,13 +447,16 @@ export default function ChallengesRewards() {
                           Available Points
                         </div>
                         <div className="text-2xl font-bold">
-                          <CountUp
-                            start={0}
-                            end={userPoints}
-                            separator=","
-                            duration={1.5}
-                            delay={0.5}
-                          />
+                          {isInView ? (
+                            <CountUp
+                              start={0}
+                              end={userPoints}
+                              separator=","
+                              duration={1.5}
+                            />
+                          ) : (
+                            0
+                          )}
                         </div>
                       </div>
                     </motion.div>
@@ -748,13 +477,16 @@ export default function ChallengesRewards() {
                           Points Expiring Soon
                         </div>
                         <div className="text-2xl font-bold">
-                          <CountUp
-                            start={0}
-                            end={0}
-                            separator=","
-                            duration={1.5}
-                            delay={0.5}
-                          />
+                          {isInView ? (
+                            <CountUp
+                              start={0}
+                              end={0}
+                              separator=","
+                              duration={1.5}
+                            />
+                          ) : (
+                            0
+                          )}
                         </div>
                       </div>
                     </motion.div>
