@@ -10,8 +10,6 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const headers = new Headers(); // Placeholder: Replace with actual headers if needed
-
   const pathname = usePathname();
   const NavLink = ({
     href,
@@ -51,6 +49,15 @@ export default function DashboardLayout({
             href="/fun-zone/challenges"
           >
             Challenges
+          </NavLink>
+        </span>
+        <span>
+          <span className="inline md:hidden">- </span>
+          <NavLink
+            className=" mt-[2px] md:mt-0 text-black"
+            href="/fun-zone/rewards"
+          >
+            Rewards
           </NavLink>
         </span>
         <span>
