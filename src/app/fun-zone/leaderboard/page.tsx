@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
@@ -27,84 +27,105 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Sample data for the leaderboard
-const users = [
-  {
-    id: 1,
-    name: "Alex Morgan",
-    savings: 12580,
-    points: 9450,
-    trend: "up",
-    percentChange: 12,
-    rank: 1,
-  },
-  {
-    id: 2,
-    name: "Jamie Chen",
-    savings: 10340,
-    points: 8720,
-    trend: "up",
-    percentChange: 8,
-    rank: 2,
-  },
-  {
-    id: 3,
-    name: "Taylor Swift",
-    savings: 9870,
-    points: 7890,
-    trend: "down",
-    percentChange: 3,
-    rank: 3,
-  },
-  {
-    id: 4,
-    name: "Jordan Lee",
-    savings: 8650,
-    points: 7450,
-    trend: "up",
-    percentChange: 5,
-    rank: 4,
-  },
-  {
-    id: 5,
-    name: "Casey Kim",
-    savings: 7920,
-    points: 6780,
-    trend: "up",
-    percentChange: 7,
-    rank: 5,
-  },
-  {
-    id: 6,
-    name: "Riley Johnson",
-    savings: 6540,
-    points: 5430,
-    trend: "down",
-    percentChange: 2,
-    rank: 6,
-  },
-  {
-    id: 7,
-    name: "Morgan Smith",
-    savings: 5890,
-    points: 4980,
-    trend: "up",
-    percentChange: 4,
-    rank: 7,
-  },
-  {
-    id: 8,
-    name: "Avery Williams",
-    savings: 4760,
-    points: 3870,
-    trend: "up",
-    percentChange: 6,
-    rank: 8,
-  },
-];
+// const users = [
+//   {
+//     id: 1,
+//     name: "Alex Morgan",
+//     savings: 12580,
+//     points: 9450,
+//     trend: "up",
+//     percentChange: 12,
+//     rank: 1,
+//   },
+//   {
+//     id: 2,
+//     name: "Jamie Chen",
+//     savings: 10340,
+//     points: 8720,
+//     trend: "up",
+//     percentChange: 8,
+//     rank: 2,
+//   },
+//   {
+//     id: 3,
+//     name: "Taylor Swift",
+//     savings: 9870,
+//     points: 7890,
+//     trend: "down",
+//     percentChange: 3,
+//     rank: 3,
+//   },
+//   {
+//     id: 4,
+//     name: "Jordan Lee",
+//     savings: 8650,
+//     points: 7450,
+//     trend: "up",
+//     percentChange: 5,
+//     rank: 4,
+//   },
+//   {
+//     id: 5,
+//     name: "Casey Kim",
+//     savings: 7920,
+//     points: 6780,
+//     trend: "up",
+//     percentChange: 7,
+//     rank: 5,
+//   },
+//   {
+//     id: 6,
+//     name: "Riley Johnson",
+//     savings: 6540,
+//     points: 5430,
+//     trend: "down",
+//     percentChange: 2,
+//     rank: 6,
+//   },
+//   {
+//     id: 7,
+//     name: "Morgan Smith",
+//     savings: 5890,
+//     points: 4980,
+//     trend: "up",
+//     percentChange: 4,
+//     rank: 7,
+//   },
+//   {
+//     id: 8,
+//     name: "Avery Williams",
+//     savings: 4760,
+//     points: 3870,
+//     trend: "up",
+//     percentChange: 6,
+//     rank: 8,
+//   },
+// ];
+
+type Users = {
+  id: number;
+  name: string;
+  savings: number;
+  points: number;
+  trend: string;
+  percentChange: number;
+  rank: number;
+};
 
 export default function Leaderboard() {
   const [sortBy, setSortBy] = useState<"savings" | "points">("savings");
   const [searchQuery, setSearchQuery] = useState("");
+  const [users, setLeaderboard] = useState<Users[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/leaderboard")
+      .then((res) => res.json())
+      .then((data) => {
+        setLeaderboard(data);
+        setLoading(false);
+      });
+  }, []);
 
   const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
