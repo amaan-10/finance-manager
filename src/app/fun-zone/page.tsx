@@ -25,7 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import AnimatedProgress from "@/components/AnimatedProgress";
 import ScrollReveal from "@/components/ScrollAnimation";
@@ -177,21 +177,20 @@ type UserStats = {
   recentActivity: RecentActivity[];
 };
 
+type MonthlyPointsData = {
+  month: string;
+  points: number;
+};
+
+type WeeklyPointsDataData = {
+  week: string;
+  points: number;
+};
+
 const getLucideIcon = (iconName: string): LucideIcon | null => {
   return icons[iconName as keyof typeof icons] || null;
 };
 
-// Monthly points data for chart
-const monthlyPointsData = [
-  { month: "Jan", points: 1200 },
-  { month: "Feb", points: 1800 },
-  { month: "Mar", points: 2350 },
-  { month: "Apr", points: 0 },
-  { month: "May", points: 0 },
-  { month: "Jun", points: 0 },
-];
-
-// Component
 export default function FunZoneOverview() {
   const [featuredRewards, setRewards] = useState<Reward[]>([]);
   const [featuredChallenges, setChallenges] = useState<Challenge[]>([]);
@@ -228,6 +227,33 @@ export default function FunZoneOverview() {
         setLoading(false);
       });
   }, []);
+
+  const [pointsHistory, setPointsHistory] = useState<{
+    monthlyPoints: any;
+    weeklyPoints: any;
+  } | null>(null);
+
+  const [monthlyPointsData, setMonthlyPointsData] = useState<
+    MonthlyPointsData[]
+  >([]);
+  const [weeklyPointsData, setWeeklyPointsData] = useState<
+    WeeklyPointsDataData[]
+  >([]);
+
+  useEffect(() => {
+    fetch("/api/challenges/points-history")
+      .then((res) => res.json())
+      .then((data) => {
+        setMonthlyPointsData(data.monthlyPoints);
+        setWeeklyPointsData(data.weeklyPoints);
+        setPointsHistory(data);
+      })
+      .catch((error) =>
+        console.error("Error fetching challenge points:", error)
+      );
+  }, []);
+
+  console.log(pointsHistory);
 
   return (
     <>
@@ -446,95 +472,177 @@ export default function FunZoneOverview() {
               <ScrollReveal variants={cardVariants}>
                 {(isInView) => (
                   <Card className="mb-8">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
+                    <Tabs defaultValue="monthly" className="w-auto">
+                      <div className="flex items-center justify-between mt-6 mx-6">
                         <CardTitle>Points Activity</CardTitle>
-                        <Tabs defaultValue="monthly" className="w-auto">
-                          <TabsList>
-                            <TabsTrigger value="monthly">Monthly</TabsTrigger>
-                            <TabsTrigger value="weekly">Weekly</TabsTrigger>
-                          </TabsList>
-                        </Tabs>
+                        <TabsList>
+                          <TabsTrigger value="monthly">Monthly</TabsTrigger>
+                          <TabsTrigger value="weekly">Weekly</TabsTrigger>
+                        </TabsList>
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      {/* Animated Bar Chart */}
-                      <div className="h-[200px] w-full flex items-end justify-between gap-2 pt-4">
-                        {monthlyPointsData.map((month) => {
-                          const maxHeight = 150;
-                          const barHeight =
-                            (month.points /
-                              Math.max(
-                                ...monthlyPointsData.map((m) => m.points)
-                              )) *
-                            maxHeight;
+                      <TabsContent value="monthly" className="mt-4">
+                        <CardContent>
+                          {/* Animated Bar Chart */}
+                          <div className="h-[200px] w-full flex items-end justify-between gap-2 pt-4">
+                            {monthlyPointsData.map((month) => {
+                              const maxHeight = 150;
+                              const barHeight =
+                                (month.points /
+                                  Math.max(
+                                    ...monthlyPointsData.map((m) => m.points)
+                                  )) *
+                                maxHeight;
 
-                          return (
-                            <div
-                              key={month.month}
-                              className="flex flex-col items-center gap-2"
-                            >
-                              <motion.div
-                                className="w-12 bg-gradient-to-t from-amber-500 to-amber-300 rounded-t-md"
-                                custom={barHeight}
-                                initial="hidden"
-                                animate={isInView ? "visible" : "hidden"}
-                                variants={barVariants}
-                                style={{
-                                  minHeight: month.points > 0 ? "20px" : "0px",
-                                }}
-                              />
-                              <div className="text-xs font-medium">
-                                {month.month}
-                              </div>
-                              <div className="text-xs text-slate-500">
-                                {month.points > 0 ? (
-                                  isInView ? (
-                                    <CountUp
-                                      start={0}
-                                      end={month.points}
-                                      separator=","
-                                      duration={1.5}
-                                    />
-                                  ) : (
-                                    0
-                                  )
+                              return (
+                                <div
+                                  key={month.month}
+                                  className="flex flex-col items-center gap-2"
+                                >
+                                  <motion.div
+                                    className="w-12 bg-gradient-to-t from-amber-500 to-amber-300 rounded-t-md"
+                                    custom={barHeight}
+                                    initial="hidden"
+                                    animate={isInView ? "visible" : "hidden"}
+                                    variants={barVariants}
+                                    style={{
+                                      minHeight:
+                                        month.points > 0 ? "20px" : "0px",
+                                    }}
+                                  />
+                                  <div className="text-xs font-medium">
+                                    {month.month}
+                                  </div>
+                                  <div className="text-xs text-slate-500">
+                                    {month.points > 0 ? (
+                                      isInView ? (
+                                        <CountUp
+                                          start={0}
+                                          end={month.points}
+                                          separator=","
+                                          duration={1.5}
+                                        />
+                                      ) : (
+                                        0
+                                      )
+                                    ) : (
+                                      "-"
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Footer Section */}
+                          <div className="mt-4 pt-4 border-t flex items-center justify-between">
+                            <div className="text-sm text-slate-500">
+                              <span className="font-medium text-slate-700">
+                                {isInView ? (
+                                  <CountUp
+                                    start={0}
+                                    end={userStats.pointsThisMonth}
+                                    separator=","
+                                    duration={1.5}
+                                  />
                                 ) : (
-                                  "-"
+                                  0
                                 )}
-                              </div>
+                              </span>{" "}
+                              points earned this month
                             </div>
-                          );
-                        })}
-                      </div>
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="flex items-center gap-2 px-3 py-1.5 border rounded-md text-xs font-semibold text-slate-900 hover:bg-slate-100 transition"
+                            >
+                              <BarChart3 className="h-4 w-4" />
+                              View Full Report
+                            </motion.button>
+                          </div>
+                        </CardContent>
+                      </TabsContent>
+                      <TabsContent value="weekly" className="mt-4">
+                        <CardContent>
+                          {/* Animated Bar Chart */}
+                          <div className="h-[200px] w-full flex items-end justify-between gap-2 pt-4">
+                            {weeklyPointsData.map((week) => {
+                              const maxHeight = 150;
+                              const barHeight =
+                                (week.points /
+                                  Math.max(
+                                    ...weeklyPointsData.map((w) => w.points)
+                                  )) *
+                                maxHeight;
 
-                      {/* Footer Section */}
-                      <div className="mt-4 pt-4 border-t flex items-center justify-between">
-                        <div className="text-sm text-slate-500">
-                          <span className="font-medium text-slate-700">
-                            {isInView ? (
-                              <CountUp
-                                start={0}
-                                end={userStats.pointsThisMonth}
-                                separator=","
-                                duration={1.5}
-                              />
-                            ) : (
-                              0
-                            )}
-                          </span>{" "}
-                          points earned this month
-                        </div>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="flex items-center gap-2 px-3 py-1.5 border rounded-md text-xs font-semibold text-slate-900 hover:bg-slate-100 transition"
-                        >
-                          <BarChart3 className="h-4 w-4" />
-                          View Full Report
-                        </motion.button>
-                      </div>
-                    </CardContent>
+                              return (
+                                <div
+                                  key={week.week}
+                                  className="flex flex-col items-center gap-2"
+                                >
+                                  <motion.div
+                                    className="w-12 bg-gradient-to-t from-amber-500 to-amber-300 rounded-t-md"
+                                    custom={barHeight}
+                                    initial="hidden"
+                                    animate={isInView ? "visible" : "hidden"}
+                                    variants={barVariants}
+                                    style={{
+                                      minHeight:
+                                        week.points > 0 ? "20px" : "0px",
+                                    }}
+                                  />
+                                  <div className="text-xs font-medium">
+                                    {week.week}
+                                  </div>
+                                  <div className="text-xs text-slate-500">
+                                    {week.points > 0 ? (
+                                      isInView ? (
+                                        <CountUp
+                                          start={0}
+                                          end={week.points}
+                                          separator=","
+                                          duration={1.5}
+                                        />
+                                      ) : (
+                                        0
+                                      )
+                                    ) : (
+                                      "-"
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Footer Section */}
+                          <div className="mt-4 pt-4 border-t flex items-center justify-between">
+                            <div className="text-sm text-slate-500">
+                              <span className="font-medium text-slate-700">
+                                {isInView ? (
+                                  <CountUp
+                                    start={0}
+                                    end={userStats.pointsThisMonth}
+                                    separator=","
+                                    duration={1.5}
+                                  />
+                                ) : (
+                                  0
+                                )}
+                              </span>{" "}
+                              points earned this month
+                            </div>
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="flex items-center gap-2 px-3 py-1.5 border rounded-md text-xs font-semibold text-slate-900 hover:bg-slate-100 transition"
+                            >
+                              <BarChart3 className="h-4 w-4" />
+                              View Full Report
+                            </motion.button>
+                          </div>
+                        </CardContent>
+                      </TabsContent>
+                    </Tabs>
                   </Card>
                 )}
               </ScrollReveal>
