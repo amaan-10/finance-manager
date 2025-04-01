@@ -11,7 +11,7 @@ export interface RecentActivity extends Document {
 }
 
 const RecentActivitySchema = new Schema<RecentActivity>({
-  userId: { type: String, required: true, unique: true }, // Clerk's User ID
+  userId: { type: String, required: true }, // Clerk's User ID
   type: { type: String, required: true },
   title: { type: String, required: true },
   points: { type: Number },
