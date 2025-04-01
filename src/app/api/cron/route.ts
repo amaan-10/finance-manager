@@ -7,7 +7,7 @@ export async function GET() {
 
   try {
     const result = await ChallengeModel.updateMany(
-      { daysLeft: { $gt: 0 } },
+      { daysLeft: { $gt: 0 }, isCompleted: false },
       { $inc: { daysLeft: -1 } }
     );
 
