@@ -27,24 +27,43 @@ export async function POST() {
       return NextResponse.json({ message: "No users found" });
     }
 
+    const previousLeaderboardEntries = await LeaderboardModel.find();
     const previousPointsMap = new Map(
-      (await LeaderboardModel.find()).map((entry) => [
+      previousLeaderboardEntries.map((entry) => [
         entry.userId.toString(),
         entry.points,
       ])
     );
+
     const leaderboardUpdates = [];
     const userUpdates = [];
 
     for (let i = 0; i < users.length; i++) {
       const user = users[i];
       const lastPoints = previousPointsMap.get(user.id) ?? user.points;
-      const percentChange =
-        lastPoints !== 0 ? ((user.points - lastPoints) / lastPoints) * 100 : 0;
 
+      let percentChange = 0;
       let trend = "steady";
-      if (percentChange > 0) trend = "up";
-      else if (percentChange < 0) trend = "down";
+
+      // Only update percentChange if points have changed
+      if (user.points !== lastPoints) {
+        percentChange =
+          lastPoints !== 0
+            ? ((user.points - lastPoints) / lastPoints) * 100
+            : 0;
+
+        if (percentChange > 0) trend = "up";
+        else if (percentChange < 0) trend = "down";
+      } else {
+        // Maintain previous trend if points didn't change
+        const prevEntry = previousLeaderboardEntries.find(
+          (entry) => entry.userId.toString() === user.id
+        );
+        if (prevEntry) {
+          trend = prevEntry.trend;
+          percentChange = prevEntry.percentChange;
+        }
+      }
 
       leaderboardUpdates.push({
         updateOne: {
@@ -60,7 +79,7 @@ export async function POST() {
               lastUpdated: new Date(),
             },
           },
-          upsert: true, // Create new if not exists
+          upsert: true,
         },
       });
 
@@ -72,7 +91,7 @@ export async function POST() {
               rank: i + 1,
             },
           },
-          upsert: true, // Create new if not exists
+          upsert: true,
         },
       });
     }

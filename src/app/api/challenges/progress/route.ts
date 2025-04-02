@@ -3,9 +3,7 @@ import { connectToDatabase } from "@/lib/mongoose";
 import ChallengeModel from "@/app/models/Challenge";
 import { getAuth } from "@clerk/nextjs/server";
 import UserModel from "@/app/models/User";
-import AchievementsModel from "@/app/models/Achievements";
 import RecentActivityModel from "@/app/models/RecentActivity";
-import moment from "moment";
 
 export async function POST(req: NextRequest) {
   await connectToDatabase();
@@ -32,12 +30,13 @@ export async function POST(req: NextRequest) {
         userChallenge.progress += amount;
         if (userChallenge.progress >= 500) { 
           userChallenge.isCompleted = true; 
+          userChallenge.inProgress = false;
           user.points += userChallenge.points;
           user.challengesCompleted++;
           user.challengesInProgress--;
           recentActivity = await RecentActivityModel.create({
             userId,
-            type: userChallenge.category,
+            type: "challenge",
             title: userChallenge.title,
             points: userChallenge.points,
             icon: userChallenge.icon,
@@ -51,6 +50,7 @@ export async function POST(req: NextRequest) {
         userChallenge.progress = Math.min(progress, 100);
         if (userChallenge.progress === 100) {
           userChallenge.isCompleted = true;
+          userChallenge.inProgress = false;
           user.points += userChallenge.points;
           user.challengesCompleted++;
           user.challengesInProgress--;
@@ -63,6 +63,7 @@ export async function POST(req: NextRequest) {
         userChallenge.progress += 1;
         if (userChallenge.progress >= 3) {
           userChallenge.isCompleted = true; 
+          userChallenge.inProgress = false;
           user.points += userChallenge.points;
           user.challengesCompleted++;
           user.challengesInProgress--;
@@ -75,6 +76,7 @@ export async function POST(req: NextRequest) {
         userChallenge.progress += 1;
         if (userChallenge.progress >= 7) {
           userChallenge.isCompleted = true;
+          userChallenge.inProgress = false;
           user.points += userChallenge.points;
           user.challengesCompleted++;
           user.challengesInProgress--;
@@ -88,6 +90,7 @@ export async function POST(req: NextRequest) {
       if (action === "auto_savings_enabled") {
         userChallenge.progress = 100;
         userChallenge.isCompleted = true;
+        userChallenge.inProgress = false;
         user.points += userChallenge.points;
         user.challengesCompleted++;
         user.challengesInProgress--;
@@ -98,6 +101,7 @@ export async function POST(req: NextRequest) {
       if (action === "friend_signed_up") {
         userChallenge.progress = 1;
         userChallenge.isCompleted = true;
+        userChallenge.inProgress = false;
         user.points += userChallenge.points;
         user.challengesCompleted++;
         user.challengesInProgress--;
@@ -107,7 +111,6 @@ export async function POST(req: NextRequest) {
     default:
       return NextResponse.json({ error: "Invalid challengeId" }, { status: 400 });
   }
-
 
   await userChallenge.save();
   await user.save();

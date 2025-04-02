@@ -48,14 +48,14 @@ export async function POST(req: NextRequest) {
       description,
       icon,
       total,
-      daysLeft,
+      daysLeft: daysLeft - 1,
       difficulty,
       category,
       points,
       userId: userId,
       progress: 0,
       isCompleted: false,
-      isClaimed: false,
+      inProgress: true,
       streak: 0,
     });
 
