@@ -8,6 +8,7 @@ import { ReactNode } from "react";
 import Navbar from "./Navbar";
 import { LoaderProvider } from "./../context/LoaderContext";
 import Footer from "./Footer";
+import { Toaster } from "@/components/ui/toaster";
 
 const ibm = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -45,6 +46,7 @@ export default function RootLayout({
           <LoaderProvider>
             <Navbar />
             <main className="px-10">{children}</main>
+            <Toaster />
             <Footer />
           </LoaderProvider>
         </body>
