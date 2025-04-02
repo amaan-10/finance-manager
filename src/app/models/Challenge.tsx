@@ -10,7 +10,7 @@ export interface IChallenge extends Document {
   progress: number;
   daysLeft: number;
   isCompleted: boolean;
-  isClaimed: boolean;
+  inProgress: boolean;
   lastCompleted: Date;
   userId: string;
   streak: number;
@@ -30,7 +30,7 @@ const ChallengeSchema = new Schema({
   daysLeft: { type: Number, required: true },
   lastCompleted: { type: Date, default: Date.now },
   isCompleted: { type: Boolean, default: false },
-  isClaimed: { type: Boolean, default: false },
+  inProgress: { type: Boolean, default: false },
   userId: { type: String, required: true },
   streak: { type: Number, default: 0 },
   badge: { type: String },
