@@ -3,10 +3,15 @@ import { connectToDatabase } from "@/lib/mongoose";
 import { getAuth } from "@clerk/nextjs/server";
 import RewardModel from "@/app/models/Reward";
 import { predefinedRewards } from "@/lib/predefinedRewards";
+import RedemptionModel from "@/app/models/Redemption";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   await connectToDatabase(); // Ensure MongoDB is connected
-  const dbReward = await RewardModel.find(); // Fetch challenges from MongoDB
+   const { userId } = getAuth(req);
+    if (!userId)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const dbReward = await RedemptionModel.find({ userId }); // Fetch challenges from MongoDB
 
   // Convert DB challenges to a Map for efficient lookup
   const dbRewardMap = new Map(dbReward.map((c) => [c.id, c]));
