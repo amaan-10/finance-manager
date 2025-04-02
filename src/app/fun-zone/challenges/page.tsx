@@ -23,6 +23,7 @@ import ChallengeCard from "@/components/ChallengeCard";
 import { AnimatePresence, motion } from "framer-motion";
 import CountUp from "react-countup";
 import ScrollReveal from "@/components/ScrollAnimation";
+import { useToast } from "@/hooks/use-toast";
 
 // Types
 type Challenge = {
@@ -38,6 +39,20 @@ type Challenge = {
   daysLeft: number;
   difficulty: "easy" | "medium" | "hard";
   category: "savings" | "spending" | "investing";
+};
+
+type UserStats = {
+  name: string;
+  points: number;
+  rank: number;
+  savingsGoal: number;
+  currentSavings: number;
+  challengesCompleted: number;
+  challengesInProgress: number;
+  rewardsRedeemed: number;
+  streakDays: number;
+  nextRewardPoints: number;
+  pointsThisMonth: number;
 };
 
 const getLucideIcon = (iconName: string): LucideIcon | null => {
@@ -76,12 +91,27 @@ const iconVariants = {
 export default function ChallengesRewards() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  useEffect(() => {
+  const fetchChallenges = async () => {
     fetch("/api/challenges")
       .then((res) => res.json())
       .then((data) => {
         setChallenges(data);
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchChallenges();
+  }, []);
+
+  const [userStats, setuserStats] = useState<UserStats>();
+  useEffect(() => {
+    fetch("/api/user-stats")
+      .then((res) => res.json())
+      .then((data) => {
+        setuserStats(data);
         setLoading(false);
       });
   }, []);
@@ -100,7 +130,13 @@ export default function ChallengesRewards() {
 
       if (!res.ok) throw new Error("Failed to start challenge");
 
+      fetchChallenges();
+
       console.log("Challenge started!");
+      toast({
+        description: "The challenge is now live!",
+        className: "bg-neutral-900 border-neutral-900 text-white",
+      });
     } catch (error) {
       console.error(error);
     }
@@ -117,14 +153,7 @@ export default function ChallengesRewards() {
     return a.isCompleted === b.isCompleted ? 0 : a.isCompleted ? 1 : -1;
   });
 
-  // User's current points
-  const calculateTotalPoints = (challenges: Challenge[]) => {
-    return challenges
-      .filter((challenge) => challenge.isCompleted) // Only count completed challenges
-      .reduce((acc, challenge) => acc + challenge.points, 0); // Sum up the points
-  };
-
-  const userPoints = calculateTotalPoints(challenges);
+  const userPoints = userStats?.points || 0;
 
   return (
     <>

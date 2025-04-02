@@ -17,12 +17,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AnimatePresence, motion } from "framer-motion";
 import CountUp from "react-countup";
 import ScrollReveal from "@/components/ScrollAnimation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "@/hooks/use-toast";
 
 // Types
 type Challenge = {
   isCompleted: any;
   lastCompleted: any;
-  id: number;
+  id: string;
   title: string;
   description: string;
   icon: string;
@@ -34,8 +46,22 @@ type Challenge = {
   category: "savings" | "spending" | "investing";
 };
 
+type UserStats = {
+  name: string;
+  points: number;
+  rank: number;
+  savingsGoal: number;
+  currentSavings: number;
+  challengesCompleted: number;
+  challengesInProgress: number;
+  rewardsRedeemed: number;
+  streakDays: number;
+  nextRewardPoints: number;
+  pointsThisMonth: number;
+};
+
 type Reward = {
-  id: number;
+  id: string;
   title: string;
   description: string;
   pointsCost: number;
@@ -90,31 +116,10 @@ const buttonVariants = {
   tap: { scale: 0.95 },
 };
 
-const RewardsHistory = () => {
-  // const { user } = useUser();
-  // interface Reward {
-  //   reason: string;
-  //   pointsEarned: number;
-  // }
-
-  // const [rewards, setRewards] = useState<Reward[]>([]);
-
-  // useEffect(() => {
-  //   if (!user) return;
-
-  //   const fetchRewards = async () => {
-  //     const res = await fetch(`/api/rewards/history?userId=${user.id}`);
-  //     const data = await res.json();
-
-  //     setRewards(data);
-  //   };
-  //   fetchRewards();
-  // }, [user]);
-
-  // if (!user) return <p>Please log in</p>;
-
+const Rewards = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tabValue, setTabValue] = useState("rewards");
 
   useEffect(() => {
     fetch("/api/challenges")
@@ -125,7 +130,15 @@ const RewardsHistory = () => {
       });
   }, []);
 
-  // console.log(challenges);
+  const [userStats, setuserStats] = useState<UserStats>();
+  useEffect(() => {
+    fetch("/api/user-stats")
+      .then((res) => res.json())
+      .then((data) => {
+        setuserStats(data);
+        setLoading(false);
+      });
+  }, []);
 
   const [rewards, setRewards] = useState<Reward[]>([]);
 
@@ -150,14 +163,38 @@ const RewardsHistory = () => {
     return matchesSearch && matchesCategory;
   });
 
-  // User's current points
-  const calculateTotalPoints = (challenges: Challenge[]) => {
-    return challenges
-      .filter((challenge) => challenge.isCompleted) // Only count completed challenges
-      .reduce((acc, challenge) => acc + challenge.points, 0); // Sum up the points
+  const userPoints = userStats?.points || 0;
+
+  const handleRedeem = async (rewardId: string) => {
+    try {
+      const res = await fetch("/api/rewards/redeem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rewardId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "An unexpected error occurred");
+      }
+
+      toast({
+        description: "Reward redeemed successfully!",
+        className: "bg-neutral-900 border-neutral-900 text-white",
+      });
+    } catch (error) {
+      console.error("Redemption Error:", error);
+
+      toast({
+        description:
+          error instanceof Error ? error.message : "Something went wrong",
+        variant: "destructive",
+      });
+    }
   };
 
-  const userPoints = calculateTotalPoints(challenges);
+  console.log();
 
   return (
     <>
@@ -191,7 +228,7 @@ const RewardsHistory = () => {
             </div>
           </div>
 
-          <Tabs defaultValue="rewards" className="mb-8">
+          <Tabs value={tabValue} onValueChange={setTabValue}>
             <TabsList className="grid grid-cols-2 w-full md:w-[400px] bg-slate-200">
               <TabsTrigger value="rewards">Rewards & Gift Cards</TabsTrigger>
               <TabsTrigger value="history">Rewards History</TabsTrigger>
@@ -245,16 +282,43 @@ const RewardsHistory = () => {
                               whileTap="tap"
                               variants={buttonVariants}
                             >
-                              <Button
-                                disabled={userPoints < reward.pointsCost}
-                                variant={
-                                  userPoints >= reward.pointsCost
-                                    ? "default"
-                                    : "outline"
-                                }
-                              >
-                                Redeem
-                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    disabled={userPoints < reward.pointsCost}
+                                    variant={
+                                      userPoints >= reward.pointsCost
+                                        ? "default"
+                                        : "outline"
+                                    }
+                                  >
+                                    Redeem
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Redeem Your Reward?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to redeem this
+                                      reward? This action is final and will
+                                      deduct the required points from your
+                                      balance.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                      Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleRedeem(reward.id)}
+                                    >
+                                      Continue
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </motion.div>
                           </CardFooter>
                         </div>
@@ -351,17 +415,47 @@ const RewardsHistory = () => {
                                   whileTap="tap"
                                   variants={buttonVariants}
                                 >
-                                  <Button
-                                    size="sm"
-                                    disabled={userPoints < reward.pointsCost}
-                                    variant={
-                                      userPoints >= reward.pointsCost
-                                        ? "default"
-                                        : "outline"
-                                    }
-                                  >
-                                    Redeem
-                                  </Button>
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button
+                                        disabled={
+                                          userPoints < reward.pointsCost
+                                        }
+                                        variant={
+                                          userPoints >= reward.pointsCost
+                                            ? "default"
+                                            : "outline"
+                                        }
+                                      >
+                                        Redeem
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>
+                                          Redeem Your Reward?
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure you want to redeem this
+                                          reward? This action is final and will
+                                          deduct the required points from your
+                                          balance.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>
+                                          Cancel
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() =>
+                                            handleRedeem(reward.id)
+                                          }
+                                        >
+                                          Continue
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
                                 </motion.div>
                               </CardFooter>
                             </Card>
@@ -403,7 +497,9 @@ const RewardsHistory = () => {
                             whileTap="tap"
                             variants={buttonVariants}
                           >
-                            <Button>Browse Rewards</Button>
+                            <Button onClick={() => setTabValue("rewards")}>
+                              Browse Rewards
+                            </Button>
                           </motion.div>
                         </motion.div>
                       </CardContent>
@@ -549,4 +645,4 @@ const RewardsHistory = () => {
   );
 };
 
-export default RewardsHistory;
+export default Rewards;

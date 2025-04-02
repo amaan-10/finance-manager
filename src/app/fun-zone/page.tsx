@@ -201,7 +201,14 @@ export default function FunZoneOverview() {
     fetch("/api/challenges")
       .then((res) => res.json())
       .then((data) => {
-        const slicedChallenges = data.slice(0, 3);
+        const sortedChallenges = data.sort((a: any, b: any) => {
+          if (a.inProgress && !a.isCompleted) return -1;
+          if (b.inProgress && !b.isCompleted) return 1;
+          if (!a.inProgress && !a.isCompleted) return -1;
+          if (!b.inProgress && !b.isCompleted) return 1;
+          return 0;
+        });
+        const slicedChallenges = sortedChallenges.slice(0, 3);
         setChallenges(slicedChallenges);
         setLoading(false);
       });
@@ -253,7 +260,7 @@ export default function FunZoneOverview() {
       );
   }, []);
 
-  console.log(pointsHistory);
+  console.log(featuredChallenges);
 
   return (
     <>
@@ -290,10 +297,15 @@ export default function FunZoneOverview() {
                       </div>
                     </div>
                   </div>
-                  <Button>
-                    <Gift className="h-4 w-4 mr-2" />
+                  <motion.button
+                    whileHover={{ scale: 1.025 }}
+                    whileTap={{ scale: 0.975 }}
+                    onClick={() => window.open(`/fun-zone/rewards`, "_self")}
+                    className="px-4 py-2 flex rounded-md bg-primary text-white"
+                  >
+                    <Gift className="h-4 w-4 mt-1 mr-2" />
                     Redeem
-                  </Button>
+                  </motion.button>
                 </div>
               </div>
 
@@ -352,8 +364,8 @@ export default function FunZoneOverview() {
                             %
                           </div>
                           <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.025 }}
+                            whileTap={{ scale: 0.975 }}
                             className="text-emerald-700 hover:text-emerald-900 hover:bg-emerald-200/50 p-2 rounded-md text-xs font-semibold"
                           >
                             View Details
@@ -455,8 +467,11 @@ export default function FunZoneOverview() {
                             more points needed
                           </div>
                           <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.025 }}
+                            whileTap={{ scale: 0.975 }}
+                            onClick={() =>
+                              window.open(`/fun-zone/rewards`, "_self")
+                            }
                             className="text-purple-700 hover:text-purple-900 hover:bg-purple-200/50 p-2 rounded-md text-xs font-semibold"
                           >
                             Browse Rewards
@@ -551,8 +566,11 @@ export default function FunZoneOverview() {
                               points earned this month
                             </div>
                             <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
+                              whileHover={{ scale: 1.025 }}
+                              whileTap={{ scale: 0.975 }}
+                              onClick={() =>
+                                window.open(`/fun-zone/challenges`, "_self")
+                              }
                               className="flex items-center gap-2 px-3 py-1.5 border rounded-md text-xs font-semibold text-slate-900 hover:bg-slate-100 transition"
                             >
                               <BarChart3 className="h-4 w-4" />
@@ -632,8 +650,11 @@ export default function FunZoneOverview() {
                               points earned this month
                             </div>
                             <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
+                              whileHover={{ scale: 1.025 }}
+                              whileTap={{ scale: 0.975 }}
+                              onClick={() =>
+                                window.open(`/fun-zone/rewards`, "_self")
+                              }
                               className="flex items-center gap-2 px-3 py-1.5 border rounded-md text-xs font-semibold text-slate-900 hover:bg-slate-100 transition"
                             >
                               <BarChart3 className="h-4 w-4" />
@@ -749,6 +770,9 @@ export default function FunZoneOverview() {
                         <motion.button
                           whileHover={{ scale: 1.01 }}
                           whileTap={{ scale: 0.99 }}
+                          onClick={() =>
+                            window.open(`/fun-zone/challenges`, "_self")
+                          }
                           className="w-full px-3 py-2 rounded-md bg-primary text-white"
                         >
                           Start New Challenge
@@ -881,7 +905,11 @@ export default function FunZoneOverview() {
                                   </div>
                                 </div>
                                 <motion.button
-                                  whileHover={{ scale: 1.05 }}
+                                  whileHover={{ scale: 1.025 }}
+                                  whileTap={{ scale: 0.975 }}
+                                  onClick={() =>
+                                    window.open(`/fun-zone/rewards`, "_self")
+                                  }
                                   className={`px-3 py-1 rounded text-sm ${
                                     userStats.points >= reward.pointsCost
                                       ? "bg-primary text-white"
@@ -982,6 +1010,7 @@ export default function FunZoneOverview() {
                         <motion.button
                           whileHover={{ scale: 1.01 }}
                           whileTap={{ scale: 0.99 }}
+                          // onClick={() => window.open(`/fun-zone/rewards`, "_self")}
                           className="w-full border rounded-md py-2 text-sm font-semibold text-gray-900 hover:bg-gray-100"
                         >
                           View All Activity
@@ -1067,6 +1096,7 @@ export default function FunZoneOverview() {
                         <motion.button
                           whileHover={{ scale: 1.01 }}
                           whileTap={{ scale: 0.99 }}
+                          // onClick={() => window.open(`/fun-zone/rewards`, "_self")}
                           className="w-full border rounded-md py-2 text-sm font-semibold text-gray-900 hover:bg-gray-100"
                         >
                           View All Achievements
