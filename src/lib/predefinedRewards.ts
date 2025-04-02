@@ -1,6 +1,6 @@
 export const predefinedRewards = [
     {
-      id: 1,
+      id: "1",
       title: "₹250 Amazon Gift Card",
       description: "Redeem your points for an Amazon gift card",
       pointsCost: 2500,
@@ -10,7 +10,7 @@ export const predefinedRewards = [
       featured: true,
     },
     {
-      id: 2,
+      id: "2",
       title: "₹100 Target Gift Card",
       description: "Redeem your points for a Target gift card",
       pointsCost: 5000,
@@ -19,7 +19,7 @@ export const predefinedRewards = [
       brand: "Target",
     },
     {
-      id: 3,
+      id: "3",
       title: "₹150 Starbucks Gift Card",
       description: "Redeem your points for a Starbucks gift card",
       pointsCost: 1500,
@@ -28,7 +28,7 @@ export const predefinedRewards = [
       brand: "Starbucks",
     },
     {
-      id: 4,
+      id: "4",
       title: "5% Cashback Boost",
       description: "Get an extra 5% cashback on all purchases for a month",
       pointsCost: 3000,
@@ -36,7 +36,7 @@ export const predefinedRewards = [
       category: "cashback",
     },
     {
-      id: 5,
+      id: "5",
       title: "Premium Subscription (1 Month)",
       description: "Upgrade to premium features for one month",
       pointsCost: 2000,
@@ -45,7 +45,7 @@ export const predefinedRewards = [
       featured: true,
     },
     {
-      id: 6,
+      id: "6",
       title: "10% Off Next Investment Fee",
       description: "Get 10% off your next investment transaction fee",
       pointsCost: 1500,
@@ -53,7 +53,7 @@ export const predefinedRewards = [
       category: "discount",
     },
     {
-      id: 7,
+      id: "7",
       title: "₹150 Uber Gift Card",
       description: "Redeem your points for an Uber ride",
       pointsCost: 1500,
@@ -62,7 +62,7 @@ export const predefinedRewards = [
       brand: "Uber",
     },
     {
-      id: 8,
+      id: "8",
       title: "Financial Planning Session",
       description: "One-on-one session with a financial advisor",
       pointsCost: 7500,
