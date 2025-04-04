@@ -58,67 +58,6 @@ const itemVariants = {
   visible: { opacity: 1, x: 0, transition: { duration: 0.3 } },
 };
 
-// Sample data for the overview page
-// const userStats = {
-//   name: "Jordan Lee",
-//   points: 7450,
-//   rank: 4,
-//   savingsGoal: 10000,
-//   currentSavings: 8650,
-//   challengesCompleted: 12,
-//   challengesInProgress: 5,
-//   rewardsRedeemed: 3,
-//   streakDays: 28,
-//   nextRewardPoints: 10000,
-//   pointsThisMonth: 2350,
-//   achievements: [
-//     {
-//       id: 1,
-//       title: "Savings Starter",
-//       description: "Save your first ₹100",
-//       date: "Mar 15, 2023",
-//       icon: IndianRupee,
-//     },
-//     {
-//       id: 2,
-//       title: "Challenge Champion",
-//       description: "Complete 10 challenges",
-//       date: "Feb 28, 2023",
-//       icon: Trophy,
-//     },
-//     {
-//       id: 3,
-//       title: "Streak Master",
-//       description: "Maintain a 25-day streak",
-//       date: "Mar 22, 2023",
-//       icon: Zap,
-//     },
-//   ],
-//   recentActivity: [
-//     {
-//       id: 1,
-//       type: "challenge",
-//       title: "Completed: Save ₹500 this month",
-//       points: 1000,
-//       date: "Mar 20, 2023",
-//     },
-//     {
-//       id: 2,
-//       type: "reward",
-//       title: "Redeemed: ₹25 Amazon Gift Card",
-//       points: -2500,
-//       date: "Mar 18, 2023",
-//     },
-//     {
-//       id: 3,
-//       type: "challenge",
-//       title: "Completed: No unnecessary purchases for a week",
-//       points: 750,
-//       date: "Mar 12, 2023",
-//     },
-//   ],
-// };
-
 type Challenge = {
   isCompleted: any;
   lastCompleted: any;
@@ -148,6 +87,7 @@ type Reward = {
 type RecentActivity = {
   id: string;
   type: string;
+  category: string;
   title: string;
   points: number;
   date: Date;
@@ -163,7 +103,14 @@ type Achievements = {
 
 type UserStats = {
   name: string;
-  points: number;
+  currentPoints: number;
+  totalEarned: number;
+  totalSpent: number;
+  lastMonthEarned?: number;
+  lastMonthSpent?: number;
+  thisMonthEarned: number;
+  thisMonthSpent: number;
+  lastUpdatedMonth: number;
   rank: number;
   savingsGoal: number;
   currentSavings: number;
@@ -172,7 +119,6 @@ type UserStats = {
   rewardsRedeemed: number;
   streakDays: number;
   nextRewardPoints: number;
-  pointsThisMonth: number;
   achievements: Achievements[];
   recentActivity: RecentActivity[];
 };
@@ -290,7 +236,7 @@ export default function FunZoneOverview() {
                       <div className="font-bold text-amber-700">
                         <CountUp
                           start={0}
-                          end={userStats.points}
+                          end={userStats.currentPoints}
                           separator=","
                           duration={1.5}
                         />
@@ -435,7 +381,7 @@ export default function FunZoneOverview() {
                           <span className="text-purple-800">
                             <CountUp
                               start={0}
-                              end={userStats.points}
+                              end={userStats.currentPoints}
                               separator=","
                               duration={1.5}
                             />{" "}
@@ -447,7 +393,8 @@ export default function FunZoneOverview() {
                         </div>
                         <AnimatedProgress
                           value={
-                            (userStats.points / userStats.nextRewardPoints) *
+                            (userStats.currentPoints /
+                              userStats.nextRewardPoints) *
                             100
                           }
                           className="bg-purple-200"
@@ -458,7 +405,8 @@ export default function FunZoneOverview() {
                               <CountUp
                                 start={0}
                                 end={
-                                  userStats.nextRewardPoints - userStats.points
+                                  userStats.nextRewardPoints -
+                                  userStats.currentPoints
                                 }
                                 separator=","
                                 duration={1.5}
@@ -555,7 +503,7 @@ export default function FunZoneOverview() {
                                 {isInView ? (
                                   <CountUp
                                     start={0}
-                                    end={userStats.pointsThisMonth}
+                                    end={userStats.thisMonthEarned}
                                     separator=","
                                     duration={1.5}
                                   />
@@ -569,7 +517,7 @@ export default function FunZoneOverview() {
                               whileHover={{ scale: 1.025 }}
                               whileTap={{ scale: 0.975 }}
                               onClick={() =>
-                                window.open(`/fun-zone/challenges`, "_self")
+                                window.open(`/fun-zone/history`, "_self")
                               }
                               className="flex items-center gap-2 px-3 py-1.5 border rounded-md text-xs font-semibold text-slate-900 hover:bg-slate-100 transition"
                             >
@@ -639,7 +587,7 @@ export default function FunZoneOverview() {
                                 {isInView ? (
                                   <CountUp
                                     start={0}
-                                    end={userStats.pointsThisMonth}
+                                    end={userStats.thisMonthEarned}
                                     separator=","
                                     duration={1.5}
                                   />
@@ -911,12 +859,12 @@ export default function FunZoneOverview() {
                                     window.open(`/fun-zone/rewards`, "_self")
                                   }
                                   className={`px-3 py-1 rounded text-sm ${
-                                    userStats.points >= reward.pointsCost
+                                    userStats.currentPoints >= reward.pointsCost
                                       ? "bg-primary text-white"
                                       : "border border-gray-300 text-gray-600"
                                   }`}
                                   disabled={
-                                    userStats.points < reward.pointsCost
+                                    userStats.currentPoints < reward.pointsCost
                                   }
                                 >
                                   Redeem
@@ -962,12 +910,12 @@ export default function FunZoneOverview() {
                                   >
                                     <div
                                       className={`p-2 rounded-full shrink-0 ${
-                                        activity.type === "challenge"
+                                        activity.category === "challenge"
                                           ? "bg-emerald-100 text-emerald-700"
                                           : "bg-amber-100 text-amber-700"
                                       }`}
                                     >
-                                      {activity.type === "challenge" ? (
+                                      {activity.category === "challenge" ? (
                                         <Trophy className="h-4 w-4" />
                                       ) : (
                                         <Gift className="h-4 w-4" />
@@ -1010,7 +958,9 @@ export default function FunZoneOverview() {
                         <motion.button
                           whileHover={{ scale: 1.01 }}
                           whileTap={{ scale: 0.99 }}
-                          // onClick={() => window.open(`/fun-zone/rewards`, "_self")}
+                          onClick={() =>
+                            window.open(`/fun-zone/history`, "_self")
+                          }
                           className="w-full border rounded-md py-2 text-sm font-semibold text-gray-900 hover:bg-gray-100"
                         >
                           View All Activity

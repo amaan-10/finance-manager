@@ -69,6 +69,15 @@ export default function DashboardLayout({
             Leaderboard
           </NavLink>
         </span>
+        <span>
+          <span className="inline md:hidden">- </span>
+          <NavLink
+            className=" mt-[2px] md:mt-0 text-black"
+            href="/fun-zone/history"
+          >
+            History
+          </NavLink>
+        </span>
       </nav>
       <div>{children}</div>
     </div>

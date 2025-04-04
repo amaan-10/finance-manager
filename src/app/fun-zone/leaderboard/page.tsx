@@ -128,7 +128,14 @@ type LeaderboardEntry = {
 
 type UserStats = {
   name: string;
-  points: number;
+  currentPoints: number;
+  totalEarned: number;
+  totalSpent: number;
+  lastMonthEarned?: number;
+  lastMonthSpent?: number;
+  thisMonthEarned: number;
+  thisMonthSpent: number;
+  lastUpdatedMonth: number;
   rank: number;
   savingsGoal: number;
   currentSavings: number;
@@ -137,7 +144,6 @@ type UserStats = {
   rewardsRedeemed: number;
   streakDays: number;
   nextRewardPoints: number;
-  pointsThisMonth: number;
 };
 
 export default function Leaderboard() {
@@ -595,7 +601,7 @@ export default function Leaderboard() {
                   <div className="text-2xl font-bold text-amber-900">
                     <CountUp
                       start={0}
-                      end={userStats?.points || 0}
+                      end={userStats?.currentPoints || 0}
                       separator=","
                       duration={1.5}
                     />{" "}

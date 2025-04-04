@@ -48,7 +48,14 @@ type Challenge = {
 
 type UserStats = {
   name: string;
-  points: number;
+  currentPoints: number;
+  totalEarned: number;
+  totalSpent: number;
+  lastMonthEarned?: number;
+  lastMonthSpent?: number;
+  thisMonthEarned: number;
+  thisMonthSpent: number;
+  lastUpdatedMonth: number;
   rank: number;
   savingsGoal: number;
   currentSavings: number;
@@ -57,7 +64,6 @@ type UserStats = {
   rewardsRedeemed: number;
   streakDays: number;
   nextRewardPoints: number;
-  pointsThisMonth: number;
 };
 
 type Reward = {
@@ -69,6 +75,16 @@ type Reward = {
   category: "gift-card" | "cashback" | "discount" | "experience";
   featured?: boolean;
   brand?: string;
+};
+
+type RewardHistory = {
+  date: Date;
+  description: string;
+  rewardId: string;
+  title: string;
+  userId: string;
+  image: string;
+  pointsSpent: number;
 };
 
 const fadeIn = {
@@ -150,6 +166,18 @@ const Rewards = () => {
       });
   }, []);
 
+  const [rewardsHistory, setRewardsHistory] = useState<RewardHistory[]>([]);
+
+  useEffect(() => {
+    fetch("/api/rewards/history")
+      .then((res) => res.json())
+      .then((data) => {
+        setRewardsHistory(data);
+      });
+  }, []);
+
+  console.log(rewardsHistory);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("all");
 
@@ -163,7 +191,7 @@ const Rewards = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const userPoints = userStats?.points || 0;
+  const userPoints = userStats?.currentPoints || 0;
 
   const handleRedeem = async (rewardId: string) => {
     try {
@@ -478,32 +506,85 @@ const Rewards = () => {
                     exit="exit"
                     variants={fadeInVariants}
                   >
-                    <Card>
-                      <CardContent className="p-6">
-                        <motion.div
-                          variants={fadeInVariants}
-                          className="flex flex-col items-center justify-center py-8 text-center"
-                        >
-                          <Gift className="h-12 w-12 text-slate-300 mb-4" />
-                          <h3 className="text-xl font-medium mb-2">
-                            No redemptions yet
-                          </h3>
-                          <p className="text-slate-500 max-w-md mb-6">
-                            Complete challenges to earn points and redeem them
-                            for exciting rewards
-                          </p>
+                    {rewardsHistory.length === 0 ? (
+                      <Card>
+                        <CardContent className="p-6">
                           <motion.div
-                            whileHover="hover"
-                            whileTap="tap"
-                            variants={buttonVariants}
+                            variants={fadeInVariants}
+                            className="flex flex-col items-center justify-center py-8 text-center"
                           >
-                            <Button onClick={() => setTabValue("rewards")}>
-                              Browse Rewards
-                            </Button>
+                            <Gift className="h-12 w-12 text-slate-300 mb-4" />
+                            <h3 className="text-xl font-medium mb-2">
+                              No redemptions yet
+                            </h3>
+                            <p className="text-slate-500 max-w-md mb-6">
+                              Complete challenges to earn points and redeem them
+                              for exciting rewards
+                            </p>
+                            <motion.div
+                              whileHover="hover"
+                              whileTap="tap"
+                              variants={buttonVariants}
+                            >
+                              <Button onClick={() => setTabValue("rewards")}>
+                                Browse Rewards
+                              </Button>
+                            </motion.div>
                           </motion.div>
-                        </motion.div>
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <Card>
+                        <CardContent className="p-6">
+                          <motion.div
+                            variants={fadeInVariants}
+                            className="flex flex-col items-center justify-center py-8 text-center"
+                          >
+                            <h3 className="text-xl font-medium mb-2">
+                              Your Redemption History
+                            </h3>
+                            <p className="text-slate-500 max-w-md mb-6">
+                              Here are the rewards you've redeemed so far
+                            </p>
+                            <div className="grid gap-4">
+                              {rewardsHistory.map((reward) => (
+                                <Card
+                                  key={reward?.rewardId}
+                                  className="shadow-sm"
+                                >
+                                  <CardHeader>
+                                    <CardTitle className="text-base">
+                                      {reward?.title}
+                                    </CardTitle>
+                                    <CardDescription>
+                                      {reward?.description}
+                                    </CardDescription>
+                                  </CardHeader>
+                                  <CardContent className="flex items-center justify-center p-4">
+                                    <div className="flex items-center gap-2">
+                                      <Image
+                                        src={
+                                          reward?.image || "/placeholder.svg"
+                                        }
+                                        alt={reward?.title}
+                                        width={50}
+                                        height={50}
+                                        className="object-contain rounded"
+                                      />
+                                      <Star className="h-4 w-4 text-amber-500 ml-2" />
+                                      <span className="font-bold text-slate-800">
+                                        {reward?.pointsSpent.toLocaleString()}{" "}
+                                        points
+                                      </span>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </div>
+                          </motion.div>
+                        </CardContent>
+                      </Card>
+                    )}
                   </motion.div>
                 )}
               </ScrollReveal>

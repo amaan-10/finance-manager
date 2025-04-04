@@ -43,7 +43,14 @@ type Challenge = {
 
 type UserStats = {
   name: string;
-  points: number;
+  currentPoints: number;
+  totalEarned: number;
+  totalSpent: number;
+  lastMonthEarned?: number;
+  lastMonthSpent?: number;
+  thisMonthEarned: number;
+  thisMonthSpent: number;
+  lastUpdatedMonth: number;
   rank: number;
   savingsGoal: number;
   currentSavings: number;
@@ -52,7 +59,6 @@ type UserStats = {
   rewardsRedeemed: number;
   streakDays: number;
   nextRewardPoints: number;
-  pointsThisMonth: number;
 };
 
 const getLucideIcon = (iconName: string): LucideIcon | null => {
@@ -153,7 +159,7 @@ export default function ChallengesRewards() {
     return a.isCompleted === b.isCompleted ? 0 : a.isCompleted ? 1 : -1;
   });
 
-  const userPoints = userStats?.points || 0;
+  const userPoints = userStats?.currentPoints || 0;
 
   return (
     <>
@@ -187,231 +193,218 @@ export default function ChallengesRewards() {
             </div>
           </div>
 
-          <Tabs defaultValue="challenges" className="mb-8">
-            <TabsList className="grid grid-cols-2 w-full md:w-[400px] bg-slate-200">
-              <TabsTrigger value="challenges">Challenges</TabsTrigger>
-              <TabsTrigger value="history">Points Histroy</TabsTrigger>
-            </TabsList>
-
-            {/* Challenges Tab */}
-            <TabsContent value="challenges" className="mt-6">
-              <motion.div
-                className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
-                initial="hidden"
-                animate="visible"
-                variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
-              >
-                {/* Savings Challenges */}
-                <motion.div variants={cardVariants}>
-                  <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-0 shadow-md shadow-emerald-100/50">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg text-emerald-800">
-                        Savings Challenges
-                      </CardTitle>
-                      <CardDescription className="text-emerald-700">
-                        Save more, earn more points
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between">
-                        <div className="text-2xl font-bold text-emerald-900">
-                          <CountUp
-                            start={0}
-                            end={
-                              challenges.filter(
-                                (challenge) => challenge.category === "savings"
-                              ).length
-                            }
-                            separator=","
-                            duration={1.5}
-                            delay={0.5}
-                          />
-                        </div>
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => setActiveCategory("savings")}
-                          className="text-emerald-700 hover:text-emerald-900 hover:bg-emerald-200/50 p-2 rounded-md"
-                        >
-                          <ChevronRight className="h-5 w-5" />
-                        </motion.button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-
-                {/* Spending Challenges */}
-                <motion.div variants={cardVariants}>
-                  <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-0 shadow-md shadow-blue-100/50">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg text-blue-800">
-                        Spending Challenges
-                      </CardTitle>
-                      <CardDescription className="text-blue-700">
-                        Optimize your spending habits
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between">
-                        <div className="text-2xl font-bold text-blue-900">
-                          <CountUp
-                            start={0}
-                            end={
-                              challenges.filter(
-                                (challenge) => challenge.category === "spending"
-                              ).length
-                            }
-                            separator=","
-                            duration={1.5}
-                            delay={0.5}
-                          />
-                        </div>
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => setActiveCategory("spending")}
-                          className="text-blue-700 hover:text-blue-900 hover:bg-blue-200/50 p-2 rounded-md"
-                        >
-                          <ChevronRight className="h-5 w-5" />
-                        </motion.button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-
-                {/* Investing Challenges */}
-                <motion.div variants={cardVariants}>
-                  <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-0 shadow-md shadow-purple-100/50">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg text-purple-800">
-                        Investing Challenges
-                      </CardTitle>
-                      <CardDescription className="text-purple-700">
-                        Grow your investment portfolio
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between">
-                        <div className="text-2xl font-bold text-purple-900">
-                          <CountUp
-                            start={0}
-                            end={
-                              challenges.filter(
-                                (challenge) =>
-                                  challenge.category === "investing"
-                              ).length
-                            }
-                            separator=","
-                            duration={1.5}
-                            delay={0.5}
-                          />
-                        </div>
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => setActiveCategory("investing")}
-                          className="text-purple-700 hover:text-purple-900 hover:bg-purple-200/50 p-2 rounded-md"
-                        >
-                          <ChevronRight className="h-5 w-5" />
-                        </motion.button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </motion.div>
-
-              <motion.div
-                className="grid gap-4"
-                initial="hidden"
-                animate="visible"
-                variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
-              >
-                <div className="grid gap-4">
-                  {/* Header with Tabs */}
-                  <motion.div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold">Active Challenges</h2>
-                    <Tabs defaultValue="all" className="w-auto">
-                      <TabsList className="bg-slate-200">
-                        {["all", "savings", "spending", "investing"].map(
-                          (category) => (
-                            <TabsTrigger
-                              key={category}
-                              value={category}
-                              onClick={() => setActiveCategory(category)}
-                            >
-                              {category.charAt(0).toUpperCase() +
-                                category.slice(1)}
-                            </TabsTrigger>
-                          )
-                        )}
-                      </TabsList>
-                    </Tabs>
-                  </motion.div>
-
-                  {/* Challenges Grid */}
-                  <ScrollReveal variants={containerVariants}>
-                    {(isInView) => (
-                      <>
-                        <AnimatePresence mode="wait">
-                          <motion.div
-                            key={activeCategory} // This re-renders when category changes
-                            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                            initial="hidden"
-                            animate={isInView ? "visible" : "hidden"}
-                            exit="hidden"
-                            variants={containerVariants}
-                          >
-                            {sortedChallenges
-                              .filter(
-                                (challenge) =>
-                                  activeCategory === "all" ||
-                                  challenge.category === activeCategory
-                              )
-                              .map((challenge) => {
-                                const IconComponent = getLucideIcon(
-                                  challenge.icon
-                                );
-                                return (
-                                  <motion.div
-                                    key={challenge.id}
-                                    variants={itemVariants}
-                                  >
-                                    <ChallengeCard
-                                      challenge={challenge}
-                                      IconComponent={IconComponent}
-                                      userPoints={userPoints}
-                                      startChallenge={() =>
-                                        startChallenge(challenge)
-                                      }
-                                      isInView={isInView}
-                                    />
-                                  </motion.div>
-                                );
-                              })}
-                          </motion.div>
-                        </AnimatePresence>
-                      </>
-                    )}
-                  </ScrollReveal>
-
-                  {/* View All Button */}
-                  {sortedChallenges.length > 6 && (
-                    <motion.div
-                      className="mt-4 flex justify-center"
-                      variants={itemVariants}
+          {/* Challenges Tab */}
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 mb-8"
+            initial="hidden"
+            animate="visible"
+            variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
+          >
+            {/* Savings Challenges */}
+            <motion.div variants={cardVariants}>
+              <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-0 shadow-md shadow-emerald-100/50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg text-emerald-800">
+                    Savings Challenges
+                  </CardTitle>
+                  <CardDescription className="text-emerald-700">
+                    Save more, earn more points
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-bold text-emerald-900">
+                      <CountUp
+                        start={0}
+                        end={
+                          challenges.filter(
+                            (challenge) => challenge.category === "savings"
+                          ).length
+                        }
+                        separator=","
+                        duration={1.5}
+                        delay={0.5}
+                      />
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setActiveCategory("savings")}
+                      className="text-emerald-700 hover:text-emerald-900 hover:bg-emerald-200/50 p-2 rounded-md"
                     >
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        View All Challenges
-                      </motion.button>
-                    </motion.div>
-                  )}
-                </div>
+                      <ChevronRight className="h-5 w-5" />
+                    </motion.button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Spending Challenges */}
+            <motion.div variants={cardVariants}>
+              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-0 shadow-md shadow-blue-100/50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg text-blue-800">
+                    Spending Challenges
+                  </CardTitle>
+                  <CardDescription className="text-blue-700">
+                    Optimize your spending habits
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-bold text-blue-900">
+                      <CountUp
+                        start={0}
+                        end={
+                          challenges.filter(
+                            (challenge) => challenge.category === "spending"
+                          ).length
+                        }
+                        separator=","
+                        duration={1.5}
+                        delay={0.5}
+                      />
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setActiveCategory("spending")}
+                      className="text-blue-700 hover:text-blue-900 hover:bg-blue-200/50 p-2 rounded-md"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </motion.button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Investing Challenges */}
+            <motion.div variants={cardVariants}>
+              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-0 shadow-md shadow-purple-100/50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg text-purple-800">
+                    Investing Challenges
+                  </CardTitle>
+                  <CardDescription className="text-purple-700">
+                    Grow your investment portfolio
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-bold text-purple-900">
+                      <CountUp
+                        start={0}
+                        end={
+                          challenges.filter(
+                            (challenge) => challenge.category === "investing"
+                          ).length
+                        }
+                        separator=","
+                        duration={1.5}
+                        delay={0.5}
+                      />
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setActiveCategory("investing")}
+                      className="text-purple-700 hover:text-purple-900 hover:bg-purple-200/50 p-2 rounded-md"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </motion.button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </motion.div>
+
+          <motion.div
+            className="grid gap-4"
+            initial="hidden"
+            animate="visible"
+            variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
+          >
+            <div className="grid gap-4">
+              {/* Header with Tabs */}
+              <motion.div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Active Challenges</h2>
+                <Tabs defaultValue="all" className="w-auto">
+                  <TabsList className="bg-slate-200">
+                    {["all", "savings", "spending", "investing"].map(
+                      (category) => (
+                        <TabsTrigger
+                          key={category}
+                          value={category}
+                          onClick={() => setActiveCategory(category)}
+                        >
+                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                        </TabsTrigger>
+                      )
+                    )}
+                  </TabsList>
+                </Tabs>
               </motion.div>
-            </TabsContent>
-          </Tabs>
+
+              {/* Challenges Grid */}
+              <ScrollReveal variants={containerVariants}>
+                {(isInView) => (
+                  <>
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={activeCategory} // This re-renders when category changes
+                        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                        initial="hidden"
+                        animate={isInView ? "visible" : "hidden"}
+                        exit="hidden"
+                        variants={containerVariants}
+                      >
+                        {sortedChallenges
+                          .filter(
+                            (challenge) =>
+                              activeCategory === "all" ||
+                              challenge.category === activeCategory
+                          )
+                          .map((challenge) => {
+                            const IconComponent = getLucideIcon(challenge.icon);
+                            return (
+                              <motion.div
+                                key={challenge.id}
+                                variants={itemVariants}
+                              >
+                                <ChallengeCard
+                                  challenge={challenge}
+                                  IconComponent={IconComponent}
+                                  userPoints={userPoints}
+                                  startChallenge={() =>
+                                    startChallenge(challenge)
+                                  }
+                                  isInView={isInView}
+                                />
+                              </motion.div>
+                            );
+                          })}
+                      </motion.div>
+                    </AnimatePresence>
+                  </>
+                )}
+              </ScrollReveal>
+
+              {/* View All Button */}
+              {sortedChallenges.length > 6 && (
+                <motion.div
+                  className="mt-4 flex justify-center"
+                  variants={itemVariants}
+                >
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    View All Challenges
+                  </motion.button>
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
 
           {/* Points Summary Card */}
           <ScrollReveal variants={containerVariants}>
