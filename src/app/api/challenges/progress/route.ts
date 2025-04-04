@@ -31,13 +31,17 @@ export async function POST(req: NextRequest) {
         if (userChallenge.progress >= 500) { 
           userChallenge.isCompleted = true; 
           userChallenge.inProgress = false;
-          user.points += userChallenge.points;
+          user.currentPoints += userChallenge.points;
+          user.totalEarned += userChallenge.points;
+          user.thisMonthEarned += userChallenge.points;
           user.challengesCompleted++;
           user.challengesInProgress--;
           recentActivity = await RecentActivityModel.create({
             userId,
-            type: "challenge",
+            type: "earned",
+            category: "challenge",
             title: userChallenge.title,
+            description: userChallenge.completionText,
             points: userChallenge.points,
             icon: userChallenge.icon,
           })
@@ -51,9 +55,20 @@ export async function POST(req: NextRequest) {
         if (userChallenge.progress === 100) {
           userChallenge.isCompleted = true;
           userChallenge.inProgress = false;
-          user.points += userChallenge.points;
+          user.currentPoints += userChallenge.points;
+          user.totalEarned += userChallenge.points;
+          user.thisMonthEarned += userChallenge.points;
           user.challengesCompleted++;
           user.challengesInProgress--;
+          recentActivity = await RecentActivityModel.create({
+            userId,
+            type: "earned",
+            category: "challenge",
+            title: userChallenge.title,
+            description: userChallenge.completionText,
+            points: userChallenge.points,
+            icon: userChallenge.icon,
+          })
         }
       }
       break;
@@ -64,9 +79,20 @@ export async function POST(req: NextRequest) {
         if (userChallenge.progress >= 3) {
           userChallenge.isCompleted = true; 
           userChallenge.inProgress = false;
-          user.points += userChallenge.points;
+          user.currentPoints += userChallenge.points;
+          user.totalEarned += userChallenge.points;
+          user.thisMonthEarned += userChallenge.points;
           user.challengesCompleted++;
           user.challengesInProgress--;
+          recentActivity = await RecentActivityModel.create({
+            userId,
+            type: "earned",
+            category: "challenge",
+            title: userChallenge.title,
+            description: userChallenge.completionText,
+            points: userChallenge.points,
+            icon: userChallenge.icon,
+          })
         }
       }
       break;
@@ -77,9 +103,20 @@ export async function POST(req: NextRequest) {
         if (userChallenge.progress >= 7) {
           userChallenge.isCompleted = true;
           userChallenge.inProgress = false;
-          user.points += userChallenge.points;
+          user.currentPoints += userChallenge.points;
+          user.totalEarned += userChallenge.points;
+          user.thisMonthEarned += userChallenge.points;
           user.challengesCompleted++;
           user.challengesInProgress--;
+          recentActivity = await RecentActivityModel.create({
+            userId,
+            type: "earned",
+            category: "challenge",
+            title: userChallenge.title,
+            description: userChallenge.completionText,
+            points: userChallenge.points,
+            icon: userChallenge.icon,
+          })
         }
       } else if (action === "reset") {
         userChallenge.progress = 0; // Reset if unnecessary spending occurs
@@ -91,9 +128,20 @@ export async function POST(req: NextRequest) {
         userChallenge.progress = 100;
         userChallenge.isCompleted = true;
         userChallenge.inProgress = false;
-        user.points += userChallenge.points;
+        user.currentPoints += userChallenge.points;
+        user.totalEarned += userChallenge.points;
+        user.thisMonthEarned += userChallenge.points;
         user.challengesCompleted++;
         user.challengesInProgress--;
+        recentActivity = await RecentActivityModel.create({
+          userId,
+          type: "earned",
+          category: "challenge",
+          title: userChallenge.title,
+          description: userChallenge.completionText,
+          points: userChallenge.points,
+          icon: userChallenge.icon,
+        })
       }
       break;
 
@@ -102,9 +150,20 @@ export async function POST(req: NextRequest) {
         userChallenge.progress = 1;
         userChallenge.isCompleted = true;
         userChallenge.inProgress = false;
-        user.points += userChallenge.points;
+        user.currentPoints += userChallenge.points;
+        user.totalEarned += userChallenge.points;
+        user.thisMonthEarned += userChallenge.points;
         user.challengesCompleted++;
         user.challengesInProgress--;
+        recentActivity = await RecentActivityModel.create({
+          userId,
+          type: "earned",
+          category: "challenge",
+          title: userChallenge.title,
+          description: userChallenge.completionText,
+          points: userChallenge.points,
+          icon: userChallenge.icon,
+        })
       }
       break;
 

@@ -21,7 +21,10 @@ export async function POST() {
   try {
     await connectToDatabase();
 
-    const users = await UserModel.find().sort({ points: -1, savings: -1 });
+    const users = await UserModel.find().sort({
+      currentPoints: -1,
+      currentSavings: -1,
+    });
 
     if (users.length === 0) {
       return NextResponse.json({ message: "No users found" });
@@ -40,16 +43,16 @@ export async function POST() {
 
     for (let i = 0; i < users.length; i++) {
       const user = users[i];
-      const lastPoints = previousPointsMap.get(user.id) ?? user.points;
+      const lastPoints = previousPointsMap.get(user.id) ?? user.currentPoints;
 
       let percentChange = 0;
       let trend = "steady";
 
       // Only update percentChange if points have changed
-      if (user.points !== lastPoints) {
+      if (user.currentPoints !== lastPoints) {
         percentChange =
           lastPoints !== 0
-            ? ((user.points - lastPoints) / lastPoints) * 100
+            ? ((user.currentPoints - lastPoints) / lastPoints) * 100
             : 0;
 
         if (percentChange > 0) trend = "up";
@@ -72,7 +75,7 @@ export async function POST() {
             $set: {
               name: user.name,
               savings: user.savings,
-              points: user.points,
+              points: user.currentPoints,
               trend,
               percentChange: parseFloat(percentChange.toFixed(2)),
               rank: i + 1,
