@@ -3,10 +3,11 @@ import { model, models, Schema } from "mongoose";
 export interface Redemption extends Partial<Document> {
   userId: string;
   rewardId: string;
-  pointsSpent?: number;
+  pointsSpent: number;
   title?: string;
   description?: string;
-  date: Date;
+  redeemedAt: Date;
+  image: string;
 }
 
 const RedemptionSchema = new Schema<Redemption>({
@@ -15,7 +16,8 @@ const RedemptionSchema = new Schema<Redemption>({
   title: { type: String },
   description: { type: String },
   pointsSpent: { type: Number },
-  date: { type: Date, default: Date.now },
+  redeemedAt: { type: Date, default: Date.now },
+  image: { type: String },
 });
 
 const RedemptionModel =

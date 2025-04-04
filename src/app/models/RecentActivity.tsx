@@ -4,7 +4,9 @@ import { model, models, Schema } from "mongoose";
 export interface RecentActivity extends Document {
   userId: string;
   type: string;
+  category: string;
   title: string;
+  description: string;
   points: number;
   date: Date;
   icon: string;
@@ -13,7 +15,9 @@ export interface RecentActivity extends Document {
 const RecentActivitySchema = new Schema<RecentActivity>({
   userId: { type: String, required: true }, // Clerk's User ID
   type: { type: String, required: true },
+  category: { type: String, required: true },
   title: { type: String, required: true },
+  description: { type: String },
   points: { type: Number },
   date: { type: Date, default: Date.now },
   icon: { type: String },
