@@ -29,7 +29,14 @@ export async function GET(req: NextRequest) {
     // Format response
     const userStats = {
       name: user.name,
-      points: user.points,
+      currentPoints: user.currentPoints,
+      totalEarned: user.totalEarned,
+      totalSpent: user.totalSpent,
+      lastMonthEarned: user.lastMonthEarned,
+      lastMonthSpent: user.lastMonthSpent,
+      thisMonthEarned: user.thisMonthEarned,
+      thisMonthSpent: user.thisMonthSpent,
+      lastUpdatedMonth: user.lastUpdatedMonth,
       rank: user.rank,
       savingsGoal: user.savingsGoal,
       currentSavings: user.currentSavings,
@@ -38,7 +45,6 @@ export async function GET(req: NextRequest) {
       rewardsRedeemed: user.rewardsRedeemed,
       streakDays: user.streakDays,
       nextRewardPoints: user.nextRewardPoints,
-      pointsThisMonth: user.pointsThisMonth,
       achievements: achievements.map((ach) => ({
         id: ach._id,
         title: ach.title,
@@ -50,6 +56,9 @@ export async function GET(req: NextRequest) {
         id: act._id,
         type: act.type,
         title: act.title,
+        description: act.description,
+        category: act.category,
+        icon: act.icon,
         points: act.points,
         date: act.date,
       })),

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
 import { getAuth } from "@clerk/nextjs/server";
 import UserModel from "@/app/models/User";
-import RewardModel from "@/app/models/Reward";
 import RedemptionModel from "@/app/models/Redemption";
 import { predefinedRewards } from "@/lib/predefinedRewards";
 import RecentActivityModel from "@/app/models/RecentActivity";
@@ -38,7 +37,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if the user has enough points
-    if (user.points < reward.pointsCost) {
+    if (user.currentPoints < reward.pointsCost) {
       return NextResponse.json(
         { error: "Insufficient points" },
         { status: 400 }
@@ -46,7 +45,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Deduct points
-    user.points -= reward.pointsCost;
+    user.currentPoints -= reward.pointsCost;
+    user.totalSpent += reward.pointsCost;
+    user.thisMonthSpent += reward.pointsCost;
     await user.save();
 
     // Store the redemption record
@@ -56,15 +57,19 @@ export async function POST(req: NextRequest) {
       description: reward.description,
       rewardId: reward.id,
       redeemedAt: new Date(),
+      pointsSpent: reward.pointsCost,
+      image: reward.image,
     });
     await redemption.save();
 
     const recentActivity = await RecentActivityModel.create({
       userId,
-      type: "reward",
+      type: "spent",
+      category: reward.category,
       title: reward.title,
+      description: reward.completationText,
       points: -reward.pointsCost,
-      icon: reward.image,
+      icon: reward.icon,
     });
 
     await recentActivity.save();
@@ -73,7 +78,10 @@ export async function POST(req: NextRequest) {
     await user.save();
 
     return NextResponse.json(
-      { message: "Reward redeemed successfully", newBalance: user.points },
+      {
+        message: "Reward redeemed successfully",
+        newBalance: user.currentPoints,
+      },
       { status: 200 }
     );
   } catch (error) {
