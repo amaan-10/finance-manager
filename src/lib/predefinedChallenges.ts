@@ -1,11 +1,9 @@
 export const predefinedChallenges = [
-    // { id: "1", name: "No Coffee for a Week", goal: 7, badgeReward: "☕🚫 Caffeine-Free Champ", points: 70 },
-    // { id: "2", name: "Save ₹100 Every Day", goal: 30, badgeReward: "🏆 Savings Champion!", points: 300 },
-    // { id: "3", name: "Cancel One Subscription", goal: 1, badgeReward: "💡 Smart Saver", points: 100 },
     {
-      id: "1",
+      id: "ch-001",
       title: "Save ₹500 this month",
       description: "Deposit at least ₹500 into your savings account this month",
+      completationText: "Successfully saved ₹500 in your savings account",
       icon: "IndianRupee",
       points: 1000,
       progress: 0,
@@ -15,9 +13,10 @@ export const predefinedChallenges = [
       category: "savings",
     },
     {
-      id: "2",
+      id: "ch-002",
       title: "Complete financial profile",
       description: "Fill out all sections of your financial profile",
+      completationText: "Successfully completed your financial profile",
       icon: "Target",
       points: 500,
       progress: 0,
@@ -27,10 +26,11 @@ export const predefinedChallenges = [
       category: "savings",
     },
     {
-      id: "3",
+      id: "ch-003",
       title: "Invest in 3 different assets",
       description:
         "Diversify your portfolio by investing in 3 different asset types",
+      completationText: "Successfully invested in 3 different assets",
       icon: "Percent",
       points: 1500,
       progress: 0,
@@ -40,10 +40,11 @@ export const predefinedChallenges = [
       category: "investing",
     },
     {
-      id: "4",
+      id: "ch-004",
       title: "No unnecessary purchases for a week",
       description:
         "Avoid making any non-essential purchases for 7 consecutive days",
+      completationText: "Successfully avoided unnecessary purchases for a week",
       icon: "ShoppingBag",
       points: 750,
       progress: 0,
@@ -53,9 +54,10 @@ export const predefinedChallenges = [
       category: "spending",
     },
     {
-      id: "5",
+      id: "ch-006",
       title: "Set up automatic savings",
       description: "Configure automatic transfers to your savings account",
+      completationText: "Successfully set up automatic savings transfers",
       icon: "Zap",
       points: 600,
       progress: 0,
@@ -65,9 +67,10 @@ export const predefinedChallenges = [
       category: "savings",
     },
     {
-      id: "6",
+      id: "ch-007",
       title: "Refer a friend",
       description: "Invite a friend to join the platform",
+      completationText: "Your friend signed up using your referral link",
       icon: "Award",
       points: 1000,
       progress: 0,
