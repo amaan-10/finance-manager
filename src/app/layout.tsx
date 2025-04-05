@@ -4,7 +4,8 @@ import "./globals.css"; // Import global styles
 import { ClerkProvider } from "@clerk/nextjs";
 
 import { IBM_Plex_Mono, Courier_Prime, Roboto_Mono } from "next/font/google";
-import { ReactNode } from "react";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import Navbar from "./Navbar";
 import { LoaderProvider } from "./../context/LoaderContext";
 import Footer from "./Footer";
@@ -42,7 +43,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${roboto.className}`}>
+        <body className={`${GeistSans.className}`}>
           <LoaderProvider>
             <Navbar />
             <main className="px-10">{children}</main>
