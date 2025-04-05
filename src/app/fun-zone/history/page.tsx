@@ -64,6 +64,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import ScrollReveal from "@/components/ScrollAnimation";
+import CountUp from "react-countup";
 
 // Types
 type TransactionType = "earned" | "spent" | "all";
@@ -109,24 +111,41 @@ type PointsStats = {
   nextRewardPoints: number;
 };
 
+type MonthlyPointsData = {
+  month: string;
+  earned: number;
+  spent: number;
+};
+
+type WeeklyPointsDataData = {
+  week: string;
+  earned: number;
+  spent: number;
+};
+
 // Monthly points data for chart
-const monthlyPointsData = [
-  { month: "Nov", earned: 2500, spent: 1000 },
-  { month: "Dec", earned: 3200, spent: 2200 },
-  { month: "Jan", earned: 4100, spent: 1800 },
-  { month: "Feb", earned: 3800, spent: 2700 },
-  { month: "Mar", earned: 4250, spent: 2500 },
-  { month: "Apr", earned: 3750, spent: 1000 },
-];
+// const monthlyPointsData = [
+//   { month: "Nov", earned: 2500, spent: 1000 },
+//   { month: "Dec", earned: 3200, spent: 2200 },
+//   { month: "Jan", earned: 4100, spent: 1800 },
+//   { month: "Feb", earned: 3800, spent: 2700 },
+//   { month: "Mar", earned: 4250, spent: 2500 },
+//   { month: "Apr", earned: 3750, spent: 1000 },
+//   { month: "May", earned: 4900, spent: 3000 },
+//   { month: "Jun", earned: 5200, spent: 3500 },
+//   { month: "Jul", earned: 6000, spent: 4000 },
+//   { month: "Aug", earned: 7000, spent: 4500 },
+//   { month: "Sep", earned: 8000, spent: 5000 },
+//   { month: "Oct", earned: 9000, spent: 5500 },
+// ];
 
 // Animation variants
 const containerVariants = {
-  hidden: { opacity: 0 },
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.05,
-    },
+    y: 0,
+    transition: { staggerChildren: 0.2, duration: 0.5 },
   },
 };
 
@@ -181,7 +200,29 @@ export default function PointsHistoryPage() {
       });
   }, []);
 
-  console.log(transactions);
+  const [monthlyPointsData, setMonthlyPointsData] = useState<
+    MonthlyPointsData[]
+  >([]);
+  const [weeklyPointsData, setWeeklyPointsData] = useState<
+    WeeklyPointsDataData[]
+  >([]);
+
+  useEffect(() => {
+    fetch("/api/challenges/points-history")
+      .then((res) => res.json())
+      .then((data) => {
+        setMonthlyPointsData(data.monthlyPoints);
+        setWeeklyPointsData(data.weeklyPoints);
+        setLoading(false);
+      })
+      .catch((error) =>
+        console.error("Error fetching challenge points:", error)
+      );
+  }, []);
+
+  const [tab, setTab] = useState("monthly");
+
+  const dataToRender = tab === "monthly" ? monthlyPointsData : weeklyPointsData;
 
   const [activeTab, setActiveTab] = useState<TransactionType>("all");
   const [categoryFilter, setCategoryFilter] =
@@ -289,6 +330,88 @@ export default function PointsHistoryPage() {
     return format(date, "MMM d, yyyy • h:mm a");
   };
 
+  const [timeframe, setTimeframe] = useState<"monthly" | "weekly">("monthly");
+  const filteredData = useMemo(() => {
+    const groupKey =
+      timeframe === "monthly"
+        ? (date: string) =>
+            new Date(date).toLocaleString("default", { month: "long" })
+        : (date: string) => {
+            const d = new Date(date);
+            const weekStart = new Date(d.setDate(d.getDate() - d.getDay()));
+            return `${weekStart.toLocaleDateString("default", {
+              month: "short",
+              day: "numeric",
+            })}`;
+          };
+
+    const earned = transactions.filter((t) => t.type === "earned");
+    const spent = transactions.filter((t) => t.type === "spent");
+
+    const earnByCategory = earned.reduce((acc, t) => {
+      acc[t.category] = (acc[t.category] || 0) + t.points;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const earnByPeriod = earned.reduce((acc, t) => {
+      const key = groupKey(t.date);
+      acc[key] = (acc[key] || 0) + t.points;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const spentByCategory = spent.reduce((acc, t) => {
+      acc[t.category] = (acc[t.category] || 0) + t.points;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return {
+      topEarning: Object.entries(earnByCategory).sort((a, b) => b[1] - a[1])[0],
+      bestPeriod: Object.entries(earnByPeriod).sort((a, b) => b[1] - a[1])[0],
+      mostSpent: Object.entries(spentByCategory).sort((a, b) => b[1] - a[1])[0],
+    };
+  }, [transactions, timeframe]);
+
+  function capitalizeFirst(str: string): string {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  function titleCase(str: string): string {
+    return str
+      .toLowerCase()
+      .split(" ")
+      .map((word) => capitalizeFirst(word))
+      .join(" ");
+  }
+
+  const detailsData = [
+    {
+      icon: <TrendingUp className="h-4 w-4 text-emerald-600" />,
+      title: "Top Earning Source",
+      mainValue: filteredData.topEarning?.[0]?.replace("-", " ") || "N/A",
+      subText: `${
+        filteredData.topEarning?.[1]?.toLocaleString() || 0
+      } points earned`,
+    },
+    {
+      icon: <Calendar className="h-4 w-4 text-blue-600" />,
+      title:
+        timeframe === "monthly" ? "Best Earning Month" : "Best Earning Week",
+      mainValue: filteredData.bestPeriod?.[0] || "N/A",
+      subText: `${
+        filteredData.bestPeriod?.[1]?.toLocaleString() || 0
+      } points earned`,
+    },
+    {
+      icon: <Gift className="h-4 w-4 text-indigo-600" />,
+      title: "Most Redeemed",
+      mainValue: filteredData.mostSpent?.[0]?.replace("-", " ") || "N/A",
+      subText: `${
+        filteredData.mostSpent?.[1]?.toLocaleString() || 0
+      } points spent`,
+    },
+  ];
+
   return (
     <>
       {loading ? (
@@ -366,7 +489,7 @@ export default function PointsHistoryPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <Card className="mb-8 bg-gradient-to-r from-white to-gray-50 border shadow-sm overflow-hidden">
+              <Card className="mb-8 py-3 bg-gradient-to-r from-white to-gray-50 border shadow-sm overflow-hidden">
                 <CardHeader className="pb-2">
                   <CardTitle>Points Summary</CardTitle>
                   <CardDescription>
@@ -389,11 +512,22 @@ export default function PointsHistoryPage() {
                           Total Earned
                         </div>
                         <div className="text-2xl font-bold text-emerald-700">
-                          {pointsStats?.totalEarned.toLocaleString()}
+                          <CountUp
+                            start={0}
+                            end={pointsStats?.totalEarned || 0}
+                            separator=","
+                            duration={1.5}
+                          />
                         </div>
                         <div className="text-xs text-slate-500">
                           <span className="text-emerald-600">
-                            +{pointsStats?.thisMonthEarned.toLocaleString()}
+                            +
+                            <CountUp
+                              start={0}
+                              end={pointsStats?.thisMonthEarned || 0}
+                              separator=","
+                              duration={1}
+                            />
                           </span>{" "}
                           this month
                         </div>
@@ -414,11 +548,22 @@ export default function PointsHistoryPage() {
                           Total Spent
                         </div>
                         <div className="text-2xl font-bold text-red-600">
-                          {pointsStats?.totalSpent.toLocaleString()}
+                          <CountUp
+                            start={0}
+                            end={pointsStats?.totalSpent || 0}
+                            separator=","
+                            duration={1.5}
+                          />
                         </div>
                         <div className="text-xs text-slate-500">
                           <span className="text-red-600">
-                            -{pointsStats?.thisMonthSpent.toLocaleString()}
+                            -
+                            <CountUp
+                              start={0}
+                              end={pointsStats?.thisMonthSpent || 0}
+                              separator=","
+                              duration={1.0}
+                            />
                           </span>{" "}
                           this month
                         </div>
@@ -437,17 +582,27 @@ export default function PointsHistoryPage() {
                       <div>
                         <div className="text-sm text-slate-500">Net Change</div>
                         <div className="text-2xl font-bold text-blue-700">
-                          {(
-                            (pointsStats?.totalEarned || 0) -
-                            (pointsStats?.totalSpent || 0)
-                          ).toLocaleString()}
+                          <CountUp
+                            start={0}
+                            end={
+                              (pointsStats?.totalEarned || 0) -
+                              (pointsStats?.totalSpent || 0)
+                            }
+                            separator=","
+                            duration={1.5}
+                          />
                         </div>
                         <div className="text-xs text-slate-500">
                           <span className="text-blue-700">
-                            {(
-                              (pointsStats?.thisMonthEarned || 0) -
-                              (pointsStats?.thisMonthSpent || 0)
-                            ).toLocaleString()}
+                            <CountUp
+                              start={0}
+                              end={
+                                (pointsStats?.thisMonthEarned || 0) -
+                                (pointsStats?.thisMonthSpent || 0)
+                              }
+                              separator=","
+                              duration={1.0}
+                            />
                           </span>{" "}
                           this month
                         </div>
@@ -459,657 +614,866 @@ export default function PointsHistoryPage() {
             </motion.div>
 
             {/* Points Activity Chart */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="mb-8"
-            >
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Points Activity</CardTitle>
-                    <Tabs defaultValue="6months" className="w-auto">
-                      <TabsList>
-                        <TabsTrigger value="6months">6 Months</TabsTrigger>
-                        <TabsTrigger value="3months">3 Months</TabsTrigger>
-                        <TabsTrigger value="1month">1 Month</TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[250px] w-full flex flex-col">
-                    <div className="flex-1 flex items-end justify-between gap-2 pt-4 relative">
-                      {/* Y-axis labels */}
-                      <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-xs text-slate-500 py-2">
-                        <div>5000</div>
-                        <div>2500</div>
-                        <div>0</div>
-                      </div>
-
-                      {/* Chart grid lines */}
-                      <div className="absolute left-12 right-0 top-0 bottom-0 flex flex-col justify-between">
-                        <div className="border-b border-slate-100 w-full h-0"></div>
-                        <div className="border-b border-slate-100 w-full h-0"></div>
-                        <div className="border-b border-slate-200 w-full h-0"></div>
-                      </div>
-
-                      {/* Chart bars */}
-                      <div className="absolute left-12 right-0 bottom-0 flex justify-between items-end h-full px-4">
-                        {monthlyPointsData.map((month, index) => (
-                          <div
-                            key={month.month}
-                            className="flex flex-col items-center gap-1 w-full"
-                          >
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <div className="relative w-full max-w-[40px] flex justify-center">
-                                    {/* Earned bar */}
-                                    <motion.div
-                                      className="w-8 bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-md z-10"
-                                      initial={{ height: 0 }}
-                                      animate={{
-                                        height: chartData[index]?.height || 0,
-                                      }}
-                                      transition={{
-                                        delay: 0.2 + index * 0.1,
-                                        duration: 0.8,
-                                        ease: "easeOut",
-                                      }}
-                                    />
-
-                                    {/* Spent bar */}
-                                    <motion.div
-                                      className="absolute bottom-0 left-10 w-8 bg-gradient-to-t from-red-400 to-red-300 rounded-t-md z-10"
-                                      initial={{ height: 0 }}
-                                      animate={{
-                                        height:
-                                          (month.spent /
-                                            Math.max(
-                                              ...monthlyPointsData.map((d) =>
-                                                Math.max(d.earned, d.spent)
-                                              )
-                                            )) *
-                                          150,
-                                      }}
-                                      transition={{
-                                        delay: 0.4 + index * 0.1,
-                                        duration: 0.8,
-                                        ease: "easeOut",
-                                      }}
-                                    />
-                                  </div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <div className="text-xs">
-                                    <div className="font-medium">
-                                      {month.month}
-                                    </div>
-                                    <div className="flex items-center text-emerald-600">
-                                      <ArrowUpRight className="h-3 w-3 mr-1" />
-                                      Earned: {month.earned.toLocaleString()}
-                                    </div>
-                                    <div className="flex items-center text-red-600">
-                                      <ArrowDownLeft className="h-3 w-3 mr-1" />
-                                      Spent: {month.spent.toLocaleString()}
-                                    </div>
-                                    <div className="pt-1 border-t mt-1">
-                                      Net:{" "}
-                                      {(
-                                        month.earned - month.spent
-                                      ).toLocaleString()}
-                                    </div>
-                                  </div>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+            <ScrollReveal variants={containerVariants}>
+              {(isInView) => (
+                <>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      // initial={{ opacity: 0, y: 20 }}
+                      // animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3, duration: 0.5 }}
+                      className="mb-8"
+                      initial="hidden"
+                      animate={isInView ? "visible" : "hidden"}
+                      exit="hidden"
+                      variants={containerVariants}
+                    >
+                      <Card>
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <CardTitle>Points Activity</CardTitle>
+                            <Tabs
+                              defaultValue="monthly"
+                              className="w-auto"
+                              onValueChange={setTab}
+                            >
+                              <TabsList>
+                                <TabsTrigger value="monthly">
+                                  Monthly
+                                </TabsTrigger>
+                                <TabsTrigger value="weekly">Weekly</TabsTrigger>
+                              </TabsList>
+                            </Tabs>
                           </div>
-                        ))}
-                      </div>
-                    </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="h-[250px] w-full flex flex-col">
+                            <div className="flex-1 flex items-end justify-between gap-2 pt-4 relative">
+                              {/* Y-axis labels */}
+                              <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-xs text-slate-500 py-2">
+                                <div>5000</div>
+                                <div>2500</div>
+                                <div>0</div>
+                              </div>
 
-                    {/* X-axis labels */}
-                    <div className="h-8 flex gap-[166px] pl-[165px]">
-                      {monthlyPointsData.map((month) => (
-                        <div
-                          key={month.month}
-                          className="text-xs font-medium text-slate-500"
-                        >
-                          {month.month}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                              {/* Chart grid lines */}
+                              <div className="absolute left-12 right-0 top-0 bottom-0 flex flex-col justify-between">
+                                <div className="border-b border-slate-100 w-full h-0"></div>
+                                <div className="border-b border-slate-100 w-full h-0"></div>
+                                <div className="border-b border-slate-200 w-full h-0"></div>
+                              </div>
 
-                  <div className="mt-4 pt-4 border-t flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1">
-                        <div className="w-3 h-3 rounded-sm bg-emerald-500"></div>
-                        <span className="text-xs text-slate-500">Earned</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-3 h-3 rounded-sm bg-red-400"></div>
-                        <span className="text-xs text-slate-500">Spent</span>
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      Download Report
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+                              {/* Chart bars */}
+                              <div className="absolute left-2 right-0 bottom-0 flex justify-between items-end h-full px-4">
+                                {dataToRender.map((item, index) => (
+                                  <div
+                                    key={
+                                      "month" in item ? item.month : item.week
+                                    }
+                                    className="flex flex-col items-center gap-1 w-full"
+                                  >
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <div className="relative w-full max-w-[40px] flex justify-center">
+                                            {/* Earned bar */}
+                                            <motion.div
+                                              className="w-8 bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-md z-10"
+                                              initial={{ height: 0 }}
+                                              animate={
+                                                isInView
+                                                  ? {
+                                                      height:
+                                                        (item.earned /
+                                                          Math.max(
+                                                            ...dataToRender.map(
+                                                              (d) =>
+                                                                Math.max(
+                                                                  d.earned,
+                                                                  d.spent
+                                                                )
+                                                            )
+                                                          )) *
+                                                        150,
+                                                    }
+                                                  : "hidden"
+                                              }
+                                              transition={
+                                                isInView
+                                                  ? {
+                                                      delay: 0.2 + index * 0.1,
+                                                      duration: 0.8,
+                                                      ease: "easeOut",
+                                                    }
+                                                  : undefined
+                                              }
+                                            />
+
+                                            {/* Spent bar */}
+                                            <motion.div
+                                              className="absolute bottom-0 left-10 w-8 bg-gradient-to-t from-red-400 to-red-300 rounded-t-md z-10"
+                                              initial={{ height: 0 }}
+                                              animate={
+                                                isInView
+                                                  ? {
+                                                      height:
+                                                        (item.spent /
+                                                          Math.max(
+                                                            ...dataToRender.map(
+                                                              (d) =>
+                                                                Math.max(
+                                                                  d.earned,
+                                                                  d.spent
+                                                                )
+                                                            )
+                                                          )) *
+                                                        150,
+                                                    }
+                                                  : "hidden"
+                                              }
+                                              transition={
+                                                isInView
+                                                  ? {
+                                                      delay: 0.4 + index * 0.1,
+                                                      duration: 0.8,
+                                                      ease: "easeOut",
+                                                    }
+                                                  : undefined
+                                              }
+                                            />
+                                          </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <div className="text-xs">
+                                            <div className="font-medium">
+                                              {"month" in item
+                                                ? item.month
+                                                : item.week}
+                                            </div>
+                                            <div className="flex items-center text-emerald-600">
+                                              <ArrowUpRight className="h-3 w-3 mr-1" />
+                                              Earned:{" "}
+                                              {item.earned.toLocaleString()}
+                                            </div>
+                                            <div className="flex items-center text-red-600">
+                                              <ArrowDownLeft className="h-3 w-3 mr-1" />
+                                              Spent:{" "}
+                                              {item.spent.toLocaleString()}
+                                            </div>
+                                            <div className="pt-1 border-t mt-1">
+                                              Net:{" "}
+                                              {(
+                                                item.earned - item.spent
+                                              ).toLocaleString()}
+                                            </div>
+                                          </div>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* X-axis labels */}
+                            <div className="ml-11 h-8 flex items-center justify-between px-9">
+                              {dataToRender.map((item) => (
+                                <div
+                                  key={"month" in item ? item.month : item.week}
+                                  className="text-xs font-medium text-slate-500"
+                                >
+                                  {"month" in item ? item.month : item.week}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="mt-4 pt-4 border-t flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-1">
+                                <div className="w-3 h-3 rounded-sm bg-emerald-500"></div>
+                                <span className="text-xs text-slate-500">
+                                  Earned
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="w-3 h-3 rounded-sm bg-red-400"></div>
+                                <span className="text-xs text-slate-500">
+                                  Spent
+                                </span>
+                              </div>
+                            </div>
+                            <Button variant="outline" size="sm">
+                              <Download className="h-4 w-4 mr-2" />
+                              Download Report
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </AnimatePresence>
+                </>
+              )}
+            </ScrollReveal>
 
             {/* Filters and Search */}
-            <motion.div
-              className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              <Tabs
-                defaultValue="all"
-                className="w-full md:w-auto"
-                onValueChange={(value) =>
-                  setActiveTab(value as TransactionType)
-                }
-              >
-                <TabsList className="flex gap-2 w-auto mx-auto">
-                  <TabsTrigger value="all">All Transactions</TabsTrigger>
-                  <TabsTrigger value="earned">Earned</TabsTrigger>
-                  <TabsTrigger value="spent">Spent</TabsTrigger>
-                </TabsList>
-              </Tabs>
+            <ScrollReveal variants={containerVariants}>
+              {(isInView) => (
+                <>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4"
+                      initial="hidden"
+                      animate={isInView ? "visible" : "hidden"}
+                      exit="hidden"
+                      variants={containerVariants}
+                    >
+                      <Tabs
+                        defaultValue="all"
+                        className="w-full md:w-auto"
+                        onValueChange={(value) =>
+                          setActiveTab(value as TransactionType)
+                        }
+                      >
+                        <TabsList className="flex gap-2 w-auto mx-auto bg-slate-200">
+                          <TabsTrigger value="all">
+                            All Transactions
+                          </TabsTrigger>
+                          <TabsTrigger value="earned">Earned</TabsTrigger>
+                          <TabsTrigger value="spent">Spent</TabsTrigger>
+                        </TabsList>
+                      </Tabs>
 
-              <div className="flex items-center gap-2 w-full md:w-auto">
-                <div className="relative w-full md:w-64">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
-                  <Input
-                    placeholder="Search transactions..."
-                    className="pl-8 w-full"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="flex items-center gap-1"
-                    >
-                      <Calendar className="h-4 w-4 mr-1" />
-                      Date
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="end">
-                    <CalendarComponent
-                      initialFocus
-                      mode="range"
-                      defaultMonth={dateRange.from}
-                      selected={{
-                        from: dateRange.from,
-                        to: dateRange.to,
-                      }}
-                      onSelect={(range) =>
-                        setDateRange({
-                          from: range?.from,
-                          to: range?.to,
-                        })
-                      }
-                      numberOfMonths={2}
-                    />
-                  </PopoverContent>
-                </Popover>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="flex items-center gap-1"
-                    >
-                      <Filter className="h-4 w-4 mr-1" />
-                      Category
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setCategoryFilter("all")}>
-                      All Categories
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => setCategoryFilter("challenge")}
-                    >
-                      Challenges
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setCategoryFilter("achievement")}
-                    >
-                      Achievements
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setCategoryFilter("streak")}
-                    >
-                      Streaks
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setCategoryFilter("referral")}
-                    >
-                      Referrals
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setCategoryFilter("bonus")}
-                    >
-                      Bonuses
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => setCategoryFilter("reward")}
-                    >
-                      Rewards
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setCategoryFilter("gift-card")}
-                    >
-                      Gift Cards
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setCategoryFilter("cashback")}
-                    >
-                      Cashback
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </motion.div>
+                      <div className="flex items-center gap-2 w-full md:w-auto">
+                        <div className="relative w-full md:w-64">
+                          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
+                          <Input
+                            placeholder="Search transactions..."
+                            className="pl-8 w-full bg-white"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                          />
+                        </div>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="flex items-center gap-1"
+                            >
+                              <Calendar className="h-4 w-4 mr-1" />
+                              Date
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="end">
+                            <CalendarComponent
+                              initialFocus
+                              mode="range"
+                              defaultMonth={dateRange.from}
+                              selected={{
+                                from: dateRange.from,
+                                to: dateRange.to,
+                              }}
+                              onSelect={(range) =>
+                                setDateRange({
+                                  from: range?.from,
+                                  to: range?.to,
+                                })
+                              }
+                              numberOfMonths={2}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="flex items-center gap-1"
+                            >
+                              <Filter className="h-4 w-4 mr-1" />
+                              Category
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => setCategoryFilter("all")}
+                            >
+                              All Categories
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => setCategoryFilter("challenge")}
+                            >
+                              Challenges
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setCategoryFilter("achievement")}
+                            >
+                              Achievements
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setCategoryFilter("streak")}
+                            >
+                              Streaks
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setCategoryFilter("referral")}
+                            >
+                              Referrals
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setCategoryFilter("bonus")}
+                            >
+                              Bonuses
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => setCategoryFilter("reward")}
+                            >
+                              Rewards
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setCategoryFilter("gift-card")}
+                            >
+                              Gift Cards
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setCategoryFilter("cashback")}
+                            >
+                              Cashback
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </>
+              )}
+            </ScrollReveal>
 
             {/* Transactions List */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`${activeTab}-${categoryFilter}-${searchQuery}-${dateRange.from?.toISOString()}-${dateRange.to?.toISOString()}`}
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                exit={{ opacity: 0, transition: { duration: 0.2 } }}
-                className="mb-8"
-              >
-                <Card>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-center">
-                      <CardTitle>Transaction History</CardTitle>
-                      <Select defaultValue="newest">
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Sort by" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="newest">Newest First</SelectItem>
-                          <SelectItem value="oldest">Oldest First</SelectItem>
-                          <SelectItem value="highest">
-                            Highest Points
-                          </SelectItem>
-                          <SelectItem value="lowest">Lowest Points</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <CardDescription>
-                      {filteredTransactions.length} transactions found
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {filteredTransactions.length > 0 ? (
-                        filteredTransactions.map((transaction, index) => {
-                          const IconComponent = getLucideIcon(transaction.icon);
-                          return (
-                            <motion.div
-                              key={transaction.id}
-                              variants={itemVariants}
-                              custom={index}
-                              whileHover="hover"
-                            >
-                              <motion.div variants={cardHoverVariants}>
-                                <Card className="overflow-hidden border shadow-sm">
-                                  <CardContent className="p-4">
-                                    <div className="flex items-start gap-4">
-                                      <motion.div
-                                        className={`p-3 rounded-full shrink-0 ${getCategoryColor(
-                                          transaction.category
-                                        )}`}
-                                        whileHover={{ scale: 1.1, rotate: 5 }}
-                                        transition={{
-                                          type: "spring",
-                                          stiffness: 400,
-                                          damping: 10,
-                                        }}
-                                      >
-                                        {IconComponent ? (
-                                          <IconComponent className="h-5 w-5" />
-                                        ) : transaction.type === "earned" ? (
-                                          <ArrowUpRight className="h-5 w-5" />
-                                        ) : (
-                                          <ArrowDownLeft className="h-5 w-5" />
-                                        )}
-                                      </motion.div>
-
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex justify-between items-start gap-2">
-                                          <div>
-                                            <h3 className="font-medium">
-                                              {transaction.title}
-                                            </h3>
-                                            {transaction.description && (
-                                              <p className="text-xs text-slate-500 mt-1">
-                                                {transaction.description}
-                                              </p>
-                                            )}
-                                          </div>
-
-                                          <motion.div
-                                            initial={{ opacity: 0, x: 10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{
-                                              delay: 0.3 + index * 0.05,
-                                              duration: 0.3,
-                                            }}
-                                            className={`font-medium ${getTransactionTypeColor(
-                                              transaction.type
-                                            )}`}
-                                          >
-                                            {transaction.type === "earned"
-                                              ? "+"
-                                              : "-"}
-                                            {transaction.points.toLocaleString()}{" "}
-                                            points
-                                          </motion.div>
-                                        </div>
-
-                                        <div className="mt-2 flex justify-between items-center">
-                                          <div className="flex items-center gap-2">
-                                            <Badge
-                                              variant="outline"
-                                              className={`text-xs capitalize ${
-                                                transaction.type === "earned"
-                                                  ? "border-emerald-200 text-emerald-700"
-                                                  : "border-red-200 text-red-700"
-                                              }`}
+            <ScrollReveal variants={containerVariants}>
+              {(isInView) => (
+                <>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`${activeTab}-${categoryFilter}-${searchQuery}-${dateRange.from?.toISOString()}-${dateRange.to?.toISOString()}`}
+                      initial="hidden"
+                      animate={isInView ? "visible" : "hidden"}
+                      transition={{
+                        delay: 0.8,
+                        duration: 0.5,
+                        ease: "easeOut",
+                      }}
+                      exit="hidden"
+                      variants={containerVariants}
+                      className="mb-8"
+                    >
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <div className="flex justify-between items-center">
+                            <CardTitle>Transaction History</CardTitle>
+                            <Select defaultValue="newest">
+                              <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Sort by" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="newest">
+                                  Newest First
+                                </SelectItem>
+                                <SelectItem value="oldest">
+                                  Oldest First
+                                </SelectItem>
+                                <SelectItem value="highest">
+                                  Highest Points
+                                </SelectItem>
+                                <SelectItem value="lowest">
+                                  Lowest Points
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <CardDescription>
+                            {filteredTransactions.length} transactions found
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            {filteredTransactions.length > 0 ? (
+                              filteredTransactions.map((transaction, index) => {
+                                const IconComponent = getLucideIcon(
+                                  transaction.icon
+                                );
+                                return (
+                                  <motion.div
+                                    key={transaction.id}
+                                    variants={itemVariants}
+                                    custom={index}
+                                  >
+                                    <motion.div variants={cardHoverVariants}>
+                                      <Card className="overflow-hidden border shadow-sm">
+                                        <CardContent className="p-4">
+                                          <div className="flex items-start gap-4">
+                                            <motion.div
+                                              className={`p-3 rounded-full shrink-0 ${getCategoryColor(
+                                                transaction.category
+                                              )}`}
+                                              transition={{
+                                                type: "spring",
+                                                stiffness: 400,
+                                                damping: 10,
+                                              }}
                                             >
-                                              {transaction.type}
-                                            </Badge>
-                                            <Badge
-                                              variant="outline"
-                                              className="text-xs capitalize"
-                                            >
-                                              {transaction.category.replace(
-                                                "-",
-                                                " "
+                                              {IconComponent ? (
+                                                <IconComponent className="h-5 w-5" />
+                                              ) : transaction.type ===
+                                                "earned" ? (
+                                                <ArrowUpRight className="h-5 w-5" />
+                                              ) : (
+                                                <ArrowDownLeft className="h-5 w-5" />
                                               )}
-                                            </Badge>
-                                          </div>
+                                            </motion.div>
 
-                                          <div className="text-xs text-slate-500">
-                                            {formatDate(transaction.date)}
+                                            <div className="flex-1 min-w-0">
+                                              <div className="flex justify-between items-start gap-2">
+                                                <div>
+                                                  <h3 className="font-medium">
+                                                    {transaction.title}
+                                                  </h3>
+                                                  {transaction.description && (
+                                                    <p className="text-xs text-slate-500 mt-1">
+                                                      {transaction.description}
+                                                    </p>
+                                                  )}
+                                                </div>
+
+                                                <motion.div
+                                                  initial={{
+                                                    opacity: 0,
+                                                    x: 10,
+                                                  }}
+                                                  animate={{ opacity: 1, x: 0 }}
+                                                  transition={{
+                                                    delay: 0.3 + index * 0.05,
+                                                    duration: 0.3,
+                                                  }}
+                                                  className={`font-medium ${getTransactionTypeColor(
+                                                    transaction.type
+                                                  )}`}
+                                                >
+                                                  {transaction.type === "earned"
+                                                    ? "+"
+                                                    : "-"}
+                                                  {transaction.points.toLocaleString()}{" "}
+                                                  points
+                                                </motion.div>
+                                              </div>
+
+                                              <div className="mt-2 flex justify-between items-center">
+                                                <div className="flex items-center gap-2">
+                                                  <Badge
+                                                    variant="outline"
+                                                    className={`text-xs capitalize ${
+                                                      transaction.type ===
+                                                      "earned"
+                                                        ? "border-emerald-200 text-emerald-700"
+                                                        : "border-red-200 text-red-700"
+                                                    }`}
+                                                  >
+                                                    {transaction.type}
+                                                  </Badge>
+                                                  <Badge
+                                                    variant="outline"
+                                                    className="text-xs capitalize"
+                                                  >
+                                                    {transaction.category.replace(
+                                                      "-",
+                                                      " "
+                                                    )}
+                                                  </Badge>
+                                                </div>
+
+                                                <div className="text-xs text-slate-500">
+                                                  {formatDate(transaction.date)}
+                                                </div>
+                                              </div>
+                                            </div>
                                           </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
+                                        </CardContent>
+                                      </Card>
+                                    </motion.div>
+                                  </motion.div>
+                                );
+                              })
+                            ) : (
+                              <motion.div
+                                className="flex flex-col items-center justify-center py-12 text-center"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.3, duration: 0.5 }}
+                              >
+                                <History className="h-12 w-12 text-slate-300 mb-4" />
+                                <h3 className="text-xl font-medium mb-2">
+                                  No transactions found
+                                </h3>
+                                <p className="text-slate-500 max-w-md mb-6">
+                                  Try adjusting your filters or search query to
+                                  find what you're looking for
+                                </p>
+                                <Button
+                                  onClick={() => {
+                                    setActiveTab("all");
+                                    setCategoryFilter("all");
+                                    setSearchQuery("");
+                                    setDateRange({
+                                      from: subDays(new Date(), 30),
+                                      to: new Date(),
+                                    });
+                                  }}
+                                >
+                                  Reset Filters
+                                </Button>
                               </motion.div>
-                            </motion.div>
-                          );
-                        })
-                      ) : (
-                        <motion.div
-                          className="flex flex-col items-center justify-center py-12 text-center"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.3, duration: 0.5 }}
-                        >
-                          <History className="h-12 w-12 text-slate-300 mb-4" />
-                          <h3 className="text-xl font-medium mb-2">
-                            No transactions found
-                          </h3>
-                          <p className="text-slate-500 max-w-md mb-6">
-                            Try adjusting your filters or search query to find
-                            what you're looking for
-                          </p>
-                          <Button
-                            onClick={() => {
-                              setActiveTab("all");
-                              setCategoryFilter("all");
-                              setSearchQuery("");
-                              setDateRange({
-                                from: subDays(new Date(), 30),
-                                to: new Date(),
-                              });
-                            }}
-                          >
-                            Reset Filters
-                          </Button>
-                        </motion.div>
-                      )}
-                    </div>
-                  </CardContent>
-                  {filteredTransactions.length > 0 && (
-                    <CardFooter className="flex justify-between items-center border-t p-4 bg-slate-50">
-                      <div className="text-sm text-slate-500">
-                        Showing {filteredTransactions.length} of{" "}
-                        {transactions.length} transactions
-                      </div>
-                    </CardFooter>
-                  )}
-                </Card>
-              </motion.div>
-            </AnimatePresence>
+                            )}
+                          </div>
+                        </CardContent>
+                        {filteredTransactions.length > 0 && (
+                          <CardFooter className="flex justify-between items-center border-t p-4 bg-slate-50">
+                            <div className="text-sm text-slate-500">
+                              Showing {filteredTransactions.length} of{" "}
+                              {transactions.length} transactions
+                            </div>
+                          </CardFooter>
+                        )}
+                      </Card>
+                    </motion.div>
+                  </AnimatePresence>
+                </>
+              )}
+            </ScrollReveal>
 
             {/* Points Analytics */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Points Analytics</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Points by Category */}
+            <ScrollReveal variants={containerVariants}>
+              {(isInView) => (
+                <>
+                  <AnimatePresence mode="wait">
                     <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.6, duration: 0.5 }}
+                      initial="hidden"
+                      animate={isInView ? { opacity: 1, y: 0 } : "hidden"}
+                      exit="hidden"
+                      transition={{ delay: 0.5, duration: 0.5 }}
                     >
-                      <h3 className="font-medium mb-3">Points by Category</h3>
-                      <div className="space-y-3">
-                        {(
-                          [
-                            "challenge",
-                            "achievement",
-                            "streak",
-                            "referral",
-                            "bonus",
-                          ] as TransactionCategory[]
-                        ).map((category, index) => {
-                          const totalPoints = transactions
-                            .filter(
-                              (t) =>
-                                t.category === category && t.type === "earned"
-                            )
-                            .reduce((sum, t) => sum + t.points, 0);
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Points Analytics</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Points by Category */}
+                            <motion.div
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={
+                                isInView ? { opacity: 1, x: 0 } : "hidden"
+                              }
+                              transition={{ delay: 0.6, duration: 0.5 }}
+                            >
+                              <h3 className="font-medium mb-3">
+                                Points by Category
+                              </h3>
+                              <div className="space-y-3">
+                                {(
+                                  [
+                                    "challenge",
+                                    "achievement",
+                                    "streak",
+                                    "referral",
+                                    "bonus",
+                                  ] as TransactionCategory[]
+                                ).map((category, index) => {
+                                  const totalPoints = transactions
+                                    .filter(
+                                      (t) =>
+                                        t.category === category &&
+                                        t.type === "earned"
+                                    )
+                                    .reduce((sum, t) => sum + t.points, 0);
 
-                          const percentage = Math.round(
-                            (totalPoints / (pointsStats?.totalEarned || 0)) *
-                              100
-                          );
+                                  const percentage = Math.round(
+                                    (totalPoints /
+                                      (pointsStats?.totalEarned || 0)) *
+                                      100
+                                  );
 
-                          return (
-                            <div key={category}>
-                              <div className="flex justify-between text-sm mb-1">
-                                <span className="capitalize">
-                                  {category.replace("-", " ")}
-                                </span>
-                                <span>
-                                  {totalPoints.toLocaleString()} ({percentage}%)
-                                </span>
+                                  return (
+                                    <div key={category}>
+                                      <div className="flex justify-between text-sm mb-1">
+                                        <span className="capitalize">
+                                          {category.replace("-", " ")}
+                                        </span>
+                                        <span>
+                                          {isInView ? (
+                                            <CountUp
+                                              start={0}
+                                              end={totalPoints || 0}
+                                              separator=","
+                                              duration={1.5}
+                                              delay={0.5 + index * 0.1}
+                                            />
+                                          ) : (
+                                            0
+                                          )}{" "}
+                                          (
+                                          {isInView ? (
+                                            <CountUp
+                                              start={0}
+                                              end={percentage || 0}
+                                              separator=","
+                                              duration={1.5}
+                                              delay={0.5 + index * 0.1}
+                                            />
+                                          ) : (
+                                            0
+                                          )}
+                                          %)
+                                        </span>
+                                      </div>
+                                      <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                                        <motion.div
+                                          className={`h-full rounded-full ${
+                                            category === "challenge"
+                                              ? "bg-blue-500"
+                                              : category === "achievement"
+                                              ? "bg-purple-500"
+                                              : category === "streak"
+                                              ? "bg-amber-500"
+                                              : category === "referral"
+                                              ? "bg-pink-500"
+                                              : "bg-orange-500"
+                                          }`}
+                                          initial={{ width: 0 }}
+                                          animate={
+                                            isInView
+                                              ? { width: `${percentage}%` }
+                                              : "hidden"
+                                          }
+                                          transition={{
+                                            delay: 0.7 + index * 0.1,
+                                            duration: 1.5,
+                                            ease: "easeOut",
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                  );
+                                })}
                               </div>
-                              <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                                <motion.div
-                                  className={`h-full rounded-full ${
-                                    category === "challenge"
-                                      ? "bg-blue-500"
-                                      : category === "achievement"
-                                      ? "bg-purple-500"
-                                      : category === "streak"
-                                      ? "bg-amber-500"
-                                      : category === "referral"
-                                      ? "bg-pink-500"
-                                      : "bg-orange-500"
-                                  }`}
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${percentage}%` }}
-                                  transition={{
-                                    delay: 0.7 + index * 0.1,
-                                    duration: 1,
-                                    ease: "easeOut",
-                                  }}
-                                />
+                            </motion.div>
+
+                            {/* Points Spent */}
+                            <motion.div
+                              initial={{ opacity: 0, x: 20 }}
+                              animate={
+                                isInView ? { opacity: 1, x: 0 } : "hidden"
+                              }
+                              transition={{ delay: 0.7, duration: 0.5 }}
+                            >
+                              <h3 className="font-medium mb-3">Points Spent</h3>
+                              <div className="space-y-3">
+                                {(
+                                  [
+                                    "gift-card",
+                                    "cashback",
+                                    "reward",
+                                  ] as TransactionCategory[]
+                                ).map((category, index) => {
+                                  const totalPoints = transactions
+                                    .filter(
+                                      (t) =>
+                                        t.category === category &&
+                                        t.type === "spent"
+                                    )
+                                    .reduce((sum, t) => sum + t.points, 0);
+
+                                  const percentage = Math.round(
+                                    (totalPoints /
+                                      (pointsStats?.totalSpent || 0)) *
+                                      100
+                                  );
+
+                                  return (
+                                    <div key={category}>
+                                      <div className="flex justify-between text-sm mb-1">
+                                        <span className="capitalize">
+                                          {category.replace("-", " ")}
+                                        </span>
+                                        <span>
+                                          {isInView ? (
+                                            <CountUp
+                                              start={0}
+                                              end={totalPoints || 0}
+                                              separator=","
+                                              duration={1.5}
+                                              delay={0.5 + index * 0.1}
+                                            />
+                                          ) : (
+                                            0
+                                          )}{" "}
+                                          (
+                                          {isInView ? (
+                                            <CountUp
+                                              start={0}
+                                              end={percentage || 0}
+                                              separator=","
+                                              duration={1.5}
+                                              delay={0.5 + index * 0.1}
+                                            />
+                                          ) : (
+                                            0
+                                          )}
+                                          %)
+                                        </span>
+                                      </div>
+                                      <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                                        <motion.div
+                                          className={`h-full rounded-full ${
+                                            category === "gift-card"
+                                              ? "bg-indigo-500"
+                                              : category === "cashback"
+                                              ? "bg-green-500"
+                                              : "bg-emerald-500"
+                                          }`}
+                                          initial={{ width: 0 }}
+                                          animate={
+                                            isInView
+                                              ? { width: `${percentage}%` }
+                                              : "hidden"
+                                          }
+                                          transition={{
+                                            delay: 0.8 + index * 0.1,
+                                            duration: 1.5,
+                                            ease: "easeOut",
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                  );
+                                })}
                               </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </motion.div>
+                            </motion.div>
+                          </div>
 
-                    {/* Points Spent */}
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.7, duration: 0.5 }}
-                    >
-                      <h3 className="font-medium mb-3">Points Spent</h3>
-                      <div className="space-y-3">
-                        {(
-                          [
-                            "gift-card",
-                            "cashback",
-                            "reward",
-                          ] as TransactionCategory[]
-                        ).map((category, index) => {
-                          const totalPoints = transactions
-                            .filter(
-                              (t) =>
-                                t.category === category && t.type === "spent"
-                            )
-                            .reduce((sum, t) => sum + t.points, 0);
-
-                          const percentage = Math.round(
-                            (totalPoints / (pointsStats?.totalSpent || 0)) * 100
-                          );
-
-                          return (
-                            <div key={category}>
-                              <div className="flex justify-between text-sm mb-1">
-                                <span className="capitalize">
-                                  {category.replace("-", " ")}
-                                </span>
-                                <span>
-                                  {totalPoints.toLocaleString()} ({percentage}%)
-                                </span>
+                          {/* Points Insights */}
+                          {/* <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <motion.div
+                              className="bg-slate-100 p-4 rounded-lg"
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={
+                                isInView ? { opacity: 1, y: 0 } : "hidden"
+                              }
+                              transition={{ delay: 0.25, duration: 0.5 }}
+                              whileHover={{ y: -5 }}
+                            >
+                              <div className="flex items-center gap-2 mb-2">
+                                <TrendingUp className="h-4 w-4 text-emerald-600" />
+                                <h3 className="font-medium text-sm">
+                                  Top Earning Source
+                                </h3>
                               </div>
-                              <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                                <motion.div
-                                  className={`h-full rounded-full ${
-                                    category === "gift-card"
-                                      ? "bg-indigo-500"
-                                      : category === "cashback"
-                                      ? "bg-green-500"
-                                      : "bg-emerald-500"
-                                  }`}
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${percentage}%` }}
-                                  transition={{
-                                    delay: 0.8 + index * 0.1,
-                                    duration: 1,
-                                    ease: "easeOut",
-                                  }}
-                                />
+                              <div className="text-lg font-bold">
+                                Achievements
                               </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </motion.div>
-                  </div>
+                              <div className="text-sm text-slate-500">
+                                5,500 points earned
+                              </div>
+                            </motion.div>
 
-                  {/* Points Insights */}
-                  <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <motion.div
-                      className="bg-slate-50 p-4 rounded-lg"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.8, duration: 0.5 }}
-                      whileHover={{ y: -5 }}
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <TrendingUp className="h-4 w-4 text-emerald-600" />
-                        <h3 className="font-medium text-sm">
-                          Top Earning Source
-                        </h3>
-                      </div>
-                      <div className="text-lg font-bold">Achievements</div>
-                      <div className="text-sm text-slate-500">
-                        5,500 points earned
-                      </div>
-                    </motion.div>
+                            <motion.div
+                              className="bg-slate-100 p-4 rounded-lg"
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={
+                                isInView ? { opacity: 1, y: 0 } : "hidden"
+                              }
+                              transition={{ delay: 0.25, duration: 0.5 }}
+                              whileHover={{ y: -5 }}
+                            >
+                              <div className="flex items-center gap-2 mb-2">
+                                <Calendar className="h-4 w-4 text-blue-600" />
+                                <h3 className="font-medium text-sm">
+                                  Best Earning Month
+                                </h3>
+                              </div>
+                              <div className="text-lg font-bold">March</div>
+                              <div className="text-sm text-slate-500">
+                                4,250 points earned
+                              </div>
+                            </motion.div>
 
-                    <motion.div
-                      className="bg-slate-50 p-4 rounded-lg"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.9, duration: 0.5 }}
-                      whileHover={{ y: -5 }}
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <Calendar className="h-4 w-4 text-blue-600" />
-                        <h3 className="font-medium text-sm">
-                          Best Earning Month
-                        </h3>
-                      </div>
-                      <div className="text-lg font-bold">March</div>
-                      <div className="text-sm text-slate-500">
-                        4,250 points earned
-                      </div>
+                            <motion.div
+                              className="bg-slate-100 p-4 rounded-lg"
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={
+                                isInView ? { opacity: 1, y: 0 } : "hidden"
+                              }
+                              transition={{ delay: 0.25, duration: 0.5 }}
+                              whileHover={{ y: -5 }}
+                            >
+                              <div className="flex items-center gap-2 mb-2">
+                                <Gift className="h-4 w-4 text-indigo-600" />
+                                <h3 className="font-medium text-sm">
+                                  Most Redeemed
+                                </h3>
+                              </div>
+                              <div className="text-lg font-bold">
+                                Gift Cards
+                              </div>
+                              <div className="text-sm text-slate-500">
+                                5,000 points spent
+                              </div>
+                            </motion.div>
+                          </div> */}
+                          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {detailsData.map((detail, index) => (
+                              <motion.div
+                                key={index}
+                                className="bg-slate-100 p-4 rounded-lg"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={
+                                  isInView ? { opacity: 1, y: 0 } : "hidden"
+                                }
+                                transition={{
+                                  delay: 0.25 + index * 0.1,
+                                  duration: 0.5,
+                                }}
+                                whileHover={{ y: -5 }}
+                              >
+                                <div className="flex items-center gap-2 mb-2">
+                                  {detail.icon}
+                                  <h3 className="font-medium text-sm">
+                                    {detail.title}
+                                  </h3>
+                                </div>
+                                <div className="text-lg font-bold">
+                                  {titleCase(detail.mainValue)}
+                                </div>
+                                <div className="text-sm text-slate-500">
+                                  {detail.subText}
+                                </div>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </CardContent>
+                        <CardFooter className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-slate-50 rounded-b-lg border-t p-4">
+                          <div className="text-sm text-slate-500 flex items-center gap-1">
+                            <Info className="h-4 w-4" />
+                            Points data is updated in real-time as you earn and
+                            redeem rewards
+                          </div>
+                        </CardFooter>
+                      </Card>
                     </motion.div>
-
-                    <motion.div
-                      className="bg-slate-50 p-4 rounded-lg"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1.0, duration: 0.5 }}
-                      whileHover={{ y: -5 }}
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <Gift className="h-4 w-4 text-indigo-600" />
-                        <h3 className="font-medium text-sm">Most Redeemed</h3>
-                      </div>
-                      <div className="text-lg font-bold">Gift Cards</div>
-                      <div className="text-sm text-slate-500">
-                        5,000 points spent
-                      </div>
-                    </motion.div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-slate-50 rounded-b-lg border-t p-4">
-                  <div className="text-sm text-slate-500 flex items-center gap-1">
-                    <Info className="h-4 w-4" />
-                    Points data is updated in real-time as you earn and redeem
-                    rewards
-                  </div>
-                </CardFooter>
-              </Card>
-            </motion.div>
+                  </AnimatePresence>
+                </>
+              )}
+            </ScrollReveal>
           </motion.div>
         </>
       )}

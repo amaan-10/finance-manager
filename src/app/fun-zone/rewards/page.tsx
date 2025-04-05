@@ -548,9 +548,13 @@ const Rewards = () => {
                             </p>
                             <div className="grid gap-4">
                               {rewardsHistory.map((reward) => (
-                                <Card
+                                <motion.div
                                   key={reward?.rewardId}
-                                  className="shadow-sm"
+                                  className="shadow-sm border rounded-md hover:shadow-md transition-shadow bg-slate-100"
+                                  whileHover="hover"
+                                  initial="hidden"
+                                  animate={isInView ? "visible" : "hidden"}
+                                  exit="exit"
                                 >
                                   <CardHeader>
                                     <CardTitle className="text-base">
@@ -578,7 +582,7 @@ const Rewards = () => {
                                       </span>
                                     </div>
                                   </CardContent>
-                                </Card>
+                                </motion.div>
                               ))}
                             </div>
                           </motion.div>

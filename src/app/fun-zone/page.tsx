@@ -125,12 +125,14 @@ type UserStats = {
 
 type MonthlyPointsData = {
   month: string;
-  points: number;
+  earned: number;
+  spent: number;
 };
 
 type WeeklyPointsDataData = {
   week: string;
-  points: number;
+  earned: number;
+  spent: number;
 };
 
 const getLucideIcon = (iconName: string): LucideIcon | null => {
@@ -200,13 +202,12 @@ export default function FunZoneOverview() {
         setMonthlyPointsData(data.monthlyPoints);
         setWeeklyPointsData(data.weeklyPoints);
         setPointsHistory(data);
+        setLoading(false);
       })
       .catch((error) =>
         console.error("Error fetching challenge points:", error)
       );
   }, []);
-
-  console.log(featuredChallenges);
 
   return (
     <>
@@ -450,9 +451,9 @@ export default function FunZoneOverview() {
                             {monthlyPointsData.map((month) => {
                               const maxHeight = 150;
                               const barHeight =
-                                (month.points /
+                                (month.earned /
                                   Math.max(
-                                    ...monthlyPointsData.map((m) => m.points)
+                                    ...monthlyPointsData.map((m) => m.earned)
                                   )) *
                                 maxHeight;
 
@@ -469,18 +470,18 @@ export default function FunZoneOverview() {
                                     variants={barVariants}
                                     style={{
                                       minHeight:
-                                        month.points > 0 ? "20px" : "0px",
+                                        month.earned > 0 ? "20px" : "0px",
                                     }}
                                   />
                                   <div className="text-xs font-medium">
                                     {month.month}
                                   </div>
                                   <div className="text-xs text-slate-500">
-                                    {month.points > 0 ? (
+                                    {month.earned > 0 ? (
                                       isInView ? (
                                         <CountUp
                                           start={0}
-                                          end={month.points}
+                                          end={month.earned}
                                           separator=","
                                           duration={1.5}
                                         />
@@ -534,9 +535,9 @@ export default function FunZoneOverview() {
                             {weeklyPointsData.map((week) => {
                               const maxHeight = 150;
                               const barHeight =
-                                (week.points /
+                                (week.earned /
                                   Math.max(
-                                    ...weeklyPointsData.map((w) => w.points)
+                                    ...weeklyPointsData.map((w) => w.earned)
                                   )) *
                                 maxHeight;
 
@@ -553,18 +554,18 @@ export default function FunZoneOverview() {
                                     variants={barVariants}
                                     style={{
                                       minHeight:
-                                        week.points > 0 ? "20px" : "0px",
+                                        week.earned > 0 ? "20px" : "0px",
                                     }}
                                   />
                                   <div className="text-xs font-medium">
                                     {week.week}
                                   </div>
                                   <div className="text-xs text-slate-500">
-                                    {week.points > 0 ? (
+                                    {week.earned > 0 ? (
                                       isInView ? (
                                         <CountUp
                                           start={0}
-                                          end={week.points}
+                                          end={week.earned}
                                           separator=","
                                           duration={1.5}
                                         />
