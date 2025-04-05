@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/mongoose";
 import ChallengeModel from "@/app/models/Challenge";
 import { getAuth } from "@clerk/nextjs/server";
 import { format, subWeeks, startOfWeek } from "date-fns";
+import RedemptionModel from "@/app/models/Redemption";
 
 export async function GET(req: NextRequest) {
   try {
@@ -39,36 +40,81 @@ export async function GET(req: NextRequest) {
       },
     ]);
 
+    const rewards = await RedemptionModel.aggregate([
+      {
+        $match: { userId },  // Filter only completed challenges
+      },
+      {
+        $project: {
+          pointsSpent: 1,
+          redeemedAt: 1,
+          year: { $year: "$redeemedAt" },
+          month: { $month: "$redeemedAt" },
+          week: { $isoWeek: "$redeemedAt" }  // Fix incorrect week calculation
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: "$year",
+            month: "$month",
+            week: "$week",
+          },
+          totalPoints: { $sum: "$pointsSpent" },
+        },
+      },
+    ]);
+
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     
-    const monthlyPoints: Record<string, number> = {};
-    const weeklyPoints: Record<string, number> = {};
+    const monthlyPointsEarned: Record<string, number> = {};
+    const weeklyPointsEarned: Record<string, number> = {};
     
     challenges.forEach(({ _id, totalPoints }) => {
       const monthKey = `${_id.year}-${String(_id.month).padStart(2, "0")}`;
       const weekKey = `${_id.year}-W${_id.week}`;
     
       // Monthly Aggregation
-      if (!monthlyPoints[monthKey]) {
-        monthlyPoints[monthKey] = 0;
+      if (!monthlyPointsEarned[monthKey]) {
+        monthlyPointsEarned[monthKey] = 0;
       }
-      monthlyPoints[monthKey] += totalPoints;
+      monthlyPointsEarned[monthKey] += totalPoints;
     
       // Weekly Aggregation
-      if (!weeklyPoints[weekKey]) {
-        weeklyPoints[weekKey] = 0;
+      if (!weeklyPointsEarned[weekKey]) {
+        weeklyPointsEarned[weekKey] = 0;
       }
-      weeklyPoints[weekKey] += totalPoints;
+      weeklyPointsEarned[weekKey] += totalPoints;
+    });
+    
+    const monthlyPointsSpent: Record<string, number> = {};
+    const weeklyPointsSpent: Record<string, number> = {};
+    
+    rewards.forEach(({ _id, totalPoints }) => {
+      const monthKey = `${_id.year}-${String(_id.month).padStart(2, "0")}`;
+      const weekKey = `${_id.year}-W${_id.week}`;
+    
+      // Monthly Aggregation
+      if (!monthlyPointsSpent[monthKey]) {
+        monthlyPointsSpent[monthKey] = 0;
+      }
+      monthlyPointsSpent[monthKey] += totalPoints;
+    
+      // Weekly Aggregation
+      if (!weeklyPointsSpent[weekKey]) {
+        weeklyPointsSpent[weekKey] = 0;
+      }
+      weeklyPointsSpent[weekKey] += totalPoints;
     });
     
     // Convert monthlyPoints into the required format
     const formattedMonthlyData = Array.from({ length: 12 }, (_, i) => {
       const key = `${currentYear}-${String(i + 1).padStart(2, "0")}`;
-      return { month: monthNames[i], points: monthlyPoints[key] || 0 };
+      return { month: monthNames[i], earned: monthlyPointsEarned[key] || 0, spent: monthlyPointsSpent[key] || 0 };
     });
     
     // Get last 12 weeks, ensuring missing weeks are set to 0
-    const formattedWeeklyData: { week: string; points: number }[] = [];
+    const formattedWeeklyData: { week: string; earned: number, spent: number }[] = [];
     const today = new Date();
     
     for (let i = 11; i >= 0; i--) {
@@ -79,7 +125,8 @@ export async function GET(req: NextRequest) {
     
       formattedWeeklyData.push({
         week: `W${weekNumber}`,
-        points: weeklyPoints[weekKey] || 0, // Default to 0 if missing
+        earned: weeklyPointsEarned[weekKey] || 0, // Default to 0 if missing
+        spent: weeklyPointsSpent[weekKey] || 0, // Default to 0 if missing
       });
     }
     
