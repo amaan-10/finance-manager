@@ -3,9 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
 import { connectToDatabase } from "@/lib/mongoose";
 import { getAuth } from "@clerk/nextjs/server";
-import { NextApiRequest, NextApiResponse } from "next";
 import SplitUpModel from "@/app/models/SplitUp";
-import { ObjectId } from "mongodb";
 
 export async function GET(req: NextRequest) {
   await connectToDatabase(); // Ensure MongoDB is connected
@@ -28,8 +26,14 @@ export async function POST(req: NextRequest) {
   const data = await req.json();
   const transactionName = await data.transactionName;
   const members = await data.members;
+  const category = await data.category;
 
-  const splitup = new SplitUpModel({ userId, transactionName, members });
+  const splitup = new SplitUpModel({
+    userId,
+    transactionName,
+    members,
+    category,
+  });
 
   // console.log(splitup);
 
@@ -48,7 +52,6 @@ export async function DELETE(req: NextRequest) {
     const body = await req.json(); // Get the request body
 
     const _id = body.id;
-    console.log(_id);
 
     if (!_id) {
       return NextResponse.json(
@@ -66,8 +69,6 @@ export async function DELETE(req: NextRequest) {
       userId,
       _id,
     });
-
-    console.log(deleteTransaction);
 
     if (!deleteTransaction) {
       return NextResponse.json({ message: "Data not found" }, { status: 404 });
