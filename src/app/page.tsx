@@ -17,7 +17,6 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -30,6 +29,12 @@ import InvestmentDemo from "@/components/InvestmentDemo";
 import ChallengesDemo from "@/components/ChallengesDemo";
 import SpendingAnalyticsDemo from "@/components/SpendingAnalyticsDemo";
 import { cn } from "@/lib/utils";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faFacebookF,
+  faInstagram,
+  faXTwitter,
+} from "@fortawesome/free-brands-svg-icons";
 
 export default function LandingPage() {
   return (
@@ -104,7 +109,7 @@ export default function LandingPage() {
                     size="lg"
                     className="group"
                     onClick={() => {
-                      window.open("/dashboard", "_self");
+                      window.open("/finance", "_self");
                     }}
                   >
                     Get Started Free
@@ -317,7 +322,7 @@ export default function LandingPage() {
                     <Button
                       className="mt-8 group"
                       onClick={() => {
-                        window.open("/dashboard/budgets", "_self");
+                        window.open("/finance/budgets", "_self");
                       }}
                     >
                       Try Budget Tracking
@@ -381,7 +386,7 @@ export default function LandingPage() {
                     <Button
                       className="mt-8 group"
                       onClick={() => {
-                        window.open("/dashboard/expenses", "_self");
+                        window.open("/finance/expenses", "_self");
                       }}
                     >
                       Explore Analytics
@@ -445,7 +450,7 @@ export default function LandingPage() {
                     <Button
                       className="mt-8 group"
                       onClick={() => {
-                        window.open("/dashboard/investments", "_self");
+                        window.open("/finance/investments", "_self");
                       }}
                     >
                       Start Investing
@@ -509,7 +514,7 @@ export default function LandingPage() {
                     <Button
                       className="mt-8 group"
                       onClick={() => {
-                        window.open("/fun-zone/challenges", "_self");
+                        window.open("/arena/challenges", "_self");
                       }}
                     >
                       Join Challenges
@@ -602,7 +607,7 @@ export default function LandingPage() {
                   size="lg"
                   className="group"
                   onClick={() => {
-                    window.open("/split-it-up", "_self");
+                    window.open("/split-up", "_self");
                   }}
                 >
                   Try Expense Splitting
@@ -614,7 +619,7 @@ export default function LandingPage() {
         </section>
 
         {/* Testimonials Section */}
-        <section id="testimonials" className="py-20">
+        {/* <section id="testimonials" className="py-20">
           <div className="container">
             <div className="text-center mb-16">
               <motion.div
@@ -640,10 +645,10 @@ export default function LandingPage() {
                 </div>
               }
             >
-              {/* <Testimonials /> */}
+              <Testimonials />
             </Suspense>
           </div>
-        </section>
+        </section> */}
 
         {/* CTA Section */}
         <section className="px-10 py-20 bg-primary/5">
@@ -667,7 +672,7 @@ export default function LandingPage() {
                     size="lg"
                     className="group"
                     onClick={() => {
-                      window.open("/dashboard", "_self");
+                      window.open("/finance", "_self");
                     }}
                   >
                     Get Started Free
@@ -685,7 +690,14 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
             <div className="col-span-2 lg:col-span-2">
               <div className="flex items-center gap-2 mb-4">
-                <Wallet className="h-6 w-6 text-primary" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 font-normal"
+                  viewBox="0 0 24 24"
+                  fill="black"
+                >
+                  <path d="m6,9c-3.421,0-6,1.505-6,3.5v8c0,1.995,2.579,3.5,6,3.5s6-1.505,6-3.5v-8c0-1.995-2.579-3.5-6-3.5Zm4,7.5c0,.529-1.519,1.5-4,1.5s-4-.971-4-1.5v-1.348c1.046.533,2.435.848,4,.848s2.954-.315,4-.848v1.348Zm-4-5.5c2.481,0,4,.971,4,1.5s-1.519,1.5-4,1.5-4-.971-4-1.5,1.519-1.5,4-1.5Zm0,11c-2.481,0-4-.971-4-1.5v-1.348c1.046.533,2.435.848,4,.848s2.954-.315,4-.848v1.348c0,.529-1.519,1.5-4,1.5ZM24,5v14c0,2.757-2.243,5-5,5h-5c-.553,0-1-.448-1-1s.447-1,1-1h5c1.654,0,3-1.346,3-3V5c0-1.654-1.346-3-3-3h-10c-1.654,0-3,1.346-3,3v1c0,.552-.447,1-1,1s-1-.448-1-1v-1C4,2.243,6.243,0,9,0h10c2.757,0,5,2.243,5,5Zm-11,5c-.553,0-1-.448-1-1s.447-1,1-1h5v-2h-8v.5c0,.552-.447,1-1,1s-1-.448-1-1v-.5c0-1.103.897-2,2-2h8c1.103,0,2,.897,2,2v2c0,1.103-.897,2-2,2h-5Zm1,8c0-.552.447-1,1-1h4c.553,0,1,.448,1,1s-.447,1-1,1h-4c-.553,0-1-.448-1-1Zm0-4v-1c0-.552.447-1,1-1s1,.448,1,1v1c0,.552-.447,1-1,1s-1-.448-1-1Zm6,0c0,.552-.447,1-1,1s-1-.448-1-1v-1c0-.552.447-1,1-1s1,.448,1,1v1Z" />
+                </svg>
                 <span className="text-xl font-bold">SpendLess</span>
               </div>
               <p className="text-muted-foreground mb-4">
@@ -693,64 +705,28 @@ export default function LandingPage() {
                 achieve your financial goals.
               </p>
               <div className="flex gap-4">
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5"
-                  >
-                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                  </svg>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full bg-gray-200"
+                >
+                  <FontAwesomeIcon icon={faFacebookF} className="h-6 w-6" />
                   <span className="sr-only">Facebook</span>
                 </Button>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5"
-                  >
-                    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
-                  </svg>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full bg-gray-200"
+                >
+                  <FontAwesomeIcon icon={faXTwitter} className="h-6 w-6" />
                   <span className="sr-only">Twitter</span>
                 </Button>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5"
-                  >
-                    <rect
-                      width="20"
-                      height="20"
-                      x="2"
-                      y="2"
-                      rx="5"
-                      ry="5"
-                    ></rect>
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
-                  </svg>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full bg-gray-200"
+                >
+                  <FontAwesomeIcon icon={faInstagram} className="h-6 w-6" />
                   <span className="sr-only">Instagram</span>
                 </Button>
               </div>
