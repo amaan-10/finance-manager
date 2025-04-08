@@ -146,7 +146,7 @@ export default function Navbar() {
             href="/split-up"
             className={cn(
               "px-5 py-2 mr-[-2px] rounded-full text-sm transition-all duration-200 hover:bg-gray-200 text-black no-underline hover:no-underline",
-              (pathname === "/split-it-up" || hoveredItem === "splitup") &&
+              (pathname === "/split-up" || hoveredItem === "splitup") &&
                 "bg-gray-200"
             )}
             onMouseEnter={() => setHoveredItem("splitup")}
