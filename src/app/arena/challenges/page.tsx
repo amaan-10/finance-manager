@@ -328,7 +328,7 @@ export default function Challenges() {
               <motion.div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Active Challenges</h2>
                 <Tabs defaultValue="all" className="w-auto">
-                  <TabsList className="bg-slate-200">
+                  <TabsList className="bg-slate-200 flex-wrap gap-1 h-full justify-end">
                     {["all", "savings", "spending", "investing"].map(
                       (category) => (
                         <TabsTrigger

@@ -447,54 +447,57 @@ export default function ArenaDashboard() {
                       <TabsContent value="monthly" className="mt-4">
                         <CardContent>
                           {/* Animated Bar Chart */}
-                          <div className="h-[200px] w-full flex items-end justify-between gap-2 pt-4">
-                            {monthlyPointsData.map((month) => {
-                              const maxHeight = 150;
-                              const barHeight =
-                                (month.earned /
-                                  Math.max(
-                                    ...monthlyPointsData.map((m) => m.earned)
-                                  )) *
-                                maxHeight;
+                          <div className="h-full w-full overflow-x-auto">
+                            <div className="min-h-[225px] w-full justify-between py-3 flex items-end gap-4 px-1">
+                              {monthlyPointsData.map((month) => {
+                                const maxHeight = 150;
+                                const barHeight =
+                                  (month.earned /
+                                    Math.max(
+                                      ...monthlyPointsData.map((m) => m.earned)
+                                    )) *
+                                  maxHeight;
 
-                              return (
-                                <div
-                                  key={month.month}
-                                  className="flex flex-col items-center gap-2"
-                                >
-                                  <motion.div
-                                    className="w-12 bg-gradient-to-t from-amber-500 to-amber-300 rounded-t-md"
-                                    custom={barHeight}
-                                    initial="hidden"
-                                    animate={isInView ? "visible" : "hidden"}
-                                    variants={barVariants}
-                                    style={{
-                                      minHeight:
-                                        month.earned > 0 ? "20px" : "0px",
-                                    }}
-                                  />
-                                  <div className="text-xs font-medium">
-                                    {month.month}
-                                  </div>
-                                  <div className="text-xs text-slate-500">
-                                    {month.earned > 0 ? (
-                                      isInView ? (
-                                        <CountUp
-                                          start={0}
-                                          end={month.earned}
-                                          separator=","
-                                          duration={1.5}
-                                        />
+                                return (
+                                  <div
+                                    key={month.month}
+                                    className="flex flex-col items-center gap-2"
+                                  >
+                                    <motion.div
+                                      className="w-12 bg-gradient-to-t from-amber-500 to-amber-300 rounded-t-md"
+                                      custom={barHeight}
+                                      initial="hidden"
+                                      animate={isInView ? "visible" : "hidden"}
+                                      variants={barVariants}
+                                      style={{
+                                        height: `${barHeight}px`,
+                                        minHeight:
+                                          month.earned > 0 ? "20px" : "0px",
+                                      }}
+                                    />
+                                    <div className="text-xs font-medium">
+                                      {month.month}
+                                    </div>
+                                    <div className="text-xs text-slate-500">
+                                      {month.earned > 0 ? (
+                                        isInView ? (
+                                          <CountUp
+                                            start={0}
+                                            end={month.earned}
+                                            separator=","
+                                            duration={1.5}
+                                          />
+                                        ) : (
+                                          0
+                                        )
                                       ) : (
-                                        0
-                                      )
-                                    ) : (
-                                      "-"
-                                    )}
+                                        "-"
+                                      )}
+                                    </div>
                                   </div>
-                                </div>
-                              );
-                            })}
+                                );
+                              })}
+                            </div>
                           </div>
 
                           {/* Footer Section */}
@@ -531,54 +534,56 @@ export default function ArenaDashboard() {
                       <TabsContent value="weekly" className="mt-4">
                         <CardContent>
                           {/* Animated Bar Chart */}
-                          <div className="h-[200px] w-full flex items-end justify-between gap-2 pt-4">
-                            {weeklyPointsData.map((week) => {
-                              const maxHeight = 150;
-                              const barHeight =
-                                (week.earned /
-                                  Math.max(
-                                    ...weeklyPointsData.map((w) => w.earned)
-                                  )) *
-                                maxHeight;
+                          <div className="h-full w-full overflow-x-auto">
+                            <div className="min-h-[225px] w-full justify-between py-3 flex items-end gap-4 px-1">
+                              {weeklyPointsData.map((week) => {
+                                const maxHeight = 150;
+                                const barHeight =
+                                  (week.earned /
+                                    Math.max(
+                                      ...weeklyPointsData.map((w) => w.earned)
+                                    )) *
+                                  maxHeight;
 
-                              return (
-                                <div
-                                  key={week.week}
-                                  className="flex flex-col items-center gap-2"
-                                >
-                                  <motion.div
-                                    className="w-12 bg-gradient-to-t from-amber-500 to-amber-300 rounded-t-md"
-                                    custom={barHeight}
-                                    initial="hidden"
-                                    animate={isInView ? "visible" : "hidden"}
-                                    variants={barVariants}
-                                    style={{
-                                      minHeight:
-                                        week.earned > 0 ? "20px" : "0px",
-                                    }}
-                                  />
-                                  <div className="text-xs font-medium">
-                                    {week.week}
-                                  </div>
-                                  <div className="text-xs text-slate-500">
-                                    {week.earned > 0 ? (
-                                      isInView ? (
-                                        <CountUp
-                                          start={0}
-                                          end={week.earned}
-                                          separator=","
-                                          duration={1.5}
-                                        />
+                                return (
+                                  <div
+                                    key={week.week}
+                                    className="flex flex-col items-center gap-2"
+                                  >
+                                    <motion.div
+                                      className="w-12 bg-gradient-to-t from-amber-500 to-amber-300 rounded-t-md"
+                                      custom={barHeight}
+                                      initial="hidden"
+                                      animate={isInView ? "visible" : "hidden"}
+                                      variants={barVariants}
+                                      style={{
+                                        minHeight:
+                                          week.earned > 0 ? "20px" : "0px",
+                                      }}
+                                    />
+                                    <div className="text-xs font-medium">
+                                      {week.week}
+                                    </div>
+                                    <div className="text-xs text-slate-500">
+                                      {week.earned > 0 ? (
+                                        isInView ? (
+                                          <CountUp
+                                            start={0}
+                                            end={week.earned}
+                                            separator=","
+                                            duration={1.5}
+                                          />
+                                        ) : (
+                                          0
+                                        )
                                       ) : (
-                                        0
-                                      )
-                                    ) : (
-                                      "-"
-                                    )}
+                                        "-"
+                                      )}
+                                    </div>
                                   </div>
-                                </div>
-                              );
-                            })}
+                                );
+                              })}
+                            </div>
                           </div>
 
                           {/* Footer Section */}

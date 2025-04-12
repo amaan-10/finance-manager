@@ -647,144 +647,140 @@ export default function PointsHistory() {
                           </div>
                         </CardHeader>
                         <CardContent>
-                          <div className="h-[250px] w-full flex flex-col">
-                            <div className="flex-1 flex items-end justify-between gap-2 pt-4 relative">
-                              {/* Y-axis labels */}
-                              <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-xs text-slate-500 py-2">
-                                <div>5000</div>
-                                <div>2500</div>
-                                <div>0</div>
+                          <div className="w-full overflow-x-auto">
+                            <div className="min-w-[768px] h-[250px] flex flex-col">
+                              <div className="flex-1 flex items-end gap-2 pt-4 relative">
+                                {/* Y-axis labels */}
+                                <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-xs text-slate-500 py-2 z-10 bg-white">
+                                  <div>5000</div>
+                                  <div>2500</div>
+                                  <div>0</div>
+                                </div>
+
+                                {/* Chart grid lines */}
+                                <div className="absolute left-12 right-0 top-0 bottom-0 flex flex-col justify-between z-0">
+                                  <div className="border-b border-slate-100 w-full h-0"></div>
+                                  <div className="border-b border-slate-100 w-full h-0"></div>
+                                  <div className="border-b border-slate-200 w-full h-0"></div>
+                                </div>
+
+                                {/* Chart bars */}
+                                <div className="ml-12 flex flex-1 justify-between pr-6 items-end h-full min-w-[768px]">
+                                  {dataToRender.map((item, index) => (
+                                    <div
+                                      key={
+                                        "month" in item ? item.month : item.week
+                                      }
+                                      className="flex flex-col items-center gap-1 min-w-[40px] flex-shrink-0"
+                                    >
+                                      <TooltipProvider>
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <div className="relative w-full flex justify-center">
+                                              {/* Earned bar */}
+                                              <motion.div
+                                                className="w-8 bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-md z-10"
+                                                initial={{ height: 0 }}
+                                                animate={
+                                                  isInView
+                                                    ? {
+                                                        height:
+                                                          (item.earned /
+                                                            Math.max(
+                                                              ...dataToRender.map(
+                                                                (d) =>
+                                                                  Math.max(
+                                                                    d.earned,
+                                                                    d.spent
+                                                                  )
+                                                              )
+                                                            )) *
+                                                          150,
+                                                      }
+                                                    : "hidden"
+                                                }
+                                                transition={{
+                                                  delay: 0.2 + index * 0.1,
+                                                  duration: 0.8,
+                                                  ease: "easeOut",
+                                                }}
+                                              />
+
+                                              {/* Spent bar */}
+                                              <motion.div
+                                                className="absolute bottom-0 left-10 w-8 bg-gradient-to-t from-red-400 to-red-300 rounded-t-md z-10"
+                                                initial={{ height: 0 }}
+                                                animate={
+                                                  isInView
+                                                    ? {
+                                                        height:
+                                                          (item.spent /
+                                                            Math.max(
+                                                              ...dataToRender.map(
+                                                                (d) =>
+                                                                  Math.max(
+                                                                    d.earned,
+                                                                    d.spent
+                                                                  )
+                                                              )
+                                                            )) *
+                                                          150,
+                                                      }
+                                                    : "hidden"
+                                                }
+                                                transition={{
+                                                  delay: 0.4 + index * 0.1,
+                                                  duration: 0.8,
+                                                  ease: "easeOut",
+                                                }}
+                                              />
+                                            </div>
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            <div className="text-xs">
+                                              <div className="font-medium">
+                                                {"month" in item
+                                                  ? item.month
+                                                  : item.week}
+                                              </div>
+                                              <div className="flex items-center text-emerald-600">
+                                                <ArrowUpRight className="h-3 w-3 mr-1" />
+                                                Earned:{" "}
+                                                {item.earned.toLocaleString()}
+                                              </div>
+                                              <div className="flex items-center text-red-600">
+                                                <ArrowDownLeft className="h-3 w-3 mr-1" />
+                                                Spent:{" "}
+                                                {item.spent.toLocaleString()}
+                                              </div>
+                                              <div className="pt-1 border-t mt-1">
+                                                Net:{" "}
+                                                {(
+                                                  item.earned - item.spent
+                                                ).toLocaleString()}
+                                              </div>
+                                            </div>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                      </TooltipProvider>
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
 
-                              {/* Chart grid lines */}
-                              <div className="absolute left-12 right-0 top-0 bottom-0 flex flex-col justify-between">
-                                <div className="border-b border-slate-100 w-full h-0"></div>
-                                <div className="border-b border-slate-100 w-full h-0"></div>
-                                <div className="border-b border-slate-200 w-full h-0"></div>
-                              </div>
-
-                              {/* Chart bars */}
-                              <div className="absolute left-2 right-0 bottom-0 flex justify-between items-end h-full px-4">
-                                {dataToRender.map((item, index) => (
+                              {/* X-axis labels */}
+                              <div className="ml-16 h-8 flex justify-between items-center min-w-[768px] pr-2">
+                                {dataToRender.map((item) => (
                                   <div
                                     key={
                                       "month" in item ? item.month : item.week
                                     }
-                                    className="flex flex-col items-center gap-1 w-full"
+                                    className="text-xs font-medium text-slate-500 min-w-[40px] text-center"
                                   >
-                                    <TooltipProvider>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <div className="relative w-full max-w-[40px] flex justify-center">
-                                            {/* Earned bar */}
-                                            <motion.div
-                                              className="w-8 bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-md z-10"
-                                              initial={{ height: 0 }}
-                                              animate={
-                                                isInView
-                                                  ? {
-                                                      height:
-                                                        (item.earned /
-                                                          Math.max(
-                                                            ...dataToRender.map(
-                                                              (d) =>
-                                                                Math.max(
-                                                                  d.earned,
-                                                                  d.spent
-                                                                )
-                                                            )
-                                                          )) *
-                                                        150,
-                                                    }
-                                                  : "hidden"
-                                              }
-                                              transition={
-                                                isInView
-                                                  ? {
-                                                      delay: 0.2 + index * 0.1,
-                                                      duration: 0.8,
-                                                      ease: "easeOut",
-                                                    }
-                                                  : undefined
-                                              }
-                                            />
-
-                                            {/* Spent bar */}
-                                            <motion.div
-                                              className="absolute bottom-0 left-10 w-8 bg-gradient-to-t from-red-400 to-red-300 rounded-t-md z-10"
-                                              initial={{ height: 0 }}
-                                              animate={
-                                                isInView
-                                                  ? {
-                                                      height:
-                                                        (item.spent /
-                                                          Math.max(
-                                                            ...dataToRender.map(
-                                                              (d) =>
-                                                                Math.max(
-                                                                  d.earned,
-                                                                  d.spent
-                                                                )
-                                                            )
-                                                          )) *
-                                                        150,
-                                                    }
-                                                  : "hidden"
-                                              }
-                                              transition={
-                                                isInView
-                                                  ? {
-                                                      delay: 0.4 + index * 0.1,
-                                                      duration: 0.8,
-                                                      ease: "easeOut",
-                                                    }
-                                                  : undefined
-                                              }
-                                            />
-                                          </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <div className="text-xs">
-                                            <div className="font-medium">
-                                              {"month" in item
-                                                ? item.month
-                                                : item.week}
-                                            </div>
-                                            <div className="flex items-center text-emerald-600">
-                                              <ArrowUpRight className="h-3 w-3 mr-1" />
-                                              Earned:{" "}
-                                              {item.earned.toLocaleString()}
-                                            </div>
-                                            <div className="flex items-center text-red-600">
-                                              <ArrowDownLeft className="h-3 w-3 mr-1" />
-                                              Spent:{" "}
-                                              {item.spent.toLocaleString()}
-                                            </div>
-                                            <div className="pt-1 border-t mt-1">
-                                              Net:{" "}
-                                              {(
-                                                item.earned - item.spent
-                                              ).toLocaleString()}
-                                            </div>
-                                          </div>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
+                                    {"month" in item ? item.month : item.week}
                                   </div>
                                 ))}
                               </div>
-                            </div>
-
-                            {/* X-axis labels */}
-                            <div className="ml-11 h-8 flex items-center justify-between px-9">
-                              {dataToRender.map((item) => (
-                                <div
-                                  key={"month" in item ? item.month : item.week}
-                                  className="text-xs font-medium text-slate-500"
-                                >
-                                  {"month" in item ? item.month : item.week}
-                                </div>
-                              ))}
                             </div>
                           </div>
 
