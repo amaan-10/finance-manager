@@ -681,7 +681,7 @@ export default function Investments() {
           onValueChange={setActiveTab}
           className="w-full"
         >
-          <TabsList className="mb-4 bg-slate-200/75">
+          <TabsList className="mb-4 bg-slate-200/75 flex-wrap h-full gap-2 justify-start">
             <TabsTrigger
               value="overview"
               className="data-[state=active]:bg-yellow-100 data-[state=active]:text-yellow-900"
