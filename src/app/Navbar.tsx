@@ -37,6 +37,22 @@ export default function Navbar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const [hideNav, setHideNav] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+
+      const atBottom = scrollY + windowHeight >= docHeight - 10; // buffer
+      setHideNav(atBottom);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <>
       <header className="absolute top-[50px] w-full px-5 z-50">
@@ -84,7 +100,14 @@ export default function Navbar() {
           </div>
         </nav>
       </header>
-      <div className="fixed bottom-10 top-auto md:bottom-auto md:top-10 left-1/2 -translate-x-1/2 z-50 flex justify-center w-full max-w-2xl px-4 font-semibold">
+      <div
+        className={cn(
+          "fixed bottom-10 top-auto md:bottom-auto md:top-10 left-1/2 -translate-x-1/2 z-50 flex justify-center w-full max-w-2xl px-4 font-semibold transition-all duration-500",
+          hideNav
+            ? "opacity-0 translate-y-5 md:-translate-y-5 pointer-events-none"
+            : "opacity-100 translate-y-0"
+        )}
+      >
         <nav className="backdrop-blur-md bg-white rounded-full px-2 py-1 flex items-center justify-center gap-2 border border-gray-200/20 shadow-sm">
           <Link
             href="/"
@@ -145,7 +168,7 @@ export default function Navbar() {
           <Link
             href="/split-up"
             className={cn(
-              "pl-[10px] sm:pl-5 pr-2 sm:pr-[10px] py-2 mr-[-2px] rounded-full text-xs sm:text-sm transition-all duration-200 hover:bg-gray-200 text-black no-underline hover:no-underline",
+              "px-3 md:px-4 py-2 mr-[-2px] rounded-full text-xs sm:text-sm transition-all duration-200 hover:bg-gray-200 text-black no-underline hover:no-underline",
               (pathname === "/split-up" || hoveredItem === "splitup") &&
                 "bg-gray-200"
             )}
