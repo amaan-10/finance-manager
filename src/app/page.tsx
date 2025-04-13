@@ -277,7 +277,7 @@ export default function LandingPage() {
 
             <Tabs defaultValue="budget" className="w-full">
               <div className="flex justify-center mb-8">
-                <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full max-w-2xl bg-slate-200">
+                <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full h-full max-w-2xl bg-slate-200">
                   <TabsTrigger value="budget">Budget</TabsTrigger>
                   <TabsTrigger value="spending">Spending</TabsTrigger>
                   <TabsTrigger value="invest">Invest</TabsTrigger>
