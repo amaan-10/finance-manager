@@ -89,7 +89,7 @@ export default function ChallengesDemo() {
 
   return (
     <div className="p-6 bg-background h-full">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between mb-6">
         <h3 className="text-xl font-bold">Challenges & Rewards</h3>
         <div className="flex items-center gap-2">
           <Gift className="h-5 w-5 text-primary" />
@@ -117,19 +117,21 @@ export default function ChallengesDemo() {
                         {challenge.icon}
                       </div>
                       <div className="flex-1">
-                        <div className="flex justify-between items-start mb-1">
+                        <div>
                           <div>
-                            <h5 className="font-medium">{challenge.title}</h5>
+                            <div className="flex flex-wrap gap-y-1 justify-between items-start mb-1">
+                              <h5 className="font-medium">{challenge.title}</h5>
+                              <Badge
+                                variant="outline"
+                                className={challenge.textColor}
+                              >
+                                +{challenge.reward} pts
+                              </Badge>
+                            </div>
                             <p className="text-sm text-muted-foreground">
                               {challenge.description}
                             </p>
                           </div>
-                          <Badge
-                            variant="outline"
-                            className={challenge.textColor}
-                          >
-                            +{challenge.reward} pts
-                          </Badge>
                         </div>
                         <div className="mt-3 space-y-1">
                           <div className="flex justify-between text-sm">

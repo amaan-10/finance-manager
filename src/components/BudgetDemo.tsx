@@ -74,9 +74,9 @@ export default function BudgetDemo() {
               <span className="text-sm text-muted-foreground">
                 Monthly Budget
               </span>
-              <div className="flex items-baseline">
+              <div className="flex flex-col sm:flex-row items-baseline">
                 <span className="text-2xl font-bold">₹2,700</span>
-                <span className="text-xs text-green-500 ml-2 flex items-center">
+                <span className="text-xs text-green-500 ml-0 sm:ml-2 flex items-center">
                   <ArrowUpRight className="h-3 w-3 mr-1" />
                   5%
                 </span>
@@ -86,14 +86,14 @@ export default function BudgetDemo() {
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <div className="flex flex-col">
+          <CardContent className="p-4 h-full">
+            <div className="flex items-stretch justify-between h-full flex-col">
               <span className="text-sm text-muted-foreground">
                 Spent So Far
               </span>
-              <div className="flex items-baseline">
+              <div className="flex flex-col sm:flex-row items-baseline">
                 <span className="text-2xl font-bold">₹2,100</span>
-                <span className="text-xs text-red-500 ml-2 flex items-center">
+                <span className="text-xs text-red-500 ml-0 sm:ml-2 flex items-center">
                   <ArrowDownRight className="h-3 w-3 mr-1" />
                   78%
                 </span>

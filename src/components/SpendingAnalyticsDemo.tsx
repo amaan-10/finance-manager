@@ -109,7 +109,7 @@ export default function SpendingAnalyticsDemo() {
   return (
     <div className="p-6 bg-background h-full">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold">Spending Analytics</h3>
+        <h3 className="text-lg sm:text-xl font-bold">Spending Analytics</h3>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="flex items-center gap-1">
             <Calendar className="h-3 w-3" />
@@ -120,12 +120,12 @@ export default function SpendingAnalyticsDemo() {
 
       <div className="grid grid-cols-2 gap-4 mb-6">
         <Card>
-          <CardContent className="p-4">
-            <div className="flex flex-col">
+          <CardContent className="p-4 h-full">
+            <div className="flex justify-between items-stretch h-full flex-col">
               <span className="text-sm text-muted-foreground">Total Spent</span>
-              <div className="flex items-baseline">
+              <div className="flex flex-col sm:flex-row items-baseline">
                 <span className="text-2xl font-bold">₹6,571</span>
-                <span className="text-xs text-red-500 ml-2 flex items-center">
+                <span className="text-xs text-red-500 ml-0 sm:ml-2 flex items-center">
                   <ArrowUpRight className="h-3 w-3 mr-1" />
                   8%
                 </span>
@@ -140,9 +140,9 @@ export default function SpendingAnalyticsDemo() {
               <span className="text-sm text-muted-foreground">
                 Avg. Daily Spend
               </span>
-              <div className="flex items-baseline">
+              <div className="flex flex-col sm:flex-row items-baseline">
                 <span className="text-2xl font-bold">₹219.03</span>
-                <span className="text-xs text-green-500 ml-2 flex items-center">
+                <span className="text-xs text-green-500 ml-0 sm:ml-2 flex items-center">
                   <ArrowDownRight className="h-3 w-3 mr-1" />
                   3%
                 </span>
@@ -332,14 +332,14 @@ export default function SpendingAnalyticsDemo() {
                         <div className="font-medium">
                           {transaction.merchant}
                         </div>
-                        <div className="text-xs text-muted-foreground flex items-center gap-2">
+                        <div className="text-xs text-muted-foreground flex flex-wrap gap-y-0 items-center gap-2">
                           <span>{transaction.date}</span>
                           <span>•</span>
                           <span>{transaction.category}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="font-bold">
+                    <div className="font-bold text-xs sm:text-base">
                       -₹{transaction.amount.toFixed(2)}
                     </div>
                   </motion.div>

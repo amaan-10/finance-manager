@@ -72,9 +72,9 @@ export default function InvestmentDemo() {
               <span className="text-sm text-muted-foreground">
                 Portfolio Value
               </span>
-              <div className="flex items-baseline">
+              <div className="flex flex-col sm:flex-row items-baseline">
                 <span className="text-2xl font-bold">₹12,000</span>
-                <span className="text-xs text-green-500 ml-2 flex items-center">
+                <span className="text-xs text-green-500 ml-0 sm:ml-2 flex items-center">
                   <TrendingUp className="h-3 w-3 mr-1" />
                   20%
                 </span>
@@ -89,9 +89,9 @@ export default function InvestmentDemo() {
               <span className="text-sm text-muted-foreground">
                 Monthly Return
               </span>
-              <div className="flex items-baseline">
+              <div className="flex flex-col sm:flex-row items-baseline">
                 <span className="text-2xl font-bold">₹800</span>
-                <span className="text-xs text-green-500 ml-2 flex items-center">
+                <span className="text-xs text-green-500 ml-0 sm:ml-2 flex items-center">
                   <TrendingUp className="h-3 w-3 mr-1" />
                   7.1%
                 </span>
