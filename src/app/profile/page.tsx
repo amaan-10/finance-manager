@@ -383,7 +383,10 @@ export default function ProfilePage() {
                     <h2 className="text-2xl font-bold">
                       {userData.firstName} {userData.lastName}
                     </h2>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-1 text-gray-500">
+                    <div
+                      id="settings"
+                      className="flex flex-col sm:flex-row sm:items-center gap-2 mt-1 text-gray-500"
+                    >
                       <div className="flex items-center">
                         <AtSign className="h-4 w-4 mt-[2px] mr-1" />
                         {userData.username}
@@ -427,7 +430,7 @@ export default function ProfilePage() {
                     size="sm"
                     className="gap-1"
                     onClick={() => {
-                      window.scrollBy({ top: 320, behavior: "smooth" });
+                      window.open("#settings", "_self");
                     }}
                   >
                     <Settings className="h-3.5 w-3.5" />
