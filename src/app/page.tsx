@@ -89,7 +89,7 @@ export default function LandingPage() {
               />
             </motion.div>
           </div>
-          <div className="container relative z-10 py-24 md:py-32">
+          <div className="relative z-10 py-32 md:py-40">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -153,7 +153,7 @@ export default function LandingPage() {
 
         {/* Features Section */}
         <section id="features" className="px-10 py-20 bg-muted/50">
-          <div className="container">
+          <div className="">
             <div className="text-center mb-16">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -257,7 +257,7 @@ export default function LandingPage() {
 
         {/* App Demo Section */}
         <section id="how-it-works" className="px-10 py-20">
-          <div className="container">
+          <div className="">
             <div className="text-center mb-16">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -546,7 +546,7 @@ export default function LandingPage() {
 
         {/* Split Expenses Section */}
         <section className="px-10 py-20 bg-muted/50">
-          <div className="container">
+          <div className="">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -620,7 +620,7 @@ export default function LandingPage() {
 
         {/* Testimonials Section */}
         {/* <section id="testimonials" className="py-20">
-          <div className="container">
+          <div className="">
             <div className="text-center mb-16">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -652,7 +652,7 @@ export default function LandingPage() {
 
         {/* CTA Section */}
         <section className="px-10 py-20 bg-primary/5">
-          <div className="container">
+          <div className="">
             <div className="max-w-3xl mx-auto text-center">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -686,7 +686,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="border-t px-10 pt-12">
-        <div className="container">
+        <div className="">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
             <div className="col-span-2 lg:col-span-2">
               <div className="flex items-center gap-2 mb-4">
