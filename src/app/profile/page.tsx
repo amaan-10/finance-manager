@@ -321,7 +321,7 @@ export default function ProfilePage() {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="container pt-32 pb-10"
+      className=" pt-32 pb-10"
     >
       {/* Header */}
       <motion.div
@@ -480,7 +480,7 @@ export default function ProfilePage() {
       {/* Main Content Tabs */}
       <motion.div variants={itemVariants}>
         <Tabs value={tabValue} onValueChange={setTabValue}>
-          <TabsList className="mb-3 bg-slate-200">
+          <TabsList className="mb-3 bg-slate-200 flex flex-wrap items-start justify-start w-fit h-full">
             <TabsTrigger value="personal" className="flex items-center gap-1">
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">Personal Info</span>
@@ -627,7 +627,7 @@ export default function ProfilePage() {
 
           {/* Security Tab */}
           <TabsContent value="security">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-4">
                 {/* Password */}
                 <Card className="border-none shadow-md">
