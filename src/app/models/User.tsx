@@ -20,6 +20,7 @@ export interface User extends Document {
   rewardsRedeemed: number;
   streakDays: number;
   nextRewardPoints: number;
+  accountNumber?: string;
 }
 
 const UserSchema = new Schema<User>(
@@ -43,6 +44,7 @@ const UserSchema = new Schema<User>(
     rewardsRedeemed: { type: Number, default: 0 },
     streakDays: { type: Number, default: 0 },
     nextRewardPoints: { type: Number, default: 0 },
+    accountNumber: { type: String },
   },
   { timestamps: true }
 );
