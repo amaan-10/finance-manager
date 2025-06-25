@@ -148,24 +148,30 @@ export default function DepayIntegration() {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
       {/* Header */}
-      <div className="flex justify-center items-center top-5 sticky z-50">
-        <header className="border-b rounded-xl w-[70%] bg-white backdrop-blur-sm sticky z-50">
-          <div className="container mx-auto px-6 py-4">
+      <div className="flex justify-center items-center fixed bottom-5 md:top-5 md:bottom-auto left-0 right-0 z-50">
+        <header className="border-b rounded-xl w-[85%] md:w-[55%] lg:w-[60%] xl:w-[65%] bg-white backdrop-blur-sm z-50 mx-auto">
+          <div className="w-full px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <DePayLogo className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold">DePay Integration</h1>
-                  <p className="text-sm text-muted-foreground">
+                  <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold">
+                    DePay Integration
+                  </h1>
+                  <p className="text-[8px] sm:text-[10px] md:text-[11px] lg:text-sm text-muted-foreground">
                     Connect your decentralized payment gateway
                   </p>
                 </div>
               </div>
-              <Button variant="outline" onClick={() => window.history.back()}>
+              <Button
+                className="text-[10px] md:text-[11px] lg:text-sm px-2 md:px-4 py-1 md:py-2"
+                variant="outline"
+                onClick={() => window.history.back()}
+              >
                 Back to Dashboard
               </Button>
             </div>
@@ -173,10 +179,10 @@ export default function DepayIntegration() {
         </header>
       </div>
 
-      <main className="container mx-auto pt-10 px-6 py-8">
+      <main className="container mx-auto mt-20 py-8">
         {/* Hero Section */}
         <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-8 mb-8">
-          <div className="absolute right-[-30px] top-[-32px] -rotate-12 flex overflow-hidden">
+          <div className="absolute right-[-75px] md:right-[-30px] top-0 md:top-[-32px] -rotate-12 flex overflow-hidden">
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -205,12 +211,14 @@ export default function DepayIntegration() {
               >
                 <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
                   <Zap className="h-4 w-4 text-yellow-400" />
-                  <span className="text-sm font-medium">Powered by DePay</span>
+                  <span className="text-xs md:text-sm font-medium">
+                    Powered by DePay
+                  </span>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-bold mb-4">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
                   Connect Your Decentralized Payment Gateway
                 </h1>
-                <p className="text-xl text-white/80 mb-6">
+                <p className="text-base sm:text-lg md:text-xl text-white/80 mb-6">
                   Enable seamless digital wallet payments, lower fees, and
                   enhanced security with DePay's decentralized infrastructure.
                 </p>
@@ -247,7 +255,7 @@ export default function DepayIntegration() {
                       <AlertCircle className="h-5 w-5 text-red-500" />
                     )}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-xs lg:text-sm">
                     {isConnected
                       ? "Your DePay integration is active and ready to use"
                       : "Connect your wallet to enable DePay payments"}
@@ -289,10 +297,18 @@ export default function DepayIntegration() {
         {/* Main Content */}
         <Tabs defaultValue="setup" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="setup">Setup</TabsTrigger>
-            <TabsTrigger value="configuration">Configuration</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="help">Help</TabsTrigger>
+            <TabsTrigger className="text-xs md:text-sm" value="setup">
+              Setup
+            </TabsTrigger>
+            <TabsTrigger className="text-xs md:text-sm" value="configuration">
+              Configuration
+            </TabsTrigger>
+            <TabsTrigger className="text-xs md:text-sm" value="security">
+              Security
+            </TabsTrigger>
+            <TabsTrigger className="text-xs md:text-sm" value="help">
+              Help
+            </TabsTrigger>
           </TabsList>
 
           {/* Setup Tab */}
@@ -313,17 +329,19 @@ export default function DepayIntegration() {
                   {isConnected && user ? (
                     <div className="flex items-center justify-between p-6 bg-gradient-to-r from-green-900 to-emerald-900 border-green-800/80 rounded-xl backdrop-blur-sm">
                       <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
-                          <CheckCircle className="h-6 w-6 text-white" />
+                        <div className="w-12">
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
+                            <CheckCircle className="h-6 w-6 text-white" />
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="text-lg font-medium text-white">
+                        <div className="w-auto">
+                          <h3 className="text-base md:text-lg font-medium text-white">
                             DePay Account Connected
                           </h3>
-                          <p className="text-green-400 text-sm">
+                          <p className="text-green-400 text-sm md:text-sm">
                             Your SpendLess is now synced with DePay Account
                           </p>
-                          <h3 className="text-base font-medium text-white">
+                          <h3 className="text-sm md:text-base font-medium text-white">
                             Acc No. {userData?.accountNumber}
                           </h3>
                         </div>
