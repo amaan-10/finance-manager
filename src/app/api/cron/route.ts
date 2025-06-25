@@ -11,7 +11,7 @@ export async function GET() {
       { $inc: { daysLeft: -1 } }
     );
 
-    console.log(`Updated ${result.modifiedCount} challenges`);
+    // console.log(`Updated ${result.modifiedCount} challenges`);
     return NextResponse.json({ message: "Challenges updated" });
   } catch (error) {
     console.error("Error updating challenges:", error);

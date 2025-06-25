@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
     const { userId } = getAuth(req); // Get the authenticated user ID
     const body = await req.json(); // Read request body
     const newInvestment = new InvestmentModel({ ...body, userId });
-    console.log({ ...body, userId });
-    console.log(newInvestment);
+    // console.log({ ...body, userId });
+    // console.log(newInvestment);
 
     const savedInvestment = await newInvestment.save();
     return NextResponse.json(savedInvestment, { status: 201 });
@@ -50,7 +50,7 @@ export async function DELETE(req: NextRequest) {
     const body = await req.json(); // Get the request body
 
     const id = body; // Destructure month and year
-    console.log(id);
+    // console.log(id);
 
     if (!id) {
       return NextResponse.json({ message: "Id is required." }, { status: 400 });

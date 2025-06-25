@@ -65,3 +65,50 @@ export async function POST(req: NextRequest) {
     });
   }
 }
+
+export async function GET(req: NextRequest) {
+  try {
+    await connectToDatabase();
+
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get("email");
+
+    if (!email) {
+      return NextResponse.json({ message: "Email is required" }, {
+        status: 400,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      });
+    }
+
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "User not found" }, {
+          status: 404,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        }
+      );
+    }
+
+    return NextResponse.json(
+      { user, status: "success" }, {
+        status: 200,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      }
+    );
+  } catch (error) {
+    return NextResponse.json({ message: "Error fetching user", error }, {
+      status: 500,
+      headers: {
+        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      },
+    });
+  }
+}
