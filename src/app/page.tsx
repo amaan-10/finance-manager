@@ -13,6 +13,9 @@ import {
   TrendingUp,
   Shield,
   CreditCard,
+  Zap,
+  Globe,
+  Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +38,7 @@ import {
   faInstagram,
   faXTwitter,
 } from "@fortawesome/free-brands-svg-icons";
+import DePayLogo from "@/assets/depay-logo";
 
 export default function LandingPage() {
   return (
@@ -251,6 +255,158 @@ export default function LandingPage() {
                   </Card>
                 </motion.div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* DePay Integration Section */}
+        <section className="px-10 py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white relative overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 1px, transparent 1px)",
+                backgroundSize: "30px 30px",
+              }}
+            ></div>
+          </div>
+
+          {/* Logo Background */}
+          <div className="absolute right-[-120px] top-0 -rotate-12 flex overflow-hidden">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="relative"
+            >
+              <DePayLogo
+                className="w-96 h-96 md:w-[500px] md:h-[500px] lg:w-[700px] lg:h-[700px] text-white/5"
+                fills={[
+                  "rgba(226, 232, 240, 0.4)",
+                  "rgba(255, 255, 255, 0.175)",
+                  "rgba(203, 213, 225, 0.175)",
+                  "rgba(96, 165, 250, 0.175)",
+                  "rgba(203, 213, 225, 0.175)",
+                ]}
+              />
+            </motion.div>
+          </div>
+
+          <div className="relative z-10">
+            <div className="text-center mb-16">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
+                  <Zap className="h-4 w-4 text-yellow-400" />
+                  <span className="text-sm font-medium">
+                    Now Powered by DePay
+                  </span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                  Decentralized Payments,{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                    Simplified
+                  </span>
+                </h2>
+                <p className="text-xl text-white/80 max-w-3xl mx-auto">
+                  SpendLess now integrates with DePay, the leading decentralized
+                  payment gateway, enabling seamless peer-to-peer and merchant
+                  transactions with enhanced security and lower fees.
+                </p>
+              </motion.div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              {[
+                {
+                  title: "Peer-to-Peer Payments",
+                  description:
+                    "Send and receive payments directly without intermediaries. Split bills, pay friends, or settle debts instantly.",
+                  icon: <Users className="h-8 w-8" />,
+                  gradient: "from-blue-500 to-cyan-500",
+                },
+                {
+                  title: "Merchant Transactions",
+                  description:
+                    "Pay merchants and service providers with crypto or traditional currencies through DePay's unified gateway.",
+                  icon: <Globe className="h-8 w-8" />,
+                  gradient: "from-purple-500 to-pink-500",
+                },
+                {
+                  title: "Enhanced Security",
+                  description:
+                    "Benefit from blockchain-level security with decentralized infrastructure that protects your transactions.",
+                  icon: <Lock className="h-8 w-8" />,
+                  gradient: "from-green-500 to-emerald-500",
+                },
+              ].map((feature, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-white h-full">
+                    <CardHeader className="text-center">
+                      <div
+                        className={`w-16 h-16 rounded-full bg-gradient-to-r ${feature.gradient} flex items-center justify-center mx-auto mb-4`}
+                      >
+                        {feature.icon}
+                      </div>
+                      <CardTitle className="text-white">
+                        {feature.title}
+                      </CardTitle>
+                      <CardDescription className="text-white/70">
+                        {feature.description}
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <p className="text-white/60 mb-6">
+                  Experience the future of payments with lower fees, faster
+                  transactions, and complete control over your money.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button
+                    size="lg"
+                    className="bg-white text-slate-900 hover:bg-white/90 group"
+                    onClick={() => {
+                      window.open("/depay/connect", "_self");
+                    }}
+                  >
+                    Try DePay Integration
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-white/30 text-black hover:text-white hover:bg-white/10"
+                    onClick={() => {
+                      window.open("https://depayment.vercel.app", "_blank");
+                    }}
+                  >
+                    Learn About DePay
+                  </Button>
+                </div>
+              </motion.div>
             </div>
           </div>
         </section>

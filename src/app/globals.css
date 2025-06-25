@@ -76,3 +76,23 @@ nav a {
   80% {background-size: 20% 100%,20% 100%,20% 80% }
   100%{background-size: 20% 100%,20% 100%,20% 100%}
 }
+
+/* loader animation */
+@keyframes rocket-launch {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-rocket-launch {
+  animation: rocket-launch 1.5s ease-in-out infinite;
+}
