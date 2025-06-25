@@ -13,6 +13,8 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Save,
+  Wallet,
+  QrCode,
 } from "lucide-react";
 import {
   Card,
@@ -63,6 +65,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useToast } from "@/hooks/use-toast";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import DePayLogo from "@/assets/depay-logo";
 
 interface Expense {
   _id?: string;
@@ -70,6 +74,14 @@ interface Expense {
   amount: number;
   date: Date;
   notes?: string;
+}
+
+interface MonthlyExpense {
+  totalAmount: number;
+  _id: {
+    month: number;
+    year: number;
+  };
 }
 
 interface CategoryTotal {
@@ -133,6 +145,7 @@ const getCategoryColor = (category: string): string => {
 
 export default function Expenses() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [monthlyExpenses, setMonthlyExpenses] = useState<MonthlyExpense[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState("");
@@ -165,6 +178,9 @@ export default function Expenses() {
       const data = await response.json();
       setExpenses(data);
       processExpenseData(data);
+      const expensesRes = await fetch(`/api/expenses/monthly`);
+      const expensesData = await expensesRes.json();
+      setMonthlyExpenses(expensesData);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -412,6 +428,72 @@ export default function Expenses() {
     },
   };
 
+  const [monthlyTopCategory, setMonthlyTopCategory] = useState("N/A");
+  const [currentMonthExpense, setCurrentMonthExpense] = useState(0);
+
+  useEffect(() => {
+    const currentMonthExpense =
+      monthlyExpenses?.find((expense) => {
+        const now = new Date();
+        return (
+          expense._id.month === now.getMonth() + 1 &&
+          expense._id.year === now.getFullYear()
+        );
+      })?.totalAmount || 0;
+
+    setCurrentMonthExpense(currentMonthExpense);
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Filter expenses from current month
+    const monthExpense = expenses.filter((expense) => {
+      const date = new Date(expense.date);
+      return (
+        date.getMonth() === currentMonth && date.getFullYear() === currentYear
+      );
+    });
+
+    // Group by category and sum amounts
+    const categoryTotals: Record<string, number> = {};
+    for (const expense of monthExpense) {
+      categoryTotals[expense.category] =
+        (categoryTotals[expense.category] || 0) + expense.amount;
+    }
+
+    // Find top category
+    let top = "N/A";
+    let maxAmount = 0;
+    for (const [category, amount] of Object.entries(categoryTotals)) {
+      if (amount > maxAmount) {
+        top = category;
+        maxAmount = amount;
+      }
+    }
+
+    setMonthlyTopCategory(top);
+  }, [expenses, monthlyExpenses]);
+
+  const [view, setView] = useState<"monthly" | "total">("monthly");
+
+  const exp = view === "total" ? totalExpenses : currentMonthExpense;
+  const avgExpense = view === "total" ? averageExpense : averageExpense;
+  const change = view === "total" ? expenseChange : expenseChange;
+  const cat = view === "total" ? topCategory : monthlyTopCategory;
+
+  function handleDePayTransaction() {
+    const callbackURL = encodeURIComponent(
+      // "http://localhost:3001/depay/callback"
+      "https://spend-less.vercel.app/depay/callback"
+    );
+
+    // const depayURL = `http://localhost:3000/pay?callback=${callbackURL}`;
+    const depayURL = `https://depayment.vercel.app/pay?callback=${callbackURL}`;
+
+    window.location.href = depayURL;
+  }
+
   return (
     <motion.section
       className="container mx-auto pt-32 pb-10"
@@ -460,187 +542,290 @@ export default function Expenses() {
                 Add Expense
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
                 <DialogTitle>Add New Expense</DialogTitle>
                 <DialogDescription>
-                  Enter the details of your expense below.
+                  Select how you want to log your expense
                 </DialogDescription>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="category" className="text-right">
-                    Category
-                  </Label>
-                  <div className="col-span-3">
-                    <Select value={category} onValueChange={setCategory}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Food">Food</SelectItem>
-                        <SelectItem value="Groceries">Groceries</SelectItem>
-                        <SelectItem value="Transportation">
-                          Transportation
-                        </SelectItem>
-                        <SelectItem value="Entertainment">
-                          Entertainment
-                        </SelectItem>
-                        <SelectItem value="Shopping">Shopping</SelectItem>
-                        <SelectItem value="Utilities">Utilities</SelectItem>
-                        <SelectItem value="Rent">Rent</SelectItem>
-                        <SelectItem value="Healthcare">Healthcare</SelectItem>
-                        <SelectItem value="Education">Education</SelectItem>
-                        <SelectItem value="Travel">Travel</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
+
+              <Tabs defaultValue="form" className="mt-4">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="form">Manual Entry</TabsTrigger>
+                  <TabsTrigger value="depay">Pay via DePay</TabsTrigger>
+                </TabsList>
+
+                {/* Manual Entry Form */}
+                <TabsContent value="form">
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="category" className="text-right">
+                        Category
+                      </Label>
+                      <div className="col-span-3">
+                        <Select value={category} onValueChange={setCategory}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Food">Food</SelectItem>
+                            <SelectItem value="Groceries">Groceries</SelectItem>
+                            <SelectItem value="Transportation">
+                              Transportation
+                            </SelectItem>
+                            <SelectItem value="Entertainment">
+                              Entertainment
+                            </SelectItem>
+                            <SelectItem value="Shopping">Shopping</SelectItem>
+                            <SelectItem value="Utilities">Utilities</SelectItem>
+                            <SelectItem value="Rent">Rent</SelectItem>
+                            <SelectItem value="Healthcare">
+                              Healthcare
+                            </SelectItem>
+                            <SelectItem value="Education">Education</SelectItem>
+                            <SelectItem value="Travel">Travel</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="amount" className="text-right">
+                        Amount
+                      </Label>
+                      <div className="col-span-3 relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                          ₹
+                        </span>
+                        <Input
+                          id="amount"
+                          type="number"
+                          value={amount}
+                          onChange={(e) => setAmount(e.target.value)}
+                          className="pl-7"
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="notes" className="text-right">
+                        Notes
+                      </Label>
+                      <Input
+                        id="notes"
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        className="col-span-3"
+                        placeholder="Optional notes"
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="amount" className="text-right">
-                    Amount
-                  </Label>
-                  <div className="col-span-3 relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                      ₹
-                    </span>
-                    <Input
-                      id="amount"
-                      type="number"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="pl-7"
-                      placeholder="0.00"
-                    />
+                  <DialogFooter>
+                    <Button
+                      type="submit"
+                      onClick={handleAddExpense}
+                      className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700"
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      Save Expense
+                    </Button>
+                  </DialogFooter>
+                </TabsContent>
+
+                {/* DePay Tab Content */}
+                <TabsContent value="depay">
+                  <div className="py-6">
+                    <div>
+                      {/* QR Scan Button */}
+                      <div className="flex justify-center">
+                        <div
+                          onClick={handleDePayTransaction}
+                          className="group cursor-pointer relative"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-emerald-700/30 to-teal-600/30 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 scale-110"></div>
+
+                          <div className="relative bg-slate-900/90 backdrop-blur-sm border border-slate-700/60 rounded-3xl p-12 shadow-2xl hover:shadow-emerald-900/20 transition-all duration-500 group-hover:border-emerald-600/50 group-hover:bg-slate-900/100">
+                            <div className="absolute top-4 right-4 w-2 h-2 bg-emerald-500/60 rounded-full opacity-40 group-hover:opacity-80 transition-opacity duration-300 animate-pulse"></div>
+                            <div className="absolute bottom-6 left-6 w-1 h-1 bg-teal-400/50 rounded-full opacity-30 group-hover:opacity-70 transition-opacity duration-300"></div>
+
+                            <div className="absolute top-6 left-6 w-3 h-3 border-l-2 border-t-2 border-emerald-500/30 group-hover:border-emerald-400/60 transition-colors duration-300"></div>
+                            <div className="absolute bottom-6 right-6 w-3 h-3 border-r-2 border-b-2 border-emerald-500/30 group-hover:border-emerald-400/60 transition-colors duration-300"></div>
+
+                            <div className="flex flex-col items-center space-y-5">
+                              <div className="relative">
+                                <div className="w-16 h-16 bg-gradient-to-br from-emerald-900/50 to-teal-800/50 rounded-2xl flex items-center justify-center group-hover:from-emerald-800/60 group-hover:to-teal-700/60 transition-all duration-300 shadow-lg border border-emerald-700/30 group-hover:border-emerald-600/50">
+                                  <div className="relative">
+                                    <div>
+                                      <DePayLogo
+                                        className="h-7 w-7 text-emerald-300 group-hover:text-emerald-200 rounded-[1px] transition-colors duration-300"
+                                        fill="green"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="absolute inset-0 rounded-2xl border border-emerald-600/30 opacity-0 group-hover:opacity-100 animate-ping"></div>
+                                <div
+                                  className="absolute inset-0 rounded-2xl border border-emerald-500/20 opacity-0 group-hover:opacity-100 animate-ping"
+                                  style={{ animationDelay: "0.5s" }}
+                                ></div>
+                              </div>
+
+                              <div className="text-center space-y-1">
+                                <h3 className="text-lg font-semibold text-slate-100 tracking-tight">
+                                  Pay via DePay
+                                </h3>
+                              </div>
+                            </div>
+
+                            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-sm shadow-emerald-400/50"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Replace with your actual DePay integration logic */}
+                    <p className="text-sm text-muted-foreground text-center mt-7">
+                      You'll be redirected to the DePay interface to complete
+                      the transaction securely.
+                    </p>
                   </div>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="notes" className="text-right">
-                    Notes
-                  </Label>
-                  <Input
-                    id="notes"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    className="col-span-3"
-                    placeholder="Optional notes"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  type="submit"
-                  onClick={handleAddExpense}
-                  className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700"
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Expense
-                </Button>
-              </DialogFooter>
+                </TabsContent>
+              </Tabs>
             </DialogContent>
           </Dialog>
         </div>
       </motion.div>
 
       {/* Summary Cards */}
-      <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
-        variants={containerVariants}
-      >
-        <motion.div variants={itemVariants}>
-          <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-indigo-100 to-violet-100">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
-                Total Expenses
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <Skeleton className="h-8 w-24" />
-              ) : (
-                <div className="flex items-baseline">
-                  <span className="text-2xl font-bold">
-                    ₹
-                    {totalExpenses.toLocaleString("en-IN", {
-                      maximumFractionDigits: 2,
-                    })}
-                  </span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
+      <>
+        {/* Toggle */}
+        <div className="flex justify-end mb-4">
+          <ToggleGroup
+            type="single"
+            value={view}
+            onValueChange={(val) => val && setView(val as "monthly" | "total")}
+          >
+            <ToggleGroupItem
+              value="monthly"
+              className="px-4 py-1.5 rounded-md text-sm data-[state=on]:bg-indigo-100 data-[state=on]:text-indigo-700"
+            >
+              This Month
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="total"
+              className="px-4 py-1.5 rounded-md text-sm data-[state=on]:bg-indigo-100 data-[state=on]:text-indigo-700"
+            >
+              Total
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
 
-        <motion.div variants={itemVariants}>
-          <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-indigo-100 to-violet-100">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
-                Average Expense
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <Skeleton className="h-8 w-24" />
-              ) : (
-                <div className="flex items-baseline">
-                  <span className="text-2xl font-bold">
-                    ₹
-                    {averageExpense.toLocaleString("en-IN", {
-                      maximumFractionDigits: 2,
-                    })}
-                  </span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
+        {/* Cards */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+          variants={containerVariants}
+        >
+          {/* Total Expenses */}
+          <motion.div variants={itemVariants}>
+            <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-indigo-100 to-violet-100">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-500">
+                  Expenses ({view === "monthly" ? "This Month" : "Total"})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <Skeleton className="h-8 w-24" />
+                ) : (
+                  <div className="flex items-baseline">
+                    <span className="text-2xl font-bold">
+                      ₹
+                      {exp.toLocaleString("en-IN", {
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
 
-        <motion.div variants={itemVariants}>
-          <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-indigo-100 to-violet-100">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
-                Month-over-Month
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <Skeleton className="h-8 w-24" />
-              ) : (
-                <div className="flex items-center">
-                  <span className="text-2xl font-bold">
-                    {Math.abs(expenseChange).toFixed(1)}%
-                  </span>
-                  {expenseChange > 0 ? (
-                    <ArrowUpRight className="ml-2 h-5 w-5 text-red-500" />
-                  ) : expenseChange < 0 ? (
-                    <ArrowDownRight className="ml-2 h-5 w-5 text-green-500" />
-                  ) : null}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
+          {/* Average Expense */}
+          <motion.div variants={itemVariants}>
+            <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-indigo-100 to-violet-100">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-500">
+                  Average Expense
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <Skeleton className="h-8 w-24" />
+                ) : (
+                  <div className="flex items-baseline">
+                    <span className="text-2xl font-bold">
+                      ₹
+                      {avgExpense.toLocaleString("en-IN", {
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
 
-        <motion.div variants={itemVariants}>
-          <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-indigo-100 to-violet-100">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
-                Top Category
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <Skeleton className="h-8 w-24" />
-              ) : (
-                <div className="flex items-center">
-                  <span className="text-2xl font-bold">{topCategory}</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {/* Month-over-Month Change */}
+          <motion.div variants={itemVariants}>
+            <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-indigo-100 to-violet-100">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-500">
+                  Month-over-Month
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <Skeleton className="h-8 w-24" />
+                ) : (
+                  <div className="flex items-center">
+                    <span className="text-2xl font-bold">
+                      {Math.abs(change).toFixed(1)}%
+                    </span>
+                    {change > 0 ? (
+                      <ArrowUpRight className="ml-2 h-5 w-5 text-red-500" />
+                    ) : change < 0 ? (
+                      <ArrowDownRight className="ml-2 h-5 w-5 text-green-500" />
+                    ) : null}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Top Category */}
+          <motion.div variants={itemVariants}>
+            <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-indigo-100 to-violet-100">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-500">
+                  Top Category ({view === "monthly" ? "This Month" : "Total"})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <Skeleton className="h-8 w-24" />
+                ) : (
+                  <div className="flex items-center">
+                    <span className="text-2xl font-bold">{cat}</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </>
 
       {/* Main Content */}
       <motion.div variants={containerVariants}>

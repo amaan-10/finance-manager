@@ -14,7 +14,7 @@ export default function Page() {
   return (
     <div className="m-5 z-50 flex justify-center pt-32 pb-10">
       {loading ? (
-        <div className="flex w-[30%] my-4 items-center justify-center rounded-lg border bg-white p-6 shadow-md">
+        <div className="flex w-full sm:w-[60%] md:w-[50%] lg:w-[35%] my-4 items-center justify-center rounded-lg border bg-white p-6 shadow-md">
           {/* Skeleton Loader */}
           <div className="animate-pulse w-full my-4">
             <div className="h-12 bg-gray-300 rounded mb-8"></div>

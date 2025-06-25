@@ -25,6 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -73,6 +74,12 @@ interface Budget {
   remaining?: number;
 }
 
+type MonthlyBudget = {
+  budget: number;
+  spent: number;
+  remaining: number;
+};
+
 interface Expense {
   category: string;
   amount: number;
@@ -104,6 +111,9 @@ const months = [
 
 export default function Budgets() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [monthlyBudget, setMonthlyBudget] = useState<MonthlyBudget | null>(
+    null
+  );
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -142,6 +152,13 @@ export default function Budgets() {
       const budgetsResponse = await fetch("/api/budgets");
       const budgetsData = await budgetsResponse.json();
       setBudgets(budgetsData);
+
+      // Fetch budget
+      const monthlybudgetRes = await fetch(`/api/budgets/this-month`);
+      const monthlybudgetData = await monthlybudgetRes.json();
+      setMonthlyBudget(
+        monthlybudgetData[0] || { budget: 0, spent: 0, remaining: 0 }
+      );
 
       // Fetch expenses
       const expensesResponse = await fetch("/api/expenses");
@@ -480,6 +497,14 @@ export default function Budgets() {
     },
   };
 
+  const [view, setView] = useState<"total" | "monthly">("monthly");
+
+  const budgeted =
+    view === "total" ? totalBudgeted : monthlyBudget?.budget || 0;
+  const spent = view === "total" ? totalSpent : monthlyBudget?.spent || 0;
+  const remaining =
+    view === "total" ? totalRemaining : monthlyBudget?.remaining || 0;
+
   return (
     <motion.section
       className="container mx-auto pt-32 pb-10"
@@ -633,105 +658,133 @@ export default function Budgets() {
       </motion.div>
 
       {/* Summary Cards */}
-      <motion.div
-        className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
-        variants={containerVariants}
-      >
-        <motion.div variants={itemVariants}>
-          <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-emerald-50 to-teal-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
-                Total Budgeted
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <Skeleton className="h-8 w-24" />
-              ) : (
-                <div className="flex items-baseline">
-                  <span className="text-2xl font-bold">
-                    ₹
-                    {totalBudgeted.toLocaleString("en-IN", {
-                      maximumFractionDigits: 2,
-                    })}
-                  </span>
-                  {budgetTrend !== 0 && (
+      <>
+        {/* Toggle View */}
+        <div className="flex justify-end mb-4">
+          <ToggleGroup
+            type="single"
+            value={view}
+            onValueChange={(val) => val && setView(val as "monthly" | "total")}
+          >
+            <ToggleGroupItem
+              className="px-4 py-1.5 rounded-md text-sm data-[state=on]:bg-emerald-50 data-[state=on]:text-emerald-700"
+              value="monthly"
+            >
+              This Month
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              className="px-4 py-1.5 rounded-md text-sm data-[state=on]:bg-emerald-50 data-[state=on]:text-emerald-700"
+              value="total"
+            >
+              Total
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+
+        {/* Budget Cards */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
+          variants={containerVariants}
+        >
+          {/* Budgeted */}
+          <motion.div variants={itemVariants}>
+            <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-emerald-50 to-teal-50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-500">
+                  Budgeted ({view === "monthly" ? "This Month" : "Total"})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <Skeleton className="h-8 w-24" />
+                ) : (
+                  <div className="flex items-baseline">
+                    <span className="text-2xl font-bold">
+                      ₹
+                      {budgeted.toLocaleString("en-IN", {
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                    {budgetTrend !== 0 && (
+                      <span
+                        className={`ml-2 text-sm flex items-center ${
+                          budgetTrend > 0 ? "text-emerald-500" : "text-red-500"
+                        }`}
+                      >
+                        {budgetTrend > 0 ? (
+                          <TrendingUp className="h-3 w-3 mr-1" />
+                        ) : (
+                          <TrendingDown className="h-3 w-3 mr-1" />
+                        )}
+                        {Math.abs(budgetTrend).toFixed(1)}%
+                      </span>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Spent */}
+          <motion.div variants={itemVariants}>
+            <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-emerald-50 to-teal-50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-500">
+                  Spent ({view === "monthly" ? "This Month" : "Total"})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <Skeleton className="h-8 w-24" />
+                ) : (
+                  <div className="flex items-baseline">
+                    <span className="text-2xl font-bold">
+                      ₹
+                      {spent.toLocaleString("en-IN", {
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                    <span className="ml-2 text-sm text-gray-500">
+                      {budgeted > 0
+                        ? `(${((spent / budgeted) * 100).toFixed(1)}%)`
+                        : ""}
+                    </span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Remaining */}
+          <motion.div variants={itemVariants}>
+            <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-emerald-50 to-teal-50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-500">
+                  Remaining ({view === "monthly" ? "This Month" : "Total"})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <Skeleton className="h-8 w-24" />
+                ) : (
+                  <div className="flex items-center">
                     <span
-                      className={`ml-2 text-sm flex items-center ${
-                        budgetTrend > 0 ? "text-emerald-500" : "text-red-500"
+                      className={`text-2xl font-bold ${
+                        remaining < 0 ? "text-red-500" : ""
                       }`}
                     >
-                      {budgetTrend > 0 ? (
-                        <TrendingUp className="h-3 w-3 mr-1" />
-                      ) : (
-                        <TrendingDown className="h-3 w-3 mr-1" />
-                      )}
-                      {Math.abs(budgetTrend).toFixed(1)}%
+                      ₹
+                      {remaining.toLocaleString("en-IN", {
+                        maximumFractionDigits: 2,
+                      })}
                     </span>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
         </motion.div>
-
-        <motion.div variants={itemVariants}>
-          <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-emerald-50 to-teal-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
-                Total Spent
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <Skeleton className="h-8 w-24" />
-              ) : (
-                <div className="flex items-baseline">
-                  <span className="text-2xl font-bold">
-                    ₹
-                    {totalSpent.toLocaleString("en-IN", {
-                      maximumFractionDigits: 2,
-                    })}
-                  </span>
-                  <span className="ml-2 text-sm text-gray-500">
-                    {totalBudgeted > 0
-                      ? `(${((totalSpent / totalBudgeted) * 100).toFixed(1)}%)`
-                      : ""}
-                  </span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div variants={itemVariants}>
-          <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-emerald-50 to-teal-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
-                Remaining Balance
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <Skeleton className="h-8 w-24" />
-              ) : (
-                <div className="flex items-center">
-                  <span
-                    className={`text-2xl font-bold ${
-                      totalRemaining < 0 ? "text-red-500" : ""
-                    }`}
-                  >
-                    ₹
-                    {totalRemaining.toLocaleString("en-IN", {
-                      maximumFractionDigits: 2,
-                    })}
-                  </span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </motion.div>
+      </>
 
       {/* Main Content */}
       <motion.div variants={containerVariants}>
